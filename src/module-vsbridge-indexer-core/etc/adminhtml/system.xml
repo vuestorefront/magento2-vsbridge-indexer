@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="vuestorefront_config" translate="label" sortOrder="10">
+            <label>Vuestorefront</label>
+        </tab>
+
+        <section id="vsbridge_indexer_settings" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+            <class>separator-top</class>
+            <label>Indexer</label>
+            <tab>vuestorefront_config</tab>
+            <resource>Divante_VsbridgeIndexerCore::configuration</resource>
+
+            <group id="general_settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="allowed_stores" translate="label comment" type="multiselect" sortOrder="31" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>List of stores to reindex</label>
+                    <comment>For every store view separated index is created in Elastic</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Store</source_model>
+                </field>
+            </group>
+
+            <group id="es_client" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Elasticsearch Client</label>
+                <field id="host" translate="label comment" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Elasticsearch host</label>
+                </field>
+                <field id="port" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Elasticsearch port number</label>
+                </field>
+                <field id="enable_https_mode" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Use HTTPS</label>
+                    <comment>Select yes if you want to connect to your Elasticsearch server over HTTPS.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_http_auth" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable basic HTTP authentication</label>
+                    <comment>Enable this option when your Elasticsearch server use basic HTTP authentication.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="auth_user" translate="label comment" type="text" sortOrder="51" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Basic HTTP authentication user</label>
+                    <depends>
+                        <field id="enable_http_auth">1</field>
+                    </depends>
+                </field>
+                <field id="auth_pwd" translate="label comment" type="text" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Basic HTTP authentication password</label>
+                    <depends>
+                        <field id="enable_http_auth">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <group id="indices_settings" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Indices Settings</label>
+                <field id="batch_indexing_size" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Batch Indexing Size</label>
+                    <validate>required-entry validate-digits</validate>
+                </field>
+                <field id="index_name" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Index name prefix</label>
+                </field>
+                <field id="fields_limit" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>The maximum number of fields in an index</label>
+                    <comment>min value: 1000</comment>
+                    <validate>required-entry validate-digits validate-digits-range digits-range-1000-</validate>
+                </field>
+            </group>
+
+            <group id="redis_cache_settings" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="1">
+                <label>Redis Cache Settings</label>
+                <field id="clear_cache" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Clear cache</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="vsf_base_url" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Vsf base Url</label>
+                    <comment>with "/" in the end</comment>
+                </field>
+                <field id="invalidate_cache_key" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Invalidate Secret cache key</label>
+                    <comment>Please note that Key should be equal vue-storefront/config/local.json value of server.invalidateCacheKey</comment>
+                </field>
+                <field id="connection_timeout" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Connection timeout</label>
+                    <comment>in seconds</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package   Divante\VsbridgeIndexerCore
+ * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license   See LICENSE_DIVANTE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <vsbridge_indexer_settings>
+            <es_client>
+                <host>127.0.01</host>
+                <port>9200</port>
+            </es_client>
+            <indices_settings>
+                <batch_indexing_size>1000</batch_indexing_size>
+                <index_name>vue_storefront_magento</index_name>
+                <fields_limit>1000</fields_limit>
+                <category_products_update>0</category_products_update>
+            </indices_settings>
+            <general_settings>
+                <allowed_stores>1</allowed_stores>
+            </general_settings>
+            <redis_cache_settings>
+                <clear_cache>0</clear_cache>
+                <vsf_base_url>http://localhost:3000/</vsf_base_url>
+                <invalidate_cache_key>aeSu7aip</invalidate_cache_key>
+                <connection_timeout>10</connection_timeout>
+            </redis_cache_settings>
+        </vsbridge_indexer_settings>
+    </default>
+</config>

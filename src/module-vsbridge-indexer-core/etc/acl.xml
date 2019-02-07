@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @package   Divante\VsbridgeIndexerCore
+ * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license   See LICENSE_DIVANTE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Divante_VsbridgeIndexerCore::configuration" title="VueStorefront Indexer Configuration" />
+            </resource>
+        </resources>
+    </acl>
+</config>

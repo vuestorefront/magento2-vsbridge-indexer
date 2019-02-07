@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package   Divante\VsbridgeIndexerCore
+ * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license   See LICENSE_DIVANTE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Divante_VsbridgeIndexerCore" setup_version="1.0.0">
+        <sequence>
+            <Magento_Indexer/>
+        </sequence>
+    </module>
+</config>

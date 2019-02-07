@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="vsbridge_cms_block_indexer" view_id="vsbridge_cms_block_indexer" class="Divante\VsbridgeIndexerCms\Model\Indexer\CmsBlock">
+        <title translate="true">Vsbridge Cms Block Indexer</title>
+        <description translate="true">Update Cms Blocks in Elastic</description>
+    </indexer>
+    <indexer id="vsbridge_cms_page_indexer" view_id="vsbridge_cms_page_indexer" class="Divante\VsbridgeIndexerCms\Model\Indexer\CmsPage">
+        <title translate="true">Vsbridge Cms Page Indexer</title>
+        <description translate="true">Update Cms Pages in Elastic</description>
+    </indexer>
+</config>

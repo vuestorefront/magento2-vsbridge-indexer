@@ -1,0 +1,12 @@
+<indices xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Divante_VsbridgeIndexerCore:etc/vsbridge_indices.xsd">
+
+    <index identifier="vue_storefront_catalog">
+        <type name="taxrule">
+            <data_providers>
+                <data_provider name="tax_classes">Divante\VsbridgeIndexerTax\Model\Indexer\DataProvider\TaxClasses</data_provider>
+                <data_provider name="tax_rates">Divante\VsbridgeIndexerTax\Model\Indexer\DataProvider\TaxRates</data_provider>
+            </data_providers>
+        </type>
+    </index>
+</indices>

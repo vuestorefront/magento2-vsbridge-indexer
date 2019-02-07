@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package   Divante\VsbridgeIndexerCore
+ * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license   See LICENSE_DIVANTE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsbridge_indexer_settings">
+            <group id="catalog_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Catalog Settings</label>
+                <field id="use_magento_url_keys" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Use Short Catalog Urls</label>
+                    <comment>Set base on your setting products.useShortCatalogUrls from vsf. If you change this setting on vsf you have to reindex all product and categories for vsf.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="allowed_product_types" translate="label comment" type="multiselect" sortOrder="101" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Types of products to index</label>
+                    <comment>by default all product types will be sent to elastic.
+                        If you changed configuration after running full reindex it might be required to re-create index.
+                        Simple type should always be selected, if not VSF will not work properly.
+                    </comment>
+                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ProductType</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

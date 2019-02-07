@@ -1,0 +1,230 @@
+<?php
+/**
+ * @package   magento-2-1.dev
+ * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license   See LICENSE_DIVANTE.txt for license details.
+ */
+
+namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
+
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\EntityManager\MetadataPool;
+use Magento\Framework\EntityManager\EntityMetadataInterface;
+
+/**
+ * Class EavAttributes
+ */
+abstract class AbstractEavAttributes
+{
+    /**
+     * @var array
+     */
+    private $restrictedAttribute = [
+        'quantity_and_stock_status',
+    ];
+
+    /**
+     * @var ResourceConnection
+     */
+    private $resourceConnection;
+
+    /**
+     * @var array
+     */
+    private $attributesById;
+
+    /**
+     * @var string
+     */
+    private $entityType;
+
+    /**
+     * @var array
+     */
+    private $valuesByEntityId;
+
+    /**
+     * @var MetadataPool
+     */
+    private $metadataPool;
+
+    /**
+     * EavAttributes constructor.
+     *
+     * @param ResourceConnection $resourceConnection
+     * @param MetadataPool $metadataPool
+     * @param $entityType
+     */
+    public function __construct(
+        ResourceConnection $resourceConnection,
+        MetadataPool $metadataPool,
+        $entityType
+    ) {
+        $this->resourceConnection = $resourceConnection;
+        $this->metadataPool = $metadataPool;
+        $this->entityType = $entityType;
+    }
+
+    /**
+     * Load attributes
+     * @return mixed
+     */
+    abstract public function initAttributes();
+
+    /**
+     * @param int $storeId
+     * @param array $entityIds
+     * @param array $requiredAttributes
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function loadAttributesData($storeId, array $entityIds, array $requiredAttributes = null)
+    {
+        $this->attributesById = $this->initAttributes();
+        $tableAttributes = [];
+        $attributeTypes = [];
+        $selects = [];
+
+        foreach ($this->attributesById as $attributeId => $attribute) {
+            if ($this->canReindex($attribute, $requiredAttributes)) {
+                $tableAttributes[$attribute->getBackendTable()][] = $attributeId;
+
+                if (!isset($attributeTypes[$attribute->getBackendTable()])) {
+                    $attributeTypes[$attribute->getBackendTable()] = $attribute->getBackendType();
+                }
+            }
+        }
+
+        foreach ($tableAttributes as $table => $attributeIds) {
+            $select = $this->getLoadAttributesSelect($storeId, $table, $attributeIds, $entityIds);
+            $selects[$table] = $select;
+        }
+
+        $this->valuesByEntityId = [];
+
+        if (!empty($selects)) {
+            foreach ($selects as $select) {
+                $values = $this->getConnection()->fetchAll($select);
+                $this->prepareValues($values);
+            }
+        }
+
+        return $this->valuesByEntityId;
+    }
+
+    /**
+     * @param \Magento\Eav\Model\Entity\Attribute $attribute
+     * @param array $allowedAttributes
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    private function canReindex(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null)
+    {
+        if ($attribute->isStatic()) {
+            return false;
+        }
+
+        if (in_array($attribute->getAttributeCode(), $this->restrictedAttribute)) {
+            return false;
+        }
+
+        if (null === $allowedAttributes) {
+            return true;
+        }
+
+        return in_array($attribute->getAttributeCode(), $allowedAttributes);
+    }
+
+    /**
+     * @param array $values
+     *
+     * @return array
+     * @throws \Exception
+     */
+    private function prepareValues(array $values)
+    {
+        foreach ($values as $value) {
+            $entityIdField = $this->getEntityMetaData()->getIdentifierField();
+            $entityId = $value[$entityIdField];
+            $attribute = $this->attributesById[$value['attribute_id']];
+
+            if ($attribute->getFrontendInput() === 'multiselect') {
+                $value['value'] = explode(',', $value['value']);
+            }
+
+            $attributeCode = $attribute->getAttributeCode();
+            $this->valuesByEntityId[$entityId][$attributeCode] = $value['value'];
+        }
+
+        return $this->valuesByEntityId;
+    }
+
+    /**
+     * Retrieve attributes load select
+     *
+     * @param int $storeId
+     * @param string $table
+     * @param array $attributeIds
+     * @param array $entityIds
+     *
+     * @return \Magento\Framework\DB\Select
+     * @throws \Exception
+     */
+    private function getLoadAttributesSelect($storeId, $table, array $attributeIds, array $entityIds)
+    {
+        //  Either row_id (enterpise/commerce version) or entity_id.
+        $linkField = $this->getEntityMetaData()->getLinkField();
+        $entityIdField = $this->getEntityMetaData()->getIdentifierField();
+
+        $joinStoreCondition = [
+            "t_default.$linkField=t_store.$linkField",
+            't_default.attribute_id=t_store.attribute_id',
+            't_store.store_id=?',
+        ];
+
+        $joinCondition = $this->getConnection()->quoteInto(
+            implode(' AND ', $joinStoreCondition),
+            $storeId
+        );
+
+        $select = $this->getConnection()->select()
+            ->from(['entity' => $this->getEntityMetaData()->getEntityTable()], [$entityIdField])
+            ->joinInner(
+                ['t_default' => $table],
+                new \Zend_Db_Expr("entity.{$linkField} = t_default.{$linkField}"),
+                ['attribute_id']
+            )
+            ->joinLeft(
+                ['t_store' => $table],
+                $joinCondition,
+                ['value' => new \Zend_Db_Expr('COALESCE(t_store.value, t_default.value)')]
+            )
+            ->where('t_default.store_id = ?', \Magento\Store\Model\Store::DEFAULT_STORE_ID)
+            ->where("entity.$entityIdField IN (?)", $entityIds)
+            ->where('t_default.attribute_id IN (?)', $attributeIds);
+
+        return $select;
+    }
+
+    /**
+     * Retrieve Metadata for an entity (product or category)
+     *
+     * @return EntityMetadataInterface
+     * @throws \Exception
+     */
+    private function getEntityMetaData()
+    {
+        return $this->metadataPool->getMetadata($this->entityType);
+    }
+
+    /**
+     * @return \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    private function getConnection()
+    {
+        return $this->resourceConnection->getConnection();
+    }
+}

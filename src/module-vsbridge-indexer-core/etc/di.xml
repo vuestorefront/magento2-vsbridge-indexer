@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package   Divante\VsbridgeIndexerCore
+ * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license   See LICENSE_DIVANTE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Divante\VsbridgeIndexerCore\Api\Client\ClientInterface" type="Divante\VsbridgeIndexerCore\Elasticsearch\Client"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\Client\ConfigurationInterface" type="Divante\VsbridgeIndexerCore\Elasticsearch\ClientConfiguration"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\Client\BuilderInterface" type="Divante\VsbridgeIndexerCore\Elasticsearch\ClientBuilder"/>
+
+    <preference for="Divante\VsbridgeIndexerCore\Api\Index\TypeInterface" type="Divante\VsbridgeIndexerCore\Index\Type"/>
+
+    <preference for="Divante\VsbridgeIndexerCore\Api\Indexer\TransactionKeyInterface" type="Divante\VsbridgeIndexerCore\Indexer\TransactionKey"/>
+
+    <preference for="Divante\VsbridgeIndexerCore\Api\BulkRequestInterface" type="Divante\VsbridgeIndexerCore\Index\BulkRequest"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\BulkResponseInterface" type="Divante\VsbridgeIndexerCore\Index\BulkResponse"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\ConvertDataTypesInterface" type="Divante\VsbridgeIndexerCore\Index\ConvertDataTypes"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\IndexInterface" type="Divante\VsbridgeIndexerCore\Index\Index"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\IndexOperationInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperations"/>
+
+    <type name="Divante\VsbridgeIndexerCore\Logger\IndexerLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">vsbridgeIndexerLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="info" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\Handler\Info</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\IndexerLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Divante\VsbridgeIndexerCore\Cache\Logger\CacheLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">vsbridgeIndexerCacheLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="info" xsi:type="object">Divante\VsbridgeIndexerCore\Cache\Logger\Handler\Info</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Divante\VsbridgeIndexerCore\Cache\Processor">
+        <arguments>
+            <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCore\Cache\Logger\CacheLogger</argument>
+        </arguments>
+    </type>
+</config>
