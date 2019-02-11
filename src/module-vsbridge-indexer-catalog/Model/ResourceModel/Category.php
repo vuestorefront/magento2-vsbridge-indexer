@@ -8,10 +8,11 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
+use Divante\VsbridgeIndexerCatalog\Model\CategoryMetaData;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
-use Divante\VsbridgeIndexerCatalog\Model\CategoryMetaData;
 use Magento\Catalog\Model\Category as CoreCategoryModel;
+use Magento\Framework\DB\Select;
 
 /**
  * Class Category
@@ -62,22 +63,68 @@ class Category
      */
     public function getCategories($storeId = 1, array $categoryIds = [], $fromId = 0, $limit = 1000)
     {
-        $metaData = $this->categoryMetaData->get();
-        $rootCategoryId = $this->storeManager->getStore($storeId)->getRootCategoryId();
-
-        $select = $this->getConnection()->select()->from(
-            ['entity' => $metaData->getEntityTable()]
-        );
+        $select = $this->filterByStore($storeId, $categoryIds);
 
         if (!empty($categoryIds)) {
             $select->where('entity.entity_id IN (?)', $categoryIds);
         }
 
-        $path = "1/{$rootCategoryId}%";
-        $select->where('path LIKE ?', $path);
         $select->where('entity.entity_id > ?', $fromId);
         $select->limit($limit);
         $select->order('entity.entity_id ASC');
+
+        return $this->getConnection()->fetchAll($select);
+    }
+
+    /**
+     * @param $storeId
+     *
+     * @return \Magento\Framework\DB\Select
+     */
+    public function filterByStore($storeId)
+    {
+        $metaData = $this->categoryMetaData->get();
+        $store = $this->storeManager->getStore($storeId);
+        $connection = $this->getConnection();
+
+        $rootId = CoreCategoryModel::TREE_ROOT_ID;
+        $rootCatIdExpr = $connection->quote("{$rootId}/{$store->getRootCategoryId()}");
+        $catIdExpr = $connection->quote("{$rootId}/{$store->getRootCategoryId()}/%");
+
+        $select = $this->getConnection()->select()->from(
+            ['entity' => $metaData->getEntityTable()]
+        );
+
+        $select->where(
+            "path = {$rootCatIdExpr} OR path like {$catIdExpr}"
+        );
+
+        return $select;
+    }
+
+    /**
+     * @param $storeId
+     * @param array $productIds
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getCategoryProductSelect($storeId, array $productIds)
+    {
+        $select = $this->filterByStore($storeId);
+        $table = $this->resource->getTableName('catalog_category_product');
+        $entityIdField = $this->categoryMetaData->get()->getIdentifierField();
+
+        $select->reset(Select::COLUMNS);
+        $select->joinInner(
+            ['cpi' => $table],
+            "entity.$entityIdField = cpi.category_id",
+            [
+                'category_id',
+                'product_id',
+                'position',
+            ]
+        )->where('cpi.product_id IN (?)', $productIds);
 
         return $this->getConnection()->fetchAll($select);
     }

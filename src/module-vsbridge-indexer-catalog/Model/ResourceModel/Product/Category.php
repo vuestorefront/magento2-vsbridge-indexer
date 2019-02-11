@@ -8,8 +8,8 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
+use Divante\VsbridgeIndexerCatalog\Model\CategoryMetaData;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\DB\Select;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 
@@ -30,19 +30,37 @@ class Category
     private $categoryCollectionFactory;
 
     /**
+     * @var \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category
+     */
+    private $categoryResourceModel;
+
+    /**
      * @var array Local cache for category names
      */
     private $categoryNameCache = [];
 
     /**
+     * @var CategoryMetaData
+     */
+    private $categoryMetaData;
+
+    /**
      * Category constructor.
      *
      * @param ResourceConnection $resourceModel
+     * @param CategoryMetaData $categoryMetaData
+     * @param \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category $categoryResourceModel
      * @param CategoryCollectionFactory $categoryCollectionFactory
      */
-    public function __construct(ResourceConnection $resourceModel, CategoryCollectionFactory $categoryCollectionFactory)
-    {
+    public function __construct(
+        ResourceConnection $resourceModel,
+        CategoryMetaData $categoryMetaData,
+        \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category $categoryResourceModel,
+        CategoryCollectionFactory $categoryCollectionFactory
+    ) {
         $this->resource = $resourceModel;
+        $this->categoryMetaData = $categoryMetaData;
+        $this->categoryResourceModel = $categoryResourceModel;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
     }
 
@@ -55,9 +73,7 @@ class Category
      */
     public function loadCategoryData($storeId, array $productIds)
     {
-        $select       = $this->getCategoryProductSelect($productIds);
-        $categoryData = $this->getConnection()->fetchAll($select);
-
+        $categoryData = $this->categoryResourceModel->getCategoryProductSelect($storeId, $productIds);
         $categoryIds = [];
 
         foreach ($categoryData as $categoryDataRow) {
@@ -68,8 +84,8 @@ class Category
 
         foreach ($categoryData as &$categoryDataRow) {
             $categoryDataRow['name'] = '';
-            if (isset($storeCategoryName[(int)$categoryDataRow['category_id']])) {
-                $categoryDataRow['name'] = $storeCategoryName[(int)$categoryDataRow['category_id']];
+            if (isset($storeCategoryName[(int) $categoryDataRow['category_id']])) {
+                $categoryDataRow['name'] = $storeCategoryName[(int) $categoryDataRow['category_id']];
             }
         }
 
@@ -91,7 +107,7 @@ class Category
             $loadCategoryIds = array_diff($categoryIds, array_keys($this->categoryNameCache[$storeId]));
         }
 
-        $loadCategoryIds  = array_map('intval', $loadCategoryIds);
+        $loadCategoryIds = array_map('intval', $loadCategoryIds);
 
         if (!empty($loadCategoryIds)) {
             $select = $this->prepareCategoryNameSelect($loadCategoryIds, $storeId);
@@ -122,22 +138,6 @@ class Category
         $categoryCollection->joinAttribute('name', 'catalog_category/name', 'entity_id');
 
         $select = $categoryCollection->getSelect();
-
-        return $select;
-    }
-
-    /**
-     * @param array $productIds
-     *
-     * @return Select
-     */
-    private function getCategoryProductSelect($productIds)
-    {
-        $table = $this->resource->getTableName('catalog_category_product');
-
-        $select = $this->getConnection()->select()
-            ->from(['cpi' => $table])
-            ->where('cpi.product_id IN(?)', $productIds);
 
         return $select;
     }

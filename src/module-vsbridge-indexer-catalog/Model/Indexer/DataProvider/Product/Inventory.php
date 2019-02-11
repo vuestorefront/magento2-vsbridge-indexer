@@ -9,9 +9,8 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
+use Divante\VsbridgeIndexerCatalog\Model\InventoryProcessor;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Inventory as Resource;
-use Magento\Store\Model\StoreManagerInterface;
-use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
 
 /**
  * Class Inventory
@@ -25,30 +24,22 @@ class Inventory implements DataProviderInterface
     private $resourceModel;
 
     /**
-     * @var StoreManagerInterface
+     * @var InventoryProcessor
      */
-    private $storeManager;
-
-    /**
-     * @var GeneralMapping
-     */
-    private $generalMapping;
+    private $inventoryProcessor;
 
     /**
      * Inventory constructor.
      *
      * @param Resource $resource
-     * @param GeneralMapping $generalMapping
-     * @param StoreManagerInterface $storeManager
+     * @param InventoryProcessor $inventoryProcessor
      */
     public function __construct(
         Resource $resource,
-        GeneralMapping $generalMapping,
-        StoreManagerInterface $storeManager
+        InventoryProcessor $inventoryProcessor
     ) {
         $this->resourceModel = $resource;
-        $this->storeManager = $storeManager;
-        $this->generalMapping = $generalMapping;
+        $this->inventoryProcessor = $inventoryProcessor;
     }
 
     /**
@@ -59,12 +50,12 @@ class Inventory implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
-        $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
-        $inventoryData = $this->resourceModel->loadInventoryData($websiteId, array_keys($indexData));
+        $inventoryData = $this->resourceModel->loadInventoryData($storeId, array_keys($indexData));
 
         foreach ($inventoryData as $inventoryDataRow) {
             $productId = (int) $inventoryDataRow['product_id'];
-            $indexData[$productId]['stock'] = $this->generalMapping->prepareStockData($inventoryDataRow);
+            $indexData[$productId]['stock'] =
+                $this->inventoryProcessor->prepareInventoryData($storeId, $inventoryDataRow);
         }
 
         $inventoryData = null;

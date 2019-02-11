@@ -61,6 +61,7 @@
                 </field>
                 <field id="index_name" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Index name prefix</label>
+                    <comment>For each store view, store id will be added to index name, e.g. "vue_storefront_magento_1"</comment>
                 </field>
                 <field id="fields_limit" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>The maximum number of fields in an index</label>

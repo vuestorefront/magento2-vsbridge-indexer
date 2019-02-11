@@ -8,12 +8,13 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
-use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
+use Divante\VsbridgeIndexerCatalog\Model\InventoryProcessor;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Configurable as ConfigurableResource;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Inventory as InventoryResource;
-use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
+use Divante\VsbridgeIndexerCatalog\Model\TierPriceProcessor;
+use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 
 /**
@@ -33,6 +34,7 @@ class ConfigurableData implements DataProviderInterface
     private $childBlackListConfig = [
         'entity_id',
         'row_id',
+        'type_id',
         'parent_id',
         'parent_ids',
     ];
@@ -58,14 +60,19 @@ class ConfigurableData implements DataProviderInterface
     private $inventoryResource;
 
     /**
-     * @var GeneralMapping
+     * @var InventoryProcessor
      */
-    private $generalMapping;
+    private $inventoryProcessor;
 
     /**
      * @var ConfigurableAttributes
      */
     private $configurableAttributes;
+
+    /**
+     * @var TierPriceProcessor
+     */
+    private $tierPriceProcessor;
 
     /**
      * ConfigurableData constructor.
@@ -75,7 +82,8 @@ class ConfigurableData implements DataProviderInterface
      * @param AttributeDataProvider $attributeResource
      * @param InventoryResource $inventoryResource
      * @param ConfigurableAttributes $configurableAttributes
-     * @param GeneralMapping $generalMapping
+     * @param TierPriceProcessor $tierPriceProcessor
+     * @param InventoryProcessor $inventoryProcessor
      */
     public function __construct(
         DataFilter $dataFilter,
@@ -83,13 +91,15 @@ class ConfigurableData implements DataProviderInterface
         AttributeDataProvider $attributeResource,
         InventoryResource $inventoryResource,
         ConfigurableAttributes $configurableAttributes,
-        GeneralMapping $generalMapping
+        TierPriceProcessor $tierPriceProcessor,
+        InventoryProcessor $inventoryProcessor
     ) {
         $this->dataFilter = $dataFilter;
         $this->configurableResource = $configurableResource;
         $this->resourceAttributeModel = $attributeResource;
         $this->inventoryResource = $inventoryResource;
-        $this->generalMapping = $generalMapping;
+        $this->inventoryProcessor = $inventoryProcessor;
+        $this->tierPriceProcessor = $tierPriceProcessor;
         $this->configurableAttributes = $configurableAttributes;
     }
 
@@ -132,7 +142,6 @@ class ConfigurableData implements DataProviderInterface
             return $indexData;
         }
 
-        //$notifyStockDefaultValue = $this->getNotifyForQtyBelowDefaultValue($storeId);
         $childIds = array_keys($allChildren);
 
         $stockRowData = $this->inventoryResource->loadChildrenData($storeId, $childIds);
@@ -155,7 +164,7 @@ class ConfigurableData implements DataProviderInterface
                 $productStockData = $stockRowData[$childId];
 
                 unset($productStockData['product_id']);
-                $productStockData = $this->generalMapping->prepareStockData($productStockData);
+                $productStockData = $this->inventoryProcessor->prepareInventoryData($storeId, $productStockData);
                 $child['stock'] = $productStockData;
             }
 
@@ -206,10 +215,12 @@ class ConfigurableData implements DataProviderInterface
             $values = [];
 
             foreach ($configurableChildren as $child) {
-                $value = $child[$attributeCode];
+                if (isset($child[$attributeCode])) {
+                    $value = $child[$attributeCode];
 
-                if (isset($value)) {
-                    $values[] = (int) $value;
+                    if (isset($value)) {
+                        $values[] = (int) $value;
+                    }
                 }
             }
 
@@ -255,58 +266,74 @@ class ConfigurableData implements DataProviderInterface
     }
 
     /**
-     * @param int $storeId
+     * @param $storeId
      * @param array $allChildren
      * @param array $requiredAttributes
      *
      * @return array
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function loadChildrenRawAttributesInBatches($storeId, array $allChildren, array $requiredAttributes)
     {
         $requiredAttribute = array_unique($requiredAttributes);
-        $childIds = [];
 
-        foreach ($allChildren as $child) {
-            $childIds[] = $child['entity_id'];
-
-            if (count($childIds) >= $this->batchSize) {
-                $attributeData = $this->resourceAttributeModel->loadAttributesData(
-                    $storeId,
-                    $childIds,
-                    $requiredAttribute
-                );
-
-                foreach ($attributeData as $productId => $attribute) {
-                    $allChildren[$productId] = array_merge(
-                        $allChildren[$productId],
-                        $attribute
-                    );
-                }
-
-                $childIds = [];
-                $attributeData = null;
-            }
-        }
-
-        if (count($childIds)) {
-            $attributeData = $this->resourceAttributeModel->loadAttributesData(
+        foreach ($this->getChildrenInBatches($allChildren, $this->batchSize) as $batch) {
+            $childIds = array_keys($batch);
+            $allAttributesData = $this->resourceAttributeModel->loadAttributesData(
                 $storeId,
                 $childIds,
                 $requiredAttribute
             );
 
-            foreach ($attributeData as $productId => $attribute) {
-                $allChildren[$productId] = array_merge(
-                    $allChildren[$productId],
-                    $attribute
-                );
+            foreach ($allAttributesData as $productId => $attributes) {
+                if ($this->tierPriceProcessor->syncTierPrices()) {
+                    /*we need some extra attributes to apply tier prices*/
+                    $batch[$productId] = array_merge(
+                        $allChildren[$productId],
+                        $attributes
+                    );
+                } else {
+                    $allChildren[$productId] = array_merge(
+                        $allChildren[$productId],
+                        $attributes
+                    );
+                }
             }
 
-            $childIds = null;
-            $attributeData = null;
+            if ($this->tierPriceProcessor->syncTierPrices()) {
+                $batch = $this->tierPriceProcessor->applyTierGroupPrices($batch, $storeId);
+                $allChildren = array_replace_recursive($allChildren, $batch);
+            }
         }
 
         return $allChildren;
+    }
+
+    /**
+     * @param array $documents
+     * @param $size
+     *
+     * @return \Generator
+     */
+    private function getChildrenInBatches(array $documents, $size)
+    {
+        $i = 0;
+        $batch = [];
+
+        foreach ($documents as $documentName => $documentValue) {
+            $batch[$documentName] = $documentValue;
+
+            if (++$i == $size) {
+                yield $batch;
+                $i = 0;
+                $batch = [];
+            }
+        }
+
+        if (count($batch) > 0) {
+            yield $batch;
+        }
     }
 
     /**

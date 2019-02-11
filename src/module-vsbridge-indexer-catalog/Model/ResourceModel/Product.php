@@ -150,8 +150,11 @@ class Product
     {
         $linkField = $this->productMetaData->get()->getLinkField();
         $entityId = $this->productMetaData->get()->getIdentifierField();
-        $columns = ['sku'];
-        $columns[] = $entityId;
+        $columns = [
+            'sku',
+            'type_id',
+            $entityId,
+        ];
 
         if ($linkField !== $entityId) {
             $columns[] = $linkField;

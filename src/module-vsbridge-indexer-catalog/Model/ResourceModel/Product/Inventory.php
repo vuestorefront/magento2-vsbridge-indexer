@@ -9,6 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Magento\Framework\App\ResourceConnection;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Inventory
@@ -32,8 +33,6 @@ class Inventory
         'min_sale_qty',
         'use_config_max_sale_qty',
         'max_sale_qty',
-        'use_config_backorders',
-        'backorders',
         'use_config_notify_stock_qty',
         'notify_stock_qty',
         'use_config_qty_increments',
@@ -51,24 +50,33 @@ class Inventory
     private $resource;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * Inventory constructor.
      *
+     * @param StoreManagerInterface $storeManager
      * @param ResourceConnection $resourceModel
      */
-    public function __construct(ResourceConnection $resourceModel)
-    {
+    public function __construct(
+        StoreManagerInterface $storeManager,
+        ResourceConnection $resourceModel
+    ) {
         $this->resource = $resourceModel;
+        $this->storeManager = $storeManager;
     }
 
     /**
-     * @param       $websiteId
+     * @param int $storeId
      * @param array $productIds
      *
      * @return array
      */
-    public function loadInventoryData($websiteId, array $productIds)
+    public function loadInventoryData($storeId, array $productIds)
     {
-        return $this->getInventoryData($websiteId, $productIds, $this->fields);
+        return $this->getInventoryData($storeId, $productIds, $this->fields);
     }
 
     /**
@@ -92,14 +100,15 @@ class Inventory
     }
 
     /**
-     * @param int $websiteId
+     * @param int $storeId
      * @param array $productIds
      * @param array $fields
      *
      * @return array
      */
-    private function getInventoryData($websiteId, array $productIds, array $fields)
+    private function getInventoryData($storeId, array $productIds, array $fields)
     {
+        $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
         $connection = $this->resource->getConnection();
 
         $select = $connection->select()

@@ -33,15 +33,24 @@ class ConfigSettings
     }
 
     /**
-     * @return null|string
+     * @return bool
      */
     public function useMagentoUrlKeys()
     {
-        return $this->getConfigParam('use_magento_url_keys');
+        return (bool) $this->getConfigParam('use_magento_url_keys');
+    }
+
+    /**
+     * @return bool
+     */
+    public function syncTierPrices()
+    {
+        return (bool) $this->getConfigParam('sync_tier_prices');
     }
 
     /**
      * @param int $storeId
+     *
      * @return array
      */
     public function getAllowedProductTypes($storeId)
@@ -59,6 +68,7 @@ class ConfigSettings
 
     /**
      * @param string $configField
+     * @param int|null $storeId
      *
      * @return string|null
      */

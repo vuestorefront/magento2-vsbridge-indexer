@@ -276,7 +276,6 @@ class Configurable
     /**
      * Return all associated simple products for the configurable products in
      * the current product collection.
-     * Array key is the configurable product
      *
      * @param int $storeId
      *

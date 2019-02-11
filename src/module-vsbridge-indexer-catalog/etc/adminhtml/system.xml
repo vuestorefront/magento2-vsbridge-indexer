@@ -10,7 +10,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="vsbridge_indexer_settings">
-            <group id="catalog_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="catalog_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Catalog Settings</label>
                 <field id="use_magento_url_keys" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Use Short Catalog Urls</label>
@@ -24,6 +24,10 @@
                         Simple type should always be selected, if not VSF will not work properly.
                     </comment>
                     <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ProductType</source_model>
+                </field>
+                <field id="sync_tier_prices" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sync Tier Prices</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
         </section>

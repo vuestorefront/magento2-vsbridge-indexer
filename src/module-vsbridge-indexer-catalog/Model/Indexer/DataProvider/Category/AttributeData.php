@@ -217,7 +217,6 @@ class AttributeData
         } else {
             $slug = $this->catalogHelper->generate($categoryDTO['name'], $categoryDTO['entity_id']);
             $categoryDTO['slug'] = $slug;
-            $categoryDTO['url_key'] = $slug;
         }
 
         return $categoryDTO;

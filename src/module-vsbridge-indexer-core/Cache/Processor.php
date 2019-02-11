@@ -107,13 +107,15 @@ class Processor
      */
     public function cleanCacheByTags($storeId, array $tags)
     {
-        $cacheTags = implode(',', $tags);
-        $cacheInvalidateUrl = $this->getInvalidateCacheUrl($storeId) . $cacheTags;
+        if ($this->settings->clearCache($storeId)) {
+            $cacheTags = implode(',', $tags);
+            $cacheInvalidateUrl = $this->getInvalidateCacheUrl($storeId) . $cacheTags;
 
-        try {
-            $this->call($storeId, $cacheInvalidateUrl);
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+            try {
+                $this->call($storeId, $cacheInvalidateUrl);
+            } catch (\Exception $e) {
+                $this->logger->error($e->getMessage());
+            }
         }
     }
 
