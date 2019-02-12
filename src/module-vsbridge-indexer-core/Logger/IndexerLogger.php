@@ -15,5 +15,4 @@ use Monolog\Logger;
  */
 class IndexerLogger extends Logger
 {
-
 }

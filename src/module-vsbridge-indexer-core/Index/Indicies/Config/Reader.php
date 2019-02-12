@@ -18,7 +18,6 @@ use Magento\Framework\Config\ValidationStateInterface;
  */
 class Reader extends Filesystem
 {
-
     const FILE_NAME = 'vsbridge_indices.xml';
 
     /**
