@@ -1,7 +1,7 @@
 {
   "name": "divante/magento2-vsbridge-indexer",
   "type": "magento2-component",
-  "license": "",
+  "license": "MIT",
   "authors": [{
     "name": "Agata",
     "email": "afirlejczyk@divante.pl"
