@@ -15,5 +15,4 @@ use Monolog\Logger;
  */
 class CacheLogger extends Logger
 {
-
 }
