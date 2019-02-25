@@ -54,7 +54,7 @@ abstract class AbstractEavAttributes
      *
      * @param ResourceConnection $resourceConnection
      * @param MetadataPool $metadataPool
-     * @param $entityType
+     * @param string $entityType
      */
     public function __construct(
         ResourceConnection $resourceConnection,
