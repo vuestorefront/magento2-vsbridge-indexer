@@ -55,10 +55,10 @@ class ClientBuilder implements ClientBuilderInterface
     {
         $scheme = 'http';
 
-        if ($options['enable_https_mode']) {
+        if (isset($options['enable_https_mode'])) {
             $scheme = 'https';
-        } elseif (isset($options['schema'])) {
-            $scheme = $options['schema'];
+        } elseif (isset($options['scheme'])) {
+            $scheme = $options['scheme'];
         }
 
         $currentHostConfig = [
