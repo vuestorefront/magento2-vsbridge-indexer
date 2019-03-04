@@ -10,6 +10,8 @@ namespace Divante\VsbridgeIndexerCms\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCms\Model\ResourceModel\CmsBlock as CmsBlockResource;
 use Magento\Cms\Model\Template\FilterProvider;
+use Magento\Framework\App\Area;
+use Magento\Framework\App\AreaList;
 
 /**
  * Class CmsBlock
@@ -27,15 +29,23 @@ class CmsBlock
     private $filterProvider;
 
     /**
+     * @var AreaList
+     */
+    private $areaList;
+
+    /**
      * CmsBlock constructor.
      *
+     * @param AreaList $areaList
      * @param CmsBlockResource $cmsBlockResource
      * @param FilterProvider $filterProvider
      */
     public function __construct(
+        AreaList $areaList,
         CmsBlockResource $cmsBlockResource,
         FilterProvider $filterProvider
     ) {
+        $this->areaList = $areaList;
         $this->filterProvider = $filterProvider;
         $this->resourceModel = $cmsBlockResource;
     }
@@ -48,6 +58,8 @@ class CmsBlock
      */
     public function rebuild($storeId = 1, array $blockIds = [])
     {
+        $this->areaList->getArea(Area::AREA_FRONTEND)->load(Area::PART_DESIGN);
+
         $lastBlockId = 0;
 
         do {
@@ -58,6 +70,7 @@ class CmsBlock
                 $blockData['id'] = $blockData['block_id'];
                 $blockData['content'] =
                     $this->filterProvider->getBlockFilter()->setStoreId($storeId)->filter($blockData['content']);
+
                 $blockData['active'] = (bool)$blockData['is_active'];
 
                 unset($blockData['creation_time'], $blockData['update_time'], $blockData['block_id']);
