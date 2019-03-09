@@ -73,6 +73,10 @@ class InventoryProcessor
         if (!empty($inventory[StockItemInterface::USE_CONFIG_ENABLE_QTY_INC])) {
             $inventory['enable_qty_increments'] = $this->stockConfiguration->getEnableQtyIncrements($storeId);
         }
+
+        if (!empty($inventory[StockItemInterface::USE_CONFIG_BACKORDERS])) {
+            $inventory['backorders'] = $this->stockConfiguration->getBackorders($storeId);
+        }
         
         return $this->generalMapping->prepareStockData($inventory);
     }
