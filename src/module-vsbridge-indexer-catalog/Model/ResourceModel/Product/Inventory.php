@@ -36,6 +36,8 @@ class Inventory
         'use_config_notify_stock_qty',
         'notify_stock_qty',
         'use_config_qty_increments',
+        'backorders',
+        'use_config_backorders',
         'qty_increments',
         'use_config_enable_qty_inc',
         'enable_qty_increments',
