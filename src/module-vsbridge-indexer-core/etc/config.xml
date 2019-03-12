@@ -11,7 +11,7 @@
     <default>
         <vsbridge_indexer_settings>
             <es_client>
-                <host>127.0.01</host>
+                <host>127.0.0.1</host>
                 <port>9200</port>
             </es_client>
             <indices_settings>
