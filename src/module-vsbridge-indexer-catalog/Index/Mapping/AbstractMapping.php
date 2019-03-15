@@ -22,6 +22,7 @@ abstract class AbstractMapping
         'level' => FieldInterface::TYPE_INTEGER,
         'category_ids' => FieldInterface::TYPE_LONG,
         'sku' => FieldInterface::TYPE_KEYWORD,
+        'url_path' => FieldInterface::TYPE_KEYWORD,
         'url_key' => FieldInterface::TYPE_KEYWORD,
     ];
 

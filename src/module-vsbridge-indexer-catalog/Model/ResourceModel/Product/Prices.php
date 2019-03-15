@@ -37,6 +37,7 @@ class Prices
      *
      * @param ResourceConnection $resourceModel
      * @param StoreManagerInterface $storeManager
+     * @param ProductMetaData $productMetaData
      */
     public function __construct(
         ResourceConnection $resourceModel,

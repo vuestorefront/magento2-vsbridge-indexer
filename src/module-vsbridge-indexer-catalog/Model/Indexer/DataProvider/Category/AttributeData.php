@@ -189,7 +189,12 @@ class AttributeData
     private function prepareCategory(array $categoryDTO)
     {
         $categoryDTO['id'] = (int)$categoryDTO['entity_id'];
+
         $categoryDTO = $this->addSlug($categoryDTO);
+
+        if (!isset($categoryDTO['url_path'])) {
+            $categoryDTO['url_path'] = $categoryDTO['slug'];
+        }
 
         $categoryDTO = array_diff_key($categoryDTO, array_flip($this->fieldsToRemove));
         $categoryDTO = $this->filterData($categoryDTO);

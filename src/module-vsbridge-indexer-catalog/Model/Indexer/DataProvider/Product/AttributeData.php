@@ -13,6 +13,7 @@ use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Model\ConfigSettings;
 use Divante\VsbridgeIndexerCatalog\Model\SlugGenerator;
+use Divante\VsbridgeIndexerCatalog\Model\ProductUrlPathGenerator;
 
 /**
  * Class AttributeData
@@ -40,14 +41,23 @@ class AttributeData implements DataProviderInterface
     private $slugGenerator;
 
     /**
+     * @var AttributeDataProvider
+     */
+    private $productUrlPathGenerator;
+
+    /**
      * AttributeData constructor.
      *
+     * @param ConfigSettings $configSettings
+     * @param SlugGenerator\Proxy $slugGenerator
+     * @param ProductUrlPathGenerator $productUrlPathGenerator
      * @param DataFilter $dataFilter
      * @param AttributeDataProvider $resourceModel
      */
     public function __construct(
         ConfigSettings $configSettings,
         SlugGenerator\Proxy $slugGenerator,
+        ProductUrlPathGenerator $productUrlPathGenerator,
         DataFilter $dataFilter,
         AttributeDataProvider $resourceModel
     ) {
@@ -55,6 +65,7 @@ class AttributeData implements DataProviderInterface
         $this->settings = $configSettings;
         $this->resourceModel = $resourceModel;
         $this->dataFilter = $dataFilter;
+        $this->productUrlPathGenerator = $productUrlPathGenerator;
     }
 
     /**
@@ -62,6 +73,7 @@ class AttributeData implements DataProviderInterface
      * @param int   $storeId
      *
      * @return array
+     * @throws \Exception
      */
     public function addData(array $indexData, $storeId)
     {
@@ -81,6 +93,7 @@ class AttributeData implements DataProviderInterface
         }
 
         $attributes = null;
+        $indexData = $this->productUrlPathGenerator->addUrlPath($indexData, $storeId);
 
         return $indexData;
     }
