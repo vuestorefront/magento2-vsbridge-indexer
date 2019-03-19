@@ -18,6 +18,11 @@ class ConfigSettings
     const CATALOG_SETTINGS_XML_PREFIX = 'vsbridge_indexer_settings/catalog_settings';
 
     /**
+     * @var array
+     */
+    private $settings = [];
+
+    /**
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
@@ -74,12 +79,19 @@ class ConfigSettings
      */
     private function getConfigParam(string $configField, $storeId = null)
     {
-        $path = self::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
+        $key = $configField . (string)$storeId;
 
-        if ($storeId) {
-            return $this->scopeConfig->getValue($path, 'stores', $storeId);
+        if (!isset($this->settings[$key])) {
+            $path = self::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
+
+            if ($storeId) {
+                $configValue = $this->scopeConfig->getValue($path, 'stores', $storeId);
+            }
+
+            $configValue = $this->scopeConfig->getValue($path);
+            $this->settings[$key] = $configValue;
         }
 
-        return $this->scopeConfig->getValue($path);
+        return $this->settings[$key];
     }
 }

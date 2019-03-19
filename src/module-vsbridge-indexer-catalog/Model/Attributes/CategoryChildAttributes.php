@@ -19,6 +19,7 @@ class CategoryChildAttributes
     private $requiredAttributes = [
         'name',
         'is_active',
+        'url_path',
         'url_key',
     ];
 
