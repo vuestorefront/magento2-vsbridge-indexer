@@ -113,23 +113,37 @@ class AttributeData
 
         foreach ($indexData as $categoryId => $categoryData) {
             $children = $this->childrenResourceModel->loadChildren($categoryData, $storeId);
-            $sortChildrenById = $this->sortChildrenById($children);
+            $groupedChildrenById = $this->groupChildrenById($children);
             unset($children);
 
             $this->childrenRowAttributes =
                 $this->attributeResourceModel->loadAttributesData(
                     $storeId,
-                    array_keys($sortChildrenById),
+                    array_keys($groupedChildrenById),
                     $this->childAttributes->getRequiredAttributes()
                 );
 
-            $childrenData = $this->plotTree($sortChildrenById, $categoryId);
-
-            $indexData[$categoryId]['children_data'] = $childrenData;
-            $indexData[$categoryId]['children_count'] = count($childrenData);
+            $indexData[$categoryId] = $this->addChildrenData($categoryData, $groupedChildrenById);
         }
 
         return $indexData;
+    }
+
+    /**
+     * @param array $category
+     * @param array $groupedChildren
+     *
+     * @return array
+     */
+    private function addChildrenData(array $category, array $groupedChildren)
+    {
+        $categoryId = $category['id'];
+        $childrenData = $this->plotTree($groupedChildren, $categoryId);
+
+        $category['children_data'] = $childrenData;
+        $category['children_count'] = count($childrenData);
+
+        return $category;
     }
 
     /**
@@ -137,7 +151,7 @@ class AttributeData
      *
      * @return array
      */
-    private function sortChildrenById(array $children)
+    private function groupChildrenById(array $children)
     {
         $sortChildrenById = [];
 
@@ -221,6 +235,7 @@ class AttributeData
             $categoryDTO['slug'] = $categoryDTO['url_key'];
         } else {
             $slug = $this->catalogHelper->generate($categoryDTO['name'], $categoryDTO['entity_id']);
+            $categoryDTO['url_key'] = $slug;
             $categoryDTO['slug'] = $slug;
         }
 
