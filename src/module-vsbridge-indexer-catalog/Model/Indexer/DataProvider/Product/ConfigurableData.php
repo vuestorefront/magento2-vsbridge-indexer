@@ -129,7 +129,7 @@ class ConfigurableData implements DataProviderInterface
 
     /**
      * @param array $indexData
-     * @param $storeId
+     * @param int $storeId
      *
      * @return array
      * @throws \Exception
@@ -299,7 +299,7 @@ class ConfigurableData implements DataProviderInterface
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      * @param array $allChildren
      * @param array $requiredAttributes
      *
@@ -345,11 +345,11 @@ class ConfigurableData implements DataProviderInterface
 
     /**
      * @param array $documents
-     * @param $size
+     * @param int $batchSize
      *
      * @return \Generator
      */
-    private function getChildrenInBatches(array $documents, $size)
+    private function getChildrenInBatches(array $documents, $batchSize)
     {
         $i = 0;
         $batch = [];
@@ -357,7 +357,7 @@ class ConfigurableData implements DataProviderInterface
         foreach ($documents as $documentName => $documentValue) {
             $batch[$documentName] = $documentValue;
 
-            if (++$i == $size) {
+            if (++$i == $batchSize) {
                 yield $batch;
                 $i = 0;
                 $batch = [];

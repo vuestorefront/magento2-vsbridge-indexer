@@ -149,6 +149,16 @@ class Product extends AbstractMapping implements MappingInterface
                 'image' => ['type' => FieldInterface::TYPE_TEXT],
                 'lab' => ['type' => FieldInterface::TYPE_TEXT],
                 'pos' => ['type' => FieldInterface::TYPE_TEXT],
+                'vid' => [
+                    'properties' => [
+                        'url' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'title' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'desc' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'video_id' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'meta' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'type' =>  ['type' => FieldInterface::TYPE_TEXT],
+                    ]
+                ]
             ],
         ];
         $attributesMapping['final_price'] = ['type' => FieldInterface::TYPE_DOUBLE];

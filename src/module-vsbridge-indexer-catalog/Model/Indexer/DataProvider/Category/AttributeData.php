@@ -168,7 +168,7 @@ class AttributeData
 
     /**
      * @param array $categories
-     * @param       $rootId
+     * @param int $rootId
      *
      * @return array
      */

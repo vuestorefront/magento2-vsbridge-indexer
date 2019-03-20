@@ -18,6 +18,7 @@ use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
  */
 class MediaGalleryData implements DataProviderInterface
 {
+    const VIDEO_TYPE = 'external-video';
 
     /**
      * @var \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Gallery
@@ -38,6 +39,7 @@ class MediaGalleryData implements DataProviderInterface
      * MediaGalleryData constructor.
      *
      * @param Resource $resource
+     * @param ProductMetaData $productMetaData
      * @param GalleryProcessor $galleryProcessor
      */
     public function __construct(
@@ -57,9 +59,12 @@ class MediaGalleryData implements DataProviderInterface
     {
         $linkField = $this->productMetaData->get()->getLinkField();
         $linkFieldIds = array_column($indexData, $linkField);
-        $gallerySet = $this->resourceModel->loadGallerySet($linkFieldIds, $storeId);
 
-        $galleryPerProduct = $this->galleryProcessor->prepareMediaGallery($gallerySet);
+        $gallerySet = $this->resourceModel->loadGallerySet($linkFieldIds, $storeId);
+        $valueIds = $this->getValueIds($gallerySet);
+
+        $galleryVideos = $this->resourceModel->loadVideos($valueIds, $storeId);
+        $galleryPerProduct = $this->galleryProcessor->prepareMediaGallery($gallerySet, $galleryVideos);
 
         foreach ($indexData as $productId => $productData) {
             $linkFieldValue = $productData[$linkField];
@@ -72,5 +77,23 @@ class MediaGalleryData implements DataProviderInterface
         }
 
         return $indexData;
+    }
+
+    /**
+     * @param array $mediaGallery
+     *
+     * @return array
+     */
+    private function getValueIds(array $mediaGallery)
+    {
+        $valueIds = [];
+
+        foreach ($mediaGallery as $mediaItem) {
+            if (self::VIDEO_TYPE === $mediaItem['media_type']) {
+                $valueIds[] = $mediaItem['value_id'];
+            }
+        }
+
+        return $valueIds;
     }
 }
