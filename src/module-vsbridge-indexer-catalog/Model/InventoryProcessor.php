@@ -43,7 +43,7 @@ class InventoryProcessor
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      * @param array $inventory
      *
      * @return array

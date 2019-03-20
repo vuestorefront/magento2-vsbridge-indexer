@@ -11,7 +11,6 @@ use Magento\Framework\Stdlib\DateTime;
  */
 abstract class AbstractMapping
 {
-
     /**
      * @var array
      */
@@ -24,6 +23,14 @@ abstract class AbstractMapping
         'sku' => FieldInterface::TYPE_KEYWORD,
         'url_path' => FieldInterface::TYPE_KEYWORD,
         'url_key' => FieldInterface::TYPE_KEYWORD,
+    ];
+
+    /**
+     * @var array
+     */
+    private $staticTextMapping = [
+        'available_sort_by',
+        'default_sort_by',
     ];
 
     /**
@@ -40,7 +47,7 @@ abstract class AbstractMapping
         $attributeCode = $attribute->getAttributeCode();
         $type = $this->getAttributeType($attribute);
 
-        if ($type === 'text' && !$attribute->getBackendModel() && $attribute->getFrontendInput() != 'media_image') {
+        if ($this->addKeywordFieldToTextAttribute($attribute, $type)) {
             $mapping[$attributeCode] = [
                 'type' => $type,
                 'fields' => [
@@ -69,6 +76,27 @@ abstract class AbstractMapping
     }
 
     /**
+     * @param Attribute $attribute
+     * @param string $esType
+     *
+     * @return bool
+     */
+    private function addKeywordFieldToTextAttribute(Attribute $attribute, string $esType)
+    {
+        $attributeCode = $attribute->getAttributeCode();
+
+        if (FieldInterface::TYPE_TEXT === $esType) {
+            if (isset($this->staticTextMapping[$attributeCode])) {
+                return false;
+            }
+
+            return (!$attribute->getBackendModel() && $attribute->getFrontendInput() != 'media_image');
+        }
+
+        return false;
+    }
+
+    /**
      * Returns attribute type for indexation.
      *
      * @param Attribute $attribute
@@ -81,6 +109,10 @@ abstract class AbstractMapping
 
         if (isset($this->staticFieldMapping[$attributeCode])) {
             return $this->staticFieldMapping[$attributeCode];
+        }
+
+        if (in_array($attributeCode, $this->staticTextMapping)) {
+            return FieldInterface::TYPE_TEXT;
         }
 
         if ($this->isBooleanType($attribute)) {

@@ -78,7 +78,7 @@ class Prices
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      *
      * @return \Magento\Store\Api\Data\StoreInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException

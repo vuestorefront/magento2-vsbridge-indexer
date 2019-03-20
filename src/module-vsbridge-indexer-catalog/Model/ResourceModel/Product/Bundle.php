@@ -59,6 +59,7 @@ class Bundle
     /**
      * @param array $products
      *
+     * @return void
      * @throws \Exception
      */
     public function setProducts(array $products)
@@ -104,6 +105,8 @@ class Bundle
      * Init Options
      *
      * @param int $storeId
+     *
+     * @return void
      */
     private function initOptions($storeId)
     {
@@ -129,6 +132,8 @@ class Bundle
 
     /**
      * Append Selection
+     *
+     * @return void
      */
     private function initSelection()
     {

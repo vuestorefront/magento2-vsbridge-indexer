@@ -110,6 +110,8 @@ class Configurable
 
     /**
      * @param array $products
+     *
+     * @return void
      */
     public function setProducts(array $products)
     {

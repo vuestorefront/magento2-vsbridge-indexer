@@ -20,6 +20,15 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
  */
 class Category extends AbstractMapping implements MappingInterface
 {
+
+    /**
+     * @var array
+     */
+    private $omitAttributes = [
+        'children',
+        'all_children',
+    ];
+
     /**
      * @var EventManager
      */
@@ -76,15 +85,14 @@ class Category extends AbstractMapping implements MappingInterface
     public function getMappingProperties()
     {
         if (null === $this->properties) {
-            $properties = [];
             $attributesMapping = $this->getAllAttributesMapping();
 
-            $properties['slug'] = ['type' => FieldInterface::TYPE_KEYWORD];
-            $properties = array_merge($properties, $this->generalMapping->getCommonProperties());
+            $properties = $this->generalMapping->getCommonProperties();
             $properties['children_count'] = ['type' => FieldInterface::TYPE_INTEGER];
 
             $childMapping = $this->getChildrenDataMapping($attributesMapping, $properties);
             $properties['children_data'] = ['properties' => $childMapping];
+            $properties = array_merge($properties, $attributesMapping);
 
             /*TODO grid_per_page -> not implemented yet*/
             $properties['grid_per_page'] = ['type' => FieldInterface::TYPE_INTEGER];
@@ -113,6 +121,11 @@ class Category extends AbstractMapping implements MappingInterface
 
         foreach ($attributes as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
+
+            if (in_array($attributeCode, $this->omitAttributes)) {
+                continue;
+            }
+
             $mapping = $this->getAttributeMapping($attribute);
             $allAttributesMapping[$attributeCode] = $mapping[$attributeCode];
         }

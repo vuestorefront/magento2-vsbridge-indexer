@@ -21,7 +21,7 @@ class GeneralMapping
      */
     private $commonProperties = [
         'position' => ['type' => FieldInterface::TYPE_LONG],
-        'level' => ['type' => FieldInterface::TYPE_LONG],
+        'level' => ['type' => FieldInterface::TYPE_INTEGER],
         'created_at' => [
             'type' => FieldInterface::TYPE_DATE,
             'format' => FieldInterface::DATE_FORMAT,

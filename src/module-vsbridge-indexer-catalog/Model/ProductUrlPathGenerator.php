@@ -47,7 +47,7 @@ class ProductUrlPathGenerator
 
     /**
      * @param array $products
-     * @param $storeId
+     * @param int $storeId
      *
      * @return array
      */
