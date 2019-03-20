@@ -12,3 +12,4 @@ Need to get correct mapping for new product field.
 ### Fixed
 - fix creating mapping for category EAV attributes.
  You have to delete existing index from Elasticsearch and run full reindexation.
+- fix exporting final_price and price for configurable products created with option "Apply unique prices by attribute to each SKU"

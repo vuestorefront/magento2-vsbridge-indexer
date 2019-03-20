@@ -119,7 +119,7 @@ class ConfigurableData implements DataProviderInterface
             }
 
             $productDTO = $this->applyConfigurableOptions($productDTO);
-            $indexData[$productId]  = $this->updateStockStatus($productDTO);
+            $indexData[$productId]  = $this->prepareConfigurableProduct($productDTO);
         }
 
         $this->configurableResource->clear();
@@ -159,6 +159,11 @@ class ConfigurableData implements DataProviderInterface
             $childId = $child['entity_id'];
             $child['id'] = (int) $childId;
             $parentIds = $child['parent_ids'];
+
+            // @TODO add support for final_price in configurable_children -> check if it really necessary. Probably not
+            if (isset($child['price'])) {
+                $child['regular_price'] = $child['price'];
+            }
 
             if (isset($stockRowData[$childId])) {
                 $productStockData = $stockRowData[$childId];
@@ -243,16 +248,26 @@ class ConfigurableData implements DataProviderInterface
      *
      * @return array
      */
-    private function updateStockStatus(array $productDTO)
+    private function prepareConfigurableProduct(array $productDTO)
     {
         $configurableChildren = $productDTO['configurable_children'];
         $areChildInStock = 0;
+        $childPrice = [];
+        $hasPrice = $this->hasPrice($productDTO);
 
         foreach ($configurableChildren as $child) {
             if ($child['stock']['is_in_stock']) {
                 $areChildInStock = 1;
-                break;
             }
+
+            $childPrice[] = $child['price'];
+        }
+
+        if (!$hasPrice && !empty($childPrice)) {
+            $minPrice = min($childPrice);
+            $productDTO['price'] = $minPrice;
+            $productDTO['final_price'] = $minPrice;
+            $productDTO['regular_price'] = $minPrice;
         }
 
         $productStockStatus = $productDTO['stock']['stock_status'];
@@ -263,6 +278,24 @@ class ConfigurableData implements DataProviderInterface
         }
 
         return $productDTO;
+    }
+
+    /**
+     * @param array $product
+     *
+     * @return bool
+     */
+    private function hasPrice(array $product)
+    {
+        if (!isset($product['price'])) {
+            return false;
+        }
+
+        if (0 === (int)$product['price']) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
