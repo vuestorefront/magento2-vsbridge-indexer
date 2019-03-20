@@ -82,7 +82,7 @@ class Inventory
     }
 
     /**
-     * @param       $storeId
+     * @param int $storeId
      * @param array $productIds
      *
      * @return array

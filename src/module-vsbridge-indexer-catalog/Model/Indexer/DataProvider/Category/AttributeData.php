@@ -65,7 +65,7 @@ class AttributeData
     /**
      * @var SlugGenerator
      */
-    private $catalogHelper;
+    private $slugGenerator;
 
     /**
      * AttributeData constructor.
@@ -86,7 +86,7 @@ class AttributeData
         DataFilter $dataFilter
     ) {
         $this->settings = $configSettings;
-        $this->catalogHelper = $catalogHelper;
+        $this->slugGenerator = $catalogHelper;
         $this->attributeResourceModel = $attributeResource;
         $this->childrenResourceModel = $childrenResource;
         $this->dataFilter = $dataFilter;
@@ -101,6 +101,7 @@ class AttributeData
      */
     public function addData(array $indexData, $storeId)
     {
+        $this->settings->getAttributesUsedForSortBy($storeId);
         /**
          * TODO add option to load only specific categories
          */
@@ -108,7 +109,9 @@ class AttributeData
 
         foreach ($attributes as $entityId => $attributesData) {
             $categoryData = array_merge($indexData[$entityId], $attributesData);
-            $indexData[$entityId] = $this->prepareCategory($categoryData);
+            $categoryData = $this->prepareCategory($categoryData);
+            $categoryData = $this->addSortOptions($categoryData, $storeId);
+            $indexData[$entityId] = $categoryData;
         }
 
         foreach ($indexData as $categoryId => $categoryData) {
@@ -217,6 +220,25 @@ class AttributeData
     }
 
     /**
+     * @param array $category
+     * @param int $storeId
+     *
+     * @return array
+     */
+    private function addSortOptions(array $category, $storeId)
+    {
+        if (!isset($category['available_sort_by'])) {
+            $category['available_sort_by'] = $this->settings->getAttributesUsedForSortBy();
+        }
+
+        if (!isset($category['default_sort_by'])) {
+            $category['default_sort_by'] = $this->settings->getProductListDefaultSortBy($storeId);
+        }
+
+        return $category;
+    }
+
+    /**
      * @param array $categoryDTO
      *
      * @return array
@@ -225,7 +247,7 @@ class AttributeData
     {
         if ($this->settings->useMagentoUrlKeys()) {
             if (!isset($categoryDTO['url_key'])) {
-                $slug = $this->catalogHelper->generate(
+                $slug = $this->slugGenerator->generate(
                     $categoryDTO['name'],
                     $categoryDTO['entity_id']
                 );
@@ -234,7 +256,7 @@ class AttributeData
 
             $categoryDTO['slug'] = $categoryDTO['url_key'];
         } else {
-            $slug = $this->catalogHelper->generate($categoryDTO['name'], $categoryDTO['entity_id']);
+            $slug = $this->slugGenerator->generate($categoryDTO['name'], $categoryDTO['entity_id']);
             $categoryDTO['url_key'] = $slug;
             $categoryDTO['slug'] = $slug;
         }

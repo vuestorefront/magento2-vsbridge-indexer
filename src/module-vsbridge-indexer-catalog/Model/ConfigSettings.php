@@ -8,6 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model;
 
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Config as ConfigResource;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
 
 /**
@@ -23,18 +24,32 @@ class ConfigSettings
     private $settings = [];
 
     /**
+     * @var array
+     */
+    private $attributesSortBy = [];
+
+    /**
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
 
     /**
+     * @var ConfigResource
+     */
+    private $catalogConfigResource;
+
+    /**
      * ClientConfiguration constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
+     * @param ConfigResource $configResource
      */
-    public function __construct(ScopeConfigInterface $scopeConfig)
-    {
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        ConfigResource $configResource
+    ) {
         $this->scopeConfig = $scopeConfig;
+        $this->catalogConfigResource = $configResource;
     }
 
     /**
@@ -79,7 +94,7 @@ class ConfigSettings
      */
     private function getConfigParam(string $configField, $storeId = null)
     {
-        $key = $configField . (string)$storeId;
+        $key = $configField . (string) $storeId;
 
         if (!isset($this->settings[$key])) {
             $path = self::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
@@ -90,6 +105,46 @@ class ConfigSettings
 
             $configValue = $this->scopeConfig->getValue($path);
             $this->settings[$key] = $configValue;
+        }
+
+        return $this->settings[$key];
+    }
+
+    /**
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getAttributesUsedForSortBy()
+    {
+        if (empty($this->attributesSortBy)) {
+            $attributes = $this->catalogConfigResource->getAttributesUsedForSortBy();
+            $attributes[] = 'position';
+
+            $this->attributesSortBy = $attributes;
+        }
+
+        return $this->attributesSortBy;
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return string
+     */
+    public function getProductListDefaultSortBy($storeId)
+    {
+        $path = \Magento\Catalog\Model\Config::XML_PATH_LIST_DEFAULT_SORT_BY;
+        $key = $path . (string) $storeId;
+
+        if (!isset($this->settings[$key])) {
+            $sortBy = $this->scopeConfig->getValue(
+                $path,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+
+            $this->settings[$key] = (string) $sortBy;
         }
 
         return $this->settings[$key];

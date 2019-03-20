@@ -7,3 +7,8 @@
 - Adding 'url_path' for products. 
 You have to delete existing index from Elasticsearch and run full reindexation.
 Need to get correct mapping for new product field. 
+- Add support for "available_sort_by" and "default_sort_by" default values.
+
+### Fixed
+- fix creating mapping for category EAV attributes.
+ You have to delete existing index from Elasticsearch and run full reindexation.
