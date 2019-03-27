@@ -45,15 +45,14 @@ class UpdateAttributeData
      * TODO check if we add new attribute, after adding new attribute send request to elastic to add new mapping
      * for field.
      * @param Attribute $attribute
-     * @param Attribute $result
      *
      * @return Attribute
      */
-    public function afterAfterSave(Attribute $attribute, Attribute $result)
+    public function afterAfterSave(Attribute $attribute)
     {
         $this->attributeProcessor->reindexRow($attribute->getId());
 
-        return $result;
+        return $attribute;
     }
 
     /**
