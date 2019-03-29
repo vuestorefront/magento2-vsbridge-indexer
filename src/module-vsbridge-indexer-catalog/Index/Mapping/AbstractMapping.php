@@ -4,7 +4,6 @@ namespace Divante\VsbridgeIndexerCatalog\Index\Mapping;
 
 use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
 use Magento\Eav\Model\Entity\Attribute;
-use Magento\Framework\Stdlib\DateTime;
 
 /**
  * Class AbstractMapping
