@@ -60,13 +60,7 @@ abstract class AbstractMapping
         } elseif ($type === 'date') {
             $mapping[$attributeCode] = [
                 'type' => $type,
-                'format' => implode(
-                    '||',
-                    [
-                        DateTime::DATETIME_INTERNAL_FORMAT,
-                        DateTime::DATE_INTERNAL_FORMAT,
-                    ]
-                )
+                'format' => FieldInterface::DATE_FORMAT,
             ];
         } else {
             $mapping[$attributeCode] = ['type' => $type];
