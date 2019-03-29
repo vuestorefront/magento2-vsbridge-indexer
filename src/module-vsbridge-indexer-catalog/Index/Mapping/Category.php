@@ -89,6 +89,7 @@ class Category extends AbstractMapping implements MappingInterface
 
             $properties = $this->generalMapping->getCommonProperties();
             $properties['children_count'] = ['type' => FieldInterface::TYPE_INTEGER];
+            $properties['product_count'] = ['type' => FieldInterface::TYPE_INTEGER];
 
             $childMapping = $this->getChildrenDataMapping($attributesMapping, $properties);
             $properties['children_data'] = ['properties' => $childMapping];
