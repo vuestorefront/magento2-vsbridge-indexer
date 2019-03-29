@@ -9,6 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Attribute as ResourceModel;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 
 /**
  * Class Attribute
@@ -24,10 +25,14 @@ class Attribute
      * Attribute constructor.
      *
      * @param ResourceModel $resourceModel
+     * @param EventManager  $eventManager
      */
-    public function __construct(ResourceModel $resourceModel)
-    {
+    public function __construct(
+        ResourceModel $resourceModel,
+        EventManager $eventManager
+    ) {
         $this->resourceModel = $resourceModel;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -46,6 +51,16 @@ class Attribute
                 $lastAttributeId = $attributeData['attribute_id'];
                 $attributeData['id'] = $attributeData['attribute_id'];
                 $attributeData = $this->filterData($attributeData);
+
+                $attributeDataObject = new \Magento\Framework\DataObject();
+                $attributeDataObject->setData($attributeData);
+
+                $this->eventManager->dispatch(
+                    'elasticsearch_attribute_build_entity_data_after',
+                    ['data_object' => $attributeData]
+                );
+
+                $attributeData = $attributeDataObject->getData();
 
                 yield $lastAttributeId => $attributeData;
             }

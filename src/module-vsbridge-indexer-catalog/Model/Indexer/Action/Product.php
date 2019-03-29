@@ -9,6 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product as ResourceModel;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 
 /**
  * Class Product
@@ -19,15 +20,22 @@ class Product
      * @var ResourceModel
      */
     private $resourceModel;
+    /**
+     * @var EventManager $eventManager
+     */
+    private $eventManager;
 
     /**
      * Product constructor.
-     *
      * @param ResourceModel $resourceModel
+     * @param EventManager  $eventManager
      */
-    public function __construct(ResourceModel $resourceModel)
-    {
+    public function __construct(
+        ResourceModel $resourceModel,
+        EventManager $eventManager
+    ) {
         $this->resourceModel = $resourceModel;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -57,6 +65,17 @@ class Product
 
                 unset($product['required_options']);
                 unset($product['has_options']);
+
+                $productObject = new \Magento\Framework\DataObject();
+                $productObject->setData($product);
+
+                $this->eventManager->dispatch(
+                    'elasticsearch_product_build_entity_data_after',
+                    ['data_object' => $product]
+                );
+
+                $product = $productObject->getData();
+
                 yield $lastProductId => $product;
             }
         } while (!empty($products));
