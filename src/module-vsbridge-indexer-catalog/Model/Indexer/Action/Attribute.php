@@ -57,7 +57,7 @@ class Attribute
 
                 $this->eventManager->dispatch(
                     'elasticsearch_attribute_build_entity_data_after',
-                    ['data_object' => $attributeData]
+                    ['data_object' => $attributeDataObject]
                 );
 
                 $attributeData = $attributeDataObject->getData();

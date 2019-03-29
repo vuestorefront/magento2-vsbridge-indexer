@@ -67,7 +67,7 @@ class Category
 
                 $this->eventManager->dispatch(
                     'elasticsearch_category_build_entity_data_after',
-                    ['data_object' => $categoryData]
+                    ['data_object' => $categoryDataObject]
                 );
 
                 $categoryData = $categoryDataObject->getData();

@@ -71,7 +71,7 @@ class Product
 
                 $this->eventManager->dispatch(
                     'elasticsearch_product_build_entity_data_after',
-                    ['data_object' => $product]
+                    ['data_object' => $productObject]
                 );
 
                 $product = $productObject->getData();
