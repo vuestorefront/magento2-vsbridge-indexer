@@ -77,7 +77,7 @@ class TierPriceProcessor
 
     /**
      * @param array $indexData
-     * @param $storeId
+     * @param int $storeId
      *
      * @return array
      * @throws \Exception

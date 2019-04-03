@@ -21,6 +21,16 @@ use Magento\Store\Model\Store;
 class Gallery
 {
     /**
+     * @var array
+     */
+    private $videoProperties = [
+        'url' => 'url',
+        'title' => 'title',
+        'desc' => 'description',
+        'meta' => 'metadata',
+    ];
+
+    /**
      * @var ResourceConnection
      */
     private $resource;
@@ -54,7 +64,7 @@ class Gallery
 
     /**
      * @param array $linkFieldIds
-     * @param $storeId
+     * @param int $storeId
      *
      * @return array
      * @throws \Exception
@@ -67,7 +77,7 @@ class Gallery
     }
 
     /**
-     * @return mixed
+     * @return int
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getMediaGalleryAttributeId()
@@ -75,6 +85,93 @@ class Gallery
         $attribute = $this->entityAttribute->loadByCode(\Magento\Catalog\Model\Product::ENTITY, 'media_gallery');
 
         return $attribute->getId();
+    }
+
+    /**
+     * @param array $valueIds
+     * @param int $storeId
+     *
+     * @return array
+     */
+    public function loadVideos(array $valueIds, $storeId)
+    {
+        if (empty($valueIds)) {
+            return [];
+        }
+
+        $result = $this->getVideoRawData($valueIds, $storeId);
+        $groupByValueId = [];
+
+        foreach ($result as $item) {
+            $valueId = $item['value_id'];
+            $item = $this->substituteNullsWithDefaultValues($item);
+            unset($item['value_id']);
+            $groupByValueId[$valueId] = $item;
+        }
+
+        return $groupByValueId;
+    }
+
+    /**
+     * @param array $valueIds
+     * @param int $storeId
+     *
+     * @return array
+     */
+    private function getVideoRawData(array $valueIds, $storeId)
+    {
+        $connection = $this->getConnection();
+        $mainTableAlias = 'main';
+        $videoTable = $this->resource->getTableName('catalog_product_entity_media_gallery_value_video');
+
+        // Select gallery images for product
+        $select = $connection->select()
+            ->from(
+                [$mainTableAlias => $videoTable],
+                [
+                    'value_id' => 'value_id',
+                    'url_default' => 'url',
+                    'title_default' => 'title',
+                    'desc_default' => 'description',
+                    'meta_default' => 'metadata'
+                ]
+            );
+
+        $select->where($mainTableAlias . '.store_id = ?', Store::DEFAULT_STORE_ID);
+
+        $select->joinLeft(
+            ['value' => $videoTable],
+            implode(
+                ' AND ',
+                [
+                    $mainTableAlias . '.value_id = value.value_id',
+                    $this->getConnection()->quoteInto('value.store_id = ?', (int)$storeId),
+                ]
+            ),
+            $this->videoProperties
+        );
+
+        return $connection->fetchAll($select);
+    }
+
+    /**
+     * @param array $rowData
+     *
+     * @return array
+     */
+    private function substituteNullsWithDefaultValues(array $rowData)
+    {
+        $columns = array_keys($this->videoProperties);
+
+        foreach ($columns as $key) {
+            if (empty($rowData[$key]) && !empty($rowData[$key . '_default'])) {
+                $rowData[$key] = $rowData[$key . '_default'];
+            }
+
+            unset($rowData[$key . '_default']);
+        }
+
+        return $rowData;
     }
 
     /**
@@ -103,6 +200,7 @@ class Gallery
                 [$mainTableAlias => $this->resource->getTableName(GalleryResource::GALLERY_TABLE)],
                 [
                     'value_id',
+                    'media_type',
                     'file' => 'value'
                 ]
             )->joinInner(

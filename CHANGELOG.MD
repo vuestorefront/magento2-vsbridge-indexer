@@ -1,9 +1,9 @@
 # Changelog
 
-## 1.1.0
+## [Unreleased]
+- Adding support for video data. Small change will be needed in VSF #19
 
-
-## 1.0.0 (2019.04.03)
+## [1.0.0] (2019.04.03)
 First version
 
 ## March 2019

@@ -65,7 +65,7 @@ class Children
 
     /**
      * @param array $category
-     * @param $storeId
+     * @param int $storeId
      *
      * @return array
      * @throws \Exception
@@ -88,7 +88,7 @@ class Children
 
     /**
      * @param array $category
-     * @param $storeId
+     * @param int $storeId
      * @param bool $recursive
      *
      * @return array

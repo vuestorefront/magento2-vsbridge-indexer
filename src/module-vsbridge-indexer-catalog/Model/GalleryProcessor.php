@@ -14,16 +14,33 @@ namespace Divante\VsbridgeIndexerCatalog\Model;
 class GalleryProcessor
 {
     /**
+     * Youtube regex
+     * @var string
+     */
+    private $youtubeRegex =
+        '%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i';
+
+    /**
+     * Vimeo regex
+     * @var array
+     */
+    private $vimeoRegex = [
+        '%^https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)',
+        "?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)(?:[?]?.*)$%im",
+    ];
+
+    /**
      * @param array $gallerySet
+     * @param array $videoSet
      *
      * @return array
      */
-    public function prepareMediaGallery(array $gallerySet)
+    public function prepareMediaGallery(array $gallerySet, array $videoSet = [])
     {
         $galleryPerProduct = [];
 
         foreach ($gallerySet as $mediaImage) {
-            $linkFieldId    = $mediaImage['row_id'];
+            $linkFieldId  = $mediaImage['row_id'];
             $image['typ'] = 'image';
             $image        = [
                 'typ' => 'image',
@@ -32,10 +49,43 @@ class GalleryProcessor
                 'pos' => (int)($this->getValue('position', $mediaImage)),
             ];
 
+            $valueId = $mediaImage['value_id'];
+
+            if (isset($videoSet[$valueId])) {
+                $image['vid'] = $this->prepareVideoData($videoSet[$valueId]);
+            }
+
             $galleryPerProduct[$linkFieldId][] = $image;
         }
 
         return $galleryPerProduct;
+    }
+
+    /**
+     * @param array $video
+     *
+     * @return array
+     */
+    private function prepareVideoData(array $video)
+    {
+        $vimeoRegex = implode('', $this->vimeoRegex);
+        $id = null;
+        $type = null;
+        $reg = [];
+        $url = $video['url'];
+
+        if (preg_match($this->youtubeRegex, $url, $reg)) {
+            $id = $reg[1];
+            $type = 'youtube';
+        } elseif (preg_match($vimeoRegex, $video['url'], $reg)) {
+            $id = $reg[3];
+            $type = 'vimeo';
+        }
+
+        $video['video_id'] = $id;
+        $video['type'] = $type;
+
+        return $video;
     }
 
     /**
