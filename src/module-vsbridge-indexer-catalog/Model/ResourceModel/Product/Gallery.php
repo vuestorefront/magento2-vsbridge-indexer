@@ -138,6 +138,7 @@ class Gallery
             );
 
         $select->where($mainTableAlias . '.store_id = ?', Store::DEFAULT_STORE_ID);
+        $select->where($mainTableAlias . '.value_id IN (?)', $valueIds);
 
         $select->joinLeft(
             ['value' => $videoTable],
