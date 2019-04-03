@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+
+## 1.0.0 (2019.04.03)
+First version
 
 ## March 2019
 
