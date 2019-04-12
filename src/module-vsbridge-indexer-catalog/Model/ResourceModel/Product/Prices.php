@@ -6,6 +6,8 @@
  * @license   See LICENSE_DIVANTE.txt for license details.
  */
 
+declare(strict_types = 1);
+
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Magento\Framework\App\ResourceConnection;
@@ -15,7 +17,6 @@ use Magento\Catalog\Model\Indexer\Product\Price\PriceTableResolver;
 use Magento\Framework\Indexer\DimensionFactory;
 use Magento\Store\Model\Indexer\WebsiteDimensionProvider;
 use Magento\Customer\Model\Indexer\CustomerGroupDimensionProvider;
-
 
 /**
  * Class Prices
@@ -48,11 +49,18 @@ class Prices
     private $dimensionFactory;
 
     /**
+     * @var array
+     */
+    private $priceIndexTableName = [];
+
+    /**
      * Prices constructor.
      *
      * @param ResourceConnection $resourceModel
      * @param StoreManagerInterface $storeManager
      * @param ProductMetaData $productMetaData
+     * @param PriceTableResolver $priceTableResolver
+     * @param DimensionFactory $dimensionFactory
      */
     public function __construct(
         ResourceConnection $resourceModel,
@@ -75,27 +83,14 @@ class Prices
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function loadPriceData($storeId, array $productIds)
+    public function loadPriceData(int $storeId, array $productIds): array
     {
         $entityIdField = $this->productMetaData->get()->getIdentifierField();
-        $websiteId = $this->getStore($storeId)->getWebsiteId();
+        $websiteId = (int)$this->getStore($storeId)->getWebsiteId();
 
         // only default customer group Id is supported now
         $customerGroupId = 0;
-
-        $priceIndexTableName = $this->priceTableResolver->resolve(
-            'catalog_product_index_price',
-            [
-                $this->dimensionFactory->create(
-                    WebsiteDimensionProvider::DIMENSION_NAME,
-                    (string)$websiteId
-                ),
-                $this->dimensionFactory->create(
-                    CustomerGroupDimensionProvider::DIMENSION_NAME,
-                    (string)$customerGroupId
-                ),
-            ]
-        );
+        $priceIndexTableName = $this->getPriceIndexTableName($websiteId, $customerGroupId);
 
         $select = $this->getConnection()->select()
             ->from(
@@ -111,6 +106,37 @@ class Prices
             ->where("p.$entityIdField IN (?)", $productIds);
 
         return $this->getConnection()->fetchAll($select);
+    }
+
+    /**
+     * @param int $websiteId
+     * @param int $customerGroupId
+     *
+     * @return string
+     */
+    private function getPriceIndexTableName(int $websiteId, int $customerGroupId): string
+    {
+        $key = $websiteId . '_' . $customerGroupId;
+
+        if (!isset($this->priceIndexTableName[$key])) {
+            $priceIndexTableName = $this->priceTableResolver->resolve(
+                'catalog_product_index_price',
+                [
+                    $this->dimensionFactory->create(
+                        WebsiteDimensionProvider::DIMENSION_NAME,
+                        (string)$websiteId
+                    ),
+                    $this->dimensionFactory->create(
+                        CustomerGroupDimensionProvider::DIMENSION_NAME,
+                        (string)$customerGroupId
+                    ),
+                ]
+            );
+            
+            $this->priceIndexTableName[$key] = (string)$priceIndexTableName;
+        }
+
+        return $this->priceIndexTableName[$key];
     }
 
     /**
