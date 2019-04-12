@@ -11,7 +11,7 @@
             <table name="cms_block" entity_column="block_id"/>
         </subscriptions>
     </view>
-    <view id="vsbridge_cms_page_indexer" class="Divante\VsbridgeIndexerCms\Model\Indexer\CmsBlock" group="indexer">
+    <view id="vsbridge_cms_page_indexer" class="Divante\VsbridgeIndexerCms\Model\Indexer\CmsPage" group="indexer">
         <subscriptions>
             <table name="cms_page" entity_column="page_id"/>
         </subscriptions>
