@@ -1,0 +1,132 @@
+<?php
+
+declare(strict_types = 1);
+
+/**
+ * @package  Divante\VsbridgeIndexerReview
+ * @author Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license See LICENSE_DIVANTE.txt for license details.
+ */
+
+namespace Divante\VsbridgeIndexerReview\ResourceModel;
+
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Select;
+
+/**
+ * Class Review
+ */
+class Review
+{
+
+    /**
+     * @var ResourceConnection
+     */
+    private $resource;
+
+    /**
+     * @var array
+     */
+    private $entityIdByCode = [];
+
+    /**
+     * Rates constructor.
+     *
+     * @param ResourceConnection $resourceConnection
+     */
+    public function __construct(ResourceConnection $resourceConnection)
+    {
+        $this->resource = $resourceConnection;
+    }
+
+    /**
+     * @param int $storeId
+     * @param array $reviewIds
+     * @param int $fromId
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function getReviews(int $storeId = 1, array $reviewIds = [], int $fromId = 0, int $limit = 1000): array
+    {
+        $select = $this->getConnection()->select()
+            ->from(
+                ['main_table' => $this->resource->getTableName('review')],
+                [
+                    'review_id',
+                    'created_at',
+                    'entity_pk_value',
+                    'status_id',
+                ]
+            );
+
+        $select->joinLeft(
+            ['store' => $this->resource->getTableName('review_store')],
+            'main_table.review_id = store.review_id'
+        )->where('store.store_id = ?', $storeId);
+
+        if (!empty($reviewIds)) {
+            $select->where('main_table.review_id IN (?)', $reviewIds);
+        }
+
+        $entityId = $this->getEntityIdByCode(\Magento\Review\Model\Review::ENTITY_PRODUCT_CODE);
+        $select->where('entity_id = ? ', $entityId);
+        $select = $this->joinReviewDetails($select);
+
+        $select->where('main_table.status_id = ?', 1);
+        $select->where('main_table.review_id > ?', $fromId);
+        $select->order('main_table.review_id');
+        $select->limit($limit);
+
+        return $this->getConnection()->fetchAssoc($select);
+    }
+
+    /**
+     * @param Select $select
+     *
+     * @return Select
+     */
+    private function joinReviewDetails(Select $select): Select
+    {
+        $select->joinLeft(
+            ['detail' => $this->resource->getTableName('review_detail')],
+            'main_table.review_id = detail.review_id',
+            [
+                'title',
+                'nickname',
+                'customer_id',
+                'detail',
+            ]
+        );
+
+        return $select;
+    }
+
+    /**
+     * @param string $entityCode
+     *
+     * @return int
+     */
+    private function getEntityIdByCode(string $entityCode): int
+    {
+        if (!isset($this->entityIdByCode[$entityCode])) {
+            $connection = $this->getConnection();
+            $select = $connection->select()
+                ->from('review_entity', ['entity_id'])
+                ->where('entity_code = :entity_code');
+
+            $this->entityIdByCode[$entityCode] = (int) $connection->fetchOne($select, [':entity_code' => $entityCode]);
+        }
+
+        return $this->entityIdByCode[$entityCode];
+    }
+
+    /**
+     * @return \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    private function getConnection()
+    {
+        return $this->resource->getConnection();
+    }
+}

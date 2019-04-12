@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="Divante\VsbridgeIndexerReview\Indexer\ReviewIndexerHandlerVirtual"
+                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+        <arguments>
+            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
+            <argument name="typeName" xsi:type="string">review</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Divante\VsbridgeIndexerReview\Model\Indexer\Review">
+        <arguments>
+            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerReview\Indexer\ReviewIndexerHandlerVirtual</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Review\Model\Review">
+        <plugin name="update_review_in_elastic" type="Divante\VsbridgeIndexerReview\Plugin\Indexer\Review\Save\UpdateReview"/>
+    </type>
+</config>
