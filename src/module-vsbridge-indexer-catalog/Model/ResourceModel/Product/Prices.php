@@ -13,10 +13,6 @@ namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
-use Magento\Catalog\Model\Indexer\Product\Price\PriceTableResolver;
-use Magento\Framework\Indexer\DimensionFactory;
-use Magento\Store\Model\Indexer\WebsiteDimensionProvider;
-use Magento\Customer\Model\Indexer\CustomerGroupDimensionProvider;
 
 /**
  * Class Prices
@@ -39,16 +35,6 @@ class Prices
     private $productMetaData;
 
     /**
-     * @var \Magento\Catalog\Model\Indexer\Product\Price\PriceTableResolver
-     */
-    private $priceTableResolver;
-
-    /**
-     * @var \Magento\Framework\Indexer\DimensionFactory
-     */
-    private $dimensionFactory;
-
-    /**
      * @var array
      */
     private $priceIndexTableName = [];
@@ -59,21 +45,15 @@ class Prices
      * @param ResourceConnection $resourceModel
      * @param StoreManagerInterface $storeManager
      * @param ProductMetaData $productMetaData
-     * @param PriceTableResolver $priceTableResolver
-     * @param DimensionFactory $dimensionFactory
      */
     public function __construct(
         ResourceConnection $resourceModel,
         StoreManagerInterface $storeManager,
-        ProductMetaData $productMetaData,
-        PriceTableResolver $priceTableResolver,
-        DimensionFactory $dimensionFactory
+        ProductMetaData $productMetaData
     ) {
         $this->resource = $resourceModel;
         $this->storeManager = $storeManager;
         $this->productMetaData = $productMetaData;
-        $this->priceTableResolver = $priceTableResolver;
-        $this->dimensionFactory = $dimensionFactory;
     }
 
     /**
@@ -119,20 +99,7 @@ class Prices
         $key = $websiteId . '_' . $customerGroupId;
 
         if (!isset($this->priceIndexTableName[$key])) {
-            $priceIndexTableName = $this->priceTableResolver->resolve(
-                'catalog_product_index_price',
-                [
-                    $this->dimensionFactory->create(
-                        WebsiteDimensionProvider::DIMENSION_NAME,
-                        (string)$websiteId
-                    ),
-                    $this->dimensionFactory->create(
-                        CustomerGroupDimensionProvider::DIMENSION_NAME,
-                        (string)$customerGroupId
-                    ),
-                ]
-            );
-            
+            $priceIndexTableName = 'catalog_product_index_price';
             $this->priceIndexTableName[$key] = (string)$priceIndexTableName;
         }
 
