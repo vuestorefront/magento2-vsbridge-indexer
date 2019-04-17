@@ -11,6 +11,7 @@ namespace Divante\VsbridgeIndexerCore\Elasticsearch;
 use Divante\VsbridgeIndexerCore\Api\Client\BuilderInterface as ClientBuilder;
 use Divante\VsbridgeIndexerCore\Api\Client\ConfigurationInterface as ClientConfiguration;
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
+use Divante\VsbridgeIndexerCore\Elasticsearch\Endpoints\DeleteByQuery;
 
 /**
  * Class Client
@@ -94,10 +95,33 @@ class Client implements ClientInterface
     }
 
     /**
+     * DeleteByQuery is compatible with ES 5.*
      * @inheritdoc
+     * @throws \Exception
      */
     public function deleteByQuery(array $params)
     {
-        $this->esClient->deleteByQuery($params);
+        $index = $this->extractArgument($params, 'index');
+        $type = $this->extractArgument($params, 'type');
+        $body = $this->extractArgument($params, 'body');
+        $endpoint = new DeleteByQuery($this->esClient->transport);
+        $endpoint->setIndex($index)
+            ->setType($type)
+            ->setBody($body);
+        $endpoint->setParams($params);
+        $response = $endpoint->performRequest();
+
+        return $endpoint->resultOrFuture($response);
+    }
+
+    /**
+     * @param $params
+     * @param $arg
+     *
+     * @return mixed|null
+     */
+    private function extractArgument(&$params, $arg)
+    {
+        return $this->esClient->extractArgument($params, $arg);
     }
 }

@@ -26,6 +26,7 @@ interface IndexOperationInterface
      * @param array $params
      *
      * @return void
+     * @throws \Exception
      */
     public function deleteByQuery(array $params);
 

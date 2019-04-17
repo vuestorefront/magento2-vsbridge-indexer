@@ -120,6 +120,7 @@ Note: If a docker with ElasticSearch is disabled, Indexer will display error: "N
 *Update on Schedule* mode observes changes in corresponding tables, and probably will be more relevant in most cases. It is the default mode in any bigger stores.
      
 ### Compatibility
+Elastisearch 5.*
 
 Module was tested on:
  -- Magento Community version 2.2.0 and 2.2.4. It should perform without any issues on all Magento 2.2.x versions. 
