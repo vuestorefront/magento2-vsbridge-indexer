@@ -161,7 +161,7 @@ class GenericIndexerHandler
             $query = ['query' => ['bool' => $transactionKeyQuery]];
 
             if ($docIds) {
-                $query['query']['bool']['must']['terms'] = ['_id' => $docIds];
+                $query['query']['bool']['must']['terms'] = ['_id' => array_values($docIds)];
             }
 
             $query = [
