@@ -29,6 +29,9 @@
                 <field id="port" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Elasticsearch port number</label>
                 </field>
+                <field id="path" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Elasticsearch path</label>
+                </field>
                 <field id="enable_https_mode" translate="label comment" type="select" sortOrder="31" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Use HTTPS</label>
                     <comment>Select yes if you want to connect to your Elasticsearch server over HTTPS.</comment>

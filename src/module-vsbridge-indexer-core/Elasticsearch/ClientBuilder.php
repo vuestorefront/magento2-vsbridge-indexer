@@ -20,7 +20,8 @@ class ClientBuilder implements ClientBuilderInterface
      */
     private $defaultOptions = [
         'host' => 'localhost',
-        'port' => '9200',
+        'port' => '',
+        'path' => '',
         'enable_http_auth' => false,
         'auth_user' => null,
         'auth_pwd' => null,
@@ -36,7 +37,7 @@ class ClientBuilder implements ClientBuilderInterface
         $options = array_merge($this->defaultOptions, $options);
         $esClientBuilder = \Elasticsearch\ClientBuilder::create();
         $host = $this->getHost($options);
-
+        
         if (!empty($host)) {
             $esClientBuilder->setHosts([$host]);
         }
@@ -64,6 +65,7 @@ class ClientBuilder implements ClientBuilderInterface
         $currentHostConfig = [
             'host' => $options['host'],
             'port' => $options['port'],
+            'path' => $options['path'],
             'scheme' => $scheme,
         ];
 

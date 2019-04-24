@@ -41,6 +41,7 @@ class ClientConfiguration implements ClientConfigurationInterface
         $options = [
             'host' => $this->getHost(),
             'port' => $this->getPort(),
+            'path' => $this->getPath(),
             'scheme' => $this->getScheme(),
             'enable_http_auth' => $this->isHttpAuthEnabled(),
             'auth_user' => $this->getHttpAuthUser(),
@@ -82,6 +83,14 @@ class ClientConfiguration implements ClientConfigurationInterface
         $httpsModeEnabled = (bool)$this->getConfigParam('enable_https_mode');
 
         return $httpsModeEnabled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return (string)$this->getConfigParam('path');
     }
 
     /**
