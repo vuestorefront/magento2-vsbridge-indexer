@@ -19,13 +19,22 @@ class DataFilter
     private $integerProperties = [];
 
     /**
+     * @var array
+     */
+    private $floatProperties = [];
+
+    /**
      * DataFilter constructor.
      *
      * @param array $integerProperties
+     * @param array $floatProperties
      */
-    public function __construct(array $integerProperties = [])
-    {
+    public function __construct(
+        array $integerProperties = [],
+        array $floatProperties = []
+    ) {
         $this->integerProperties = $integerProperties;
+        $this->floatProperties = $floatProperties;
     }
 
     /**
@@ -45,6 +54,8 @@ class DataFilter
                 } else {
                     if (in_array($key, $this->integerProperties)) {
                         $dtoToFilter[$key] = (int)$val;
+                    } elseif (in_array($key, $this->floatProperties)) {
+                        $dtoToFilter[$key] = (float)$val;
                     }
                 }
             }
