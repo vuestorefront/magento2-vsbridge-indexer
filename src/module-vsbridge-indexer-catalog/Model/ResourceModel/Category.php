@@ -77,9 +77,11 @@ class Category
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      *
      * @return \Magento\Framework\DB\Select
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function filterByStore($storeId)
     {
@@ -103,7 +105,7 @@ class Category
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      * @param array $productIds
      *
      * @return array

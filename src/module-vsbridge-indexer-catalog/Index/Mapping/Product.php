@@ -149,6 +149,16 @@ class Product extends AbstractMapping implements MappingInterface
                 'image' => ['type' => FieldInterface::TYPE_TEXT],
                 'lab' => ['type' => FieldInterface::TYPE_TEXT],
                 'pos' => ['type' => FieldInterface::TYPE_TEXT],
+                'vid' => [
+                    'properties' => [
+                        'url' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'title' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'desc' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'video_id' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'meta' =>  ['type' => FieldInterface::TYPE_TEXT],
+                        'type' =>  ['type' => FieldInterface::TYPE_TEXT],
+                    ]
+                ]
             ],
         ];
         $attributesMapping['final_price'] = ['type' => FieldInterface::TYPE_DOUBLE];
@@ -168,6 +178,7 @@ class Product extends AbstractMapping implements MappingInterface
                 'properties' => [
                     'option_id' => ['type' => FieldInterface::TYPE_LONG],
                     'position' => ['type' => FieldInterface::TYPE_LONG],
+                    'title' => ['type' => FieldInterface::TYPE_TEXT],
                     'sku' => ['type' => FieldInterface::TYPE_KEYWORD],
                     'product_links' => [
                         'properties' => [
@@ -213,6 +224,32 @@ class Product extends AbstractMapping implements MappingInterface
                     'position' => ['type' => FieldInterface::TYPE_LONG],
                     'name' => ['type' => FieldInterface::TYPE_TEXT],
                 ],
+            ],
+            'custom_options' => [
+                'properties' => [
+                    'image_size_x' => ['type' => FieldInterface::TYPE_TEXT],
+                    'image_size_y' => ['type' => FieldInterface::TYPE_TEXT],
+                    'file_extension' => ['type' => FieldInterface::TYPE_TEXT],
+                    'is_require' => ['type' => FieldInterface::TYPE_BOOLEAN],
+                    'max_characters' => ['type' => FieldInterface::TYPE_TEXT],
+                    'option_id' => ['type' => FieldInterface::TYPE_LONG],
+                    'price' => ['type' => FieldInterface::TYPE_DOUBLE],
+                    'price_type' => ['type' => FieldInterface::TYPE_TEXT],
+                    'sku' => ['type' => FieldInterface::TYPE_KEYWORD],
+                    'sort_order' => ['type' => FieldInterface::TYPE_LONG],
+                    'title' => ['type' => FieldInterface::TYPE_TEXT],
+                    'type' => ['type' => FieldInterface::TYPE_TEXT],
+                    'values' => [
+                        'properties' => [
+                            'sku' => ['type' => FieldInterface::TYPE_KEYWORD],
+                            'price' => ['type' => FieldInterface::TYPE_DOUBLE],
+                            'title' => ['type' => FieldInterface::TYPE_TEXT],
+                            'price_type' => ['type' => FieldInterface::TYPE_TEXT],
+                            'sort_order' => ['type' => FieldInterface::TYPE_LONG],
+                            'option_type_id' => ['type' => FieldInterface::TYPE_INTEGER],
+                        ]
+                    ]
+                ]
             ],
             'tier_prices' => [
                 'properties' => [

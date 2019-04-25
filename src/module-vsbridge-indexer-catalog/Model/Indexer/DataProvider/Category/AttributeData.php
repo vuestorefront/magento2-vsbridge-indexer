@@ -8,6 +8,7 @@ use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryChildAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\ConfigSettings;
 use Divante\VsbridgeIndexerCatalog\Model\SlugGenerator;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
 
 /**
  * Class AttributeData
@@ -48,6 +49,11 @@ class AttributeData
     private $childrenResourceModel;
 
     /**
+     * @var ProductCountResourceModel
+     */
+    private $productCountResource;
+
+    /**
      * @var \Divante\VsbridgeIndexerCore\Indexer\DataFilter
      */
     private $dataFilter;
@@ -56,6 +62,11 @@ class AttributeData
      * @var array
      */
     private $childrenRowAttributes = [];
+
+    /**
+     * @var array
+     */
+    private $childrenProductCount = [];
 
     /**
      * @var ConfigSettings
@@ -80,6 +91,7 @@ class AttributeData
     public function __construct(
         AttributeDataProvider $attributeResource,
         CategoryChildrenResource $childrenResource,
+        ProductCountResourceModel $productCountResource,
         SlugGenerator\Proxy $catalogHelper,
         ConfigSettings $configSettings,
         CategoryChildAttributes $categoryChildAttributes,
@@ -87,6 +99,7 @@ class AttributeData
     ) {
         $this->settings = $configSettings;
         $this->slugGenerator = $catalogHelper;
+        $this->productCountResource = $productCountResource;
         $this->attributeResourceModel = $attributeResource;
         $this->childrenResourceModel = $childrenResource;
         $this->dataFilter = $dataFilter;
@@ -105,12 +118,17 @@ class AttributeData
         /**
          * TODO add option to load only specific categories
          */
-        $attributes = $this->attributeResourceModel->loadAttributesData($storeId, array_keys($indexData));
+
+        $categoryIds = array_keys($indexData);
+        $attributes = $this->attributeResourceModel->loadAttributesData($storeId, $categoryIds);
+        $productCount = $this->productCountResource->loadProductCount($categoryIds);
 
         foreach ($attributes as $entityId => $attributesData) {
             $categoryData = array_merge($indexData[$entityId], $attributesData);
             $categoryData = $this->prepareCategory($categoryData);
             $categoryData = $this->addSortOptions($categoryData, $storeId);
+            $categoryData['product_count'] = $productCount[$entityId];
+
             $indexData[$entityId] = $categoryData;
         }
 
@@ -126,6 +144,9 @@ class AttributeData
                     $this->childAttributes->getRequiredAttributes()
                 );
 
+            $this->childrenProductCount = $this->productCountResource->loadProductCount(
+                array_keys($groupedChildrenById)
+            );
             $indexData[$categoryId] = $this->addChildrenData($categoryData, $groupedChildrenById);
         }
 
@@ -168,7 +189,7 @@ class AttributeData
 
     /**
      * @param array $categories
-     * @param       $rootId
+     * @param int $rootId
      *
      * @return array
      */
@@ -188,6 +209,7 @@ class AttributeData
                     $categoryData = array_merge($categoryData, $this->childrenRowAttributes[$categoryId]);
                 }
 
+                $categoryData['product_count'] = $this->childrenProductCount[$categoryId];
                 $categoryData = $this->prepareCategory($categoryData);
                 $categoryData['children_data'] = $this->plotTree($categories, $categoryId);
                 $categoryData['children_count'] = count($categoryData['children_data']);

@@ -38,12 +38,14 @@
       "src/module-vsbridge-indexer-core/registration.php",
       "src/module-vsbridge-indexer-catalog/registration.php",
       "src/module-vsbridge-indexer-cms/registration.php",
+      "src/module-vsbridge-indexer-review/registration.php",
       "src/module-vsbridge-indexer-tax/registration.php"
     ],
     "psr-4": {
       "Divante\\VsbridgeIndexerCore\\": "src/module-vsbridge-indexer-core",
       "Divante\\VsbridgeIndexerCatalog\\": "src/module-vsbridge-indexer-catalog",
       "Divante\\VsbridgeIndexerCms\\": "src/module-vsbridge-indexer-cms",
+      "Divante\\VsbridgeIndexerReview\\": "src/module-vsbridge-indexer-review",
       "Divante\\VsbridgeIndexerTax\\": "src/module-vsbridge-indexer-tax"
     }
   },

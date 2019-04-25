@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <virtualType name="Divante\VsbridgeIndexerTax\Indexer\CmsIndexerHandlerVirtual"
+    <virtualType name="Divante\VsbridgeIndexerTax\Indexer\TaxRuleIndexerHandlerVirtual"
                  type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
         <arguments>
             <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
@@ -10,7 +10,7 @@
 
     <type name="Divante\VsbridgeIndexerTax\Model\Indexer\TaxRules">
         <arguments>
-            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerTax\Indexer\CmsIndexerHandlerVirtual</argument>
+            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerTax\Indexer\TaxRuleIndexerHandlerVirtual</argument>
         </arguments>
     </type>
 </config>

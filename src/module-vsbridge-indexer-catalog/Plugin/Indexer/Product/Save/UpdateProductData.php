@@ -33,7 +33,10 @@ class UpdateProductData
 
     /**
      * Reindex data after product save/delete resource commit
+     *
      * @param Product $product
+     *
+     * @return void
      */
     public function afterReindex(Product $product)
     {

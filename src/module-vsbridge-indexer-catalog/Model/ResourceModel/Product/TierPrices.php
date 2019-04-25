@@ -32,6 +32,7 @@ class TierPrices
      * TierPrices constructor.
      *
      * @param ResourceConnection $resourceModel
+     * @param ProductMetaData $productMetaData
      */
     public function __construct(
         ResourceConnection $resourceModel,
@@ -46,6 +47,7 @@ class TierPrices
      * @param array $linkFieldIds
      *
      * @return array
+     * @throws \Exception
      */
     public function loadTierPrices($websiteId, array $linkFieldIds)
     {

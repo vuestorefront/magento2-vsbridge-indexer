@@ -110,10 +110,10 @@ class Category
         $loadCategoryIds = array_map('intval', $loadCategoryIds);
 
         if (!empty($loadCategoryIds)) {
-            $select = $this->prepareCategoryNameSelect($loadCategoryIds, $storeId);
+            $categoryName = $this->loadCategoryName($loadCategoryIds, $storeId);
 
-            foreach ($this->getConnection()->fetchAll($select) as $row) {
-                $categoryId = (int) $row['entity_id'];
+            foreach ($categoryName as $row) {
+                $categoryId = (int)$row['entity_id'];
                 $this->categoryNameCache[$storeId][$categoryId] = $row['name'];
             }
         }
@@ -125,10 +125,10 @@ class Category
      * @param array $loadCategoryIds
      * @param int $storeId
      *
-     * @return Select
+     * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function prepareCategoryNameSelect(array $loadCategoryIds, $storeId)
+    private function loadCategoryName(array $loadCategoryIds, $storeId)
     {
         /** @var CategoryCollection $categoryCollection */
         $categoryCollection = $this->categoryCollectionFactory->create();
@@ -139,7 +139,7 @@ class Category
 
         $select = $categoryCollection->getSelect();
 
-        return $select;
+        return $this->getConnection()->fetchAll($select);
     }
 
     /**

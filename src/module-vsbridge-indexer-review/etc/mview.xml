@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
+    <view id="vsbridge_review_indexer" class="Divante\VsbridgeIndexerReview\Model\Indexer\Review" group="indexer">
+        <subscriptions>
+            <table name="review" entity_column="review_id"/>
+        </subscriptions>
+    </view>
+</config>

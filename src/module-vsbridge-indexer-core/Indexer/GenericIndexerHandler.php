@@ -118,7 +118,7 @@ class GenericIndexerHandler
         foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
             foreach ($type->getDataProviders() as $dataProvider) {
                 if (!empty($docs)) {
-                    $docs = $dataProvider->addData($docs, $store->getId());
+                    $docs = $dataProvider->addData($docs, (int)$store->getId());
                 }
             }
 
@@ -161,7 +161,7 @@ class GenericIndexerHandler
             $query = ['query' => ['bool' => $transactionKeyQuery]];
 
             if ($docIds) {
-                $query['query']['bool']['must']['terms'] = ['_id' => $docIds];
+                $query['query']['bool']['must']['terms'] = ['_id' => array_values($docIds)];
             }
 
             $query = [

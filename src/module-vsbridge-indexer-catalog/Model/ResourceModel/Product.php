@@ -65,6 +65,7 @@ class Product
      * @param AttributeDataProvider $attributeDataProvider
      * @param ResourceConnection $resourceConnection
      * @param StoreManagerInterface $storeManager
+     * @param ProductMetaData $productMetaData
      * @param DbHelper $dbHelper
      */
     public function __construct(
@@ -90,6 +91,7 @@ class Product
      * @param int $limit
      *
      * @return array
+     * @throws \Exception
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -203,7 +205,7 @@ class Product
     }
 
     /**
-     * @param $storeId
+     * @param int $storeId
      *
      * @return int
      * @throws \Magento\Framework\Exception\NoSuchEntityException
