@@ -71,7 +71,6 @@ class Review implements MappingInterface
             'title' => ['type' => FieldInterface::TYPE_TEXT],
             'detail' => ['type' => FieldInterface::TYPE_TEXT],
             'nickname' => ['type' => FieldInterface::TYPE_TEXT],
-            'review_entity' => ['type' => FieldInterface::TYPE_KEYWORD],
             'review_status' => ['type' => FieldInterface::TYPE_INTEGER],
             'customer_id' => ['type' => FieldInterface::TYPE_INTEGER],
         ];

@@ -49,7 +49,6 @@ class Review
             foreach ($reviews as $review) {
                 $review['id'] = (int)($review['review_id']);
                 $review['product_id'] = (int)$review['entity_pk_value'];
-                $review['review_entity'] = \Magento\Review\Model\Review::ENTITY_PRODUCT_CODE;
                 $review['review_status'] = $review['status_id'];
                 unset($review['review_id'], $review['entity_pk_value'], $review['status_id']);
                 $lastReviewId = $review['id'];

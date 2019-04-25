@@ -8,6 +8,7 @@
 There is not need really, VSF only has to know if `product_count > 0`, so if you already had products assign to categories (before running ` bin/magento indexer:reindex vsbridge_category_indexer`) 
 category will be visible in menu sidebar.
 - Add support for reviews. Reviews are exported without ratings (VSF does not support ratings for now)  
+- Add support for custom options. 
 
 ## [1.0.0] (2019.04.03)
 First version
