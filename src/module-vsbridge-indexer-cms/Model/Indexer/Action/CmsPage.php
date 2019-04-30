@@ -8,7 +8,9 @@
 
 namespace Divante\VsbridgeIndexerCms\Model\Indexer\Action;
 
+use Divante\VsbridgeIndexerCms\Model\ContentProcessor;
 use Divante\VsbridgeIndexerCms\Model\ResourceModel\CmsPage as CmsPageResource;
+
 use Magento\Cms\Model\Template\FilterProvider;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\AreaList;
@@ -29,6 +31,16 @@ class CmsPage
     private $filterProvider;
 
     /**
+     * @var AreaList
+     */
+    private $areaList;
+
+    /**
+     * @var ContentProcessor
+     */
+    private $contentProcessor;
+
+    /**
      * CmsBlock constructor.
      *
      * @param AreaList $areaList
@@ -37,12 +49,14 @@ class CmsPage
      */
     public function __construct(
         AreaList $areaList,
+        ContentProcessor $contentProcessor,
         CmsPageResource $cmsBlockResource,
         FilterProvider $filterProvider
     ) {
         $this->areaList = $areaList;
-        $this->filterProvider = $filterProvider;
         $this->resourceModel = $cmsBlockResource;
+        $this->filterProvider = $filterProvider;
+        $this->contentProcessor = $contentProcessor;
     }
 
     /**
@@ -54,6 +68,7 @@ class CmsPage
     public function rebuild($storeId = 1, array $pageIds = [])
     {
         $this->areaList->getArea(Area::AREA_FRONTEND)->load(Area::PART_DESIGN);
+        $templateFilter = $this->filterProvider->getPageFilter()->setStoreId($storeId);
         $lastPageId = 0;
 
         do {
@@ -62,8 +77,7 @@ class CmsPage
             foreach ($cmsPages as $pageData) {
                 $lastPageId = $pageData['page_id'];
                 $pageData['id'] = $pageData['page_id'];
-                $pageData['content'] =
-                    $this->filterProvider->getBlockFilter()->setStoreId($storeId)->filter($pageData['content']);
+                $pageData['content'] = $this->contentProcessor->parse($templateFilter, $pageData['content']);
                 $pageData['active'] = (bool)$pageData['is_active'];
 
                 unset($pageData['creation_time'], $pageData['update_time'], $pageData['page_id']);

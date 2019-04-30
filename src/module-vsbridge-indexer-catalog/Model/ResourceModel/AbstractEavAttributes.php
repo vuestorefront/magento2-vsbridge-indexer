@@ -15,7 +15,7 @@ use Magento\Framework\EntityManager\EntityMetadataInterface;
 /**
  * Class EavAttributes
  */
-abstract class AbstractEavAttributes
+abstract class AbstractEavAttributes implements EavAttributesInterface
 {
     /**
      * @var array
