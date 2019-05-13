@@ -14,15 +14,26 @@
 
             <group id="general_settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Settings</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable VS Bridge</label>
+                    <comment>Enable to run indexes with Elasticsearch.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="allowed_stores" translate="label comment" type="multiselect" sortOrder="31" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>List of stores to reindex</label>
                     <comment>For every store view separated index is created in Elastic</comment>
                     <source_model>Magento\Config\Model\Config\Source\Store</source_model>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
                 </field>
             </group>
 
             <group id="es_client" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Elasticsearch Client</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
                 <field id="host" translate="label comment" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Elasticsearch host</label>
                 </field>
@@ -55,6 +66,9 @@
 
             <group id="indices_settings" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Indices Settings</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
                 <field id="batch_indexing_size" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Batch Indexing Size</label>
                     <validate>required-entry validate-digits</validate>
@@ -72,6 +86,9 @@
 
             <group id="redis_cache_settings" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label>Redis Cache Settings</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
                 <field id="clear_cache" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
                     <label>Clear cache</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

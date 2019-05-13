@@ -18,6 +18,7 @@ use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Store\Api\Data\StoreInterface;
 use Psr\Log\LoggerInterface;
+use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
 
 /**
  * Class IndexerHandler
@@ -112,37 +113,41 @@ class GenericIndexerHandler
      */
     public function saveIndex(\Traversable $documents, StoreInterface $store)
     {
-        $index = $this->getIndex($store);
-        $type = $index->getType($this->typeName);
+        try {
+            $index = $this->getIndex($store);
+            $type = $index->getType($this->typeName);
 
-        foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
-            foreach ($type->getDataProviders() as $dataProvider) {
-                if (!empty($docs)) {
-                    $docs = $dataProvider->addData($docs, (int)$store->getId());
+            foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
+                foreach ($type->getDataProviders() as $dataProvider) {
+                    if (!empty($docs)) {
+                        $docs = $dataProvider->addData($docs, (int)$store->getId());
+                    }
                 }
+
+                $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
+                $bulkRequest = $this->indexOperation->createBulk()->addDocuments(
+                    $index->getName(),
+                    $this->typeName,
+                    $docs
+                );
+
+                $response = $this->indexOperation->executeBulk($bulkRequest);
+                $this->logErrors($response);
+                $this->eventManager->dispatch(
+                    'search_engine_save_documents_after',
+                    [
+                        'data_type' => $this->typeName,
+                        'bulk_response' => $response,
+                    ]
+                );
+
+                $docs = null;
             }
 
-            $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
-            $bulkRequest = $this->indexOperation->createBulk()->addDocuments(
-                $index->getName(),
-                $this->typeName,
-                $docs
-            );
-
-            $response = $this->indexOperation->executeBulk($bulkRequest);
-            $this->logErrors($response);
-            $this->eventManager->dispatch(
-                'search_engine_save_documents_after',
-                [
-                    'data_type' => $this->typeName,
-                    'bulk_response' => $response,
-                ]
-            );
-
-            $docs = null;
+            $this->indexOperation->refreshIndex($index);
+        } catch (ConnectionDisabledException $exception) {
+            // do nothing, ES indexer disabled in configuration
         }
-
-        $this->indexOperation->refreshIndex($index);
     }
 
     /**
@@ -153,24 +158,28 @@ class GenericIndexerHandler
      */
     public function cleanUpByTransactionKey(StoreInterface $store, array $docIds = null)
     {
-        $indexName = $this->indexOperation->getIndexName($store);
+        try {
+            $indexName = $this->indexOperation->getIndexName($store);
 
-        if ($this->indexOperation->indexExists($indexName)) {
-            $index = $this->indexOperation->getIndexByName($this->indexIdentifier, $store);
-            $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey]]];
-            $query = ['query' => ['bool' => $transactionKeyQuery]];
+            if ($this->indexOperation->indexExists($indexName)) {
+                $index = $this->indexOperation->getIndexByName($this->indexIdentifier, $store);
+                $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey]]];
+                $query = ['query' => ['bool' => $transactionKeyQuery]];
 
-            if ($docIds) {
-                $query['query']['bool']['must']['terms'] = ['_id' => array_values($docIds)];
+                if ($docIds) {
+                    $query['query']['bool']['must']['terms'] = ['_id' => array_values($docIds)];
+                }
+
+                $query = [
+                    'index' => $index->getName(),
+                    'type' => $this->typeName,
+                    'body' => $query,
+                ];
+
+                $this->indexOperation->deleteByQuery($query);
             }
-
-            $query = [
-                'index' => $index->getName(),
-                'type' => $this->typeName,
-                'body' => $query,
-            ];
-
-            $this->indexOperation->deleteByQuery($query);
+        } catch (ConnectionDisabledException $exception) {
+            // do nothing, ES indexer disabled in configuration
         }
     }
 
