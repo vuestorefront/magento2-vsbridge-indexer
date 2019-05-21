@@ -65,6 +65,16 @@ class GeneralSettings
     }
 
     /**
+     * Check if ES indexing enabled
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return (bool)$this->getConfigParam('enable');
+    }
+
+    /**
      * @param string $configField
      *
      * @return string|null
