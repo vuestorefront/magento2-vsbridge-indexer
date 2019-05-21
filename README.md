@@ -30,7 +30,12 @@ php bin/magento setup:upgrade
 
 
 ### Configuration
-Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront → Indexer), available now in the in the Magento Panel, and configure it in the listed areas: 
+Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront → Indexer), available now in the in the Magento Panel, and configure it in the listed areas:
+1. General settings → Enable VS Bridge
+ 
+   Enable to export data to elasticsearch. By default indexing is disable.
+
+    ![](docs/images/config-general-enable.png) 
  
 1. General settings → List of stores to reindex
  

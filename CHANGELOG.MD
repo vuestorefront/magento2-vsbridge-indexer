@@ -9,6 +9,7 @@ There is not need really, VSF only has to know if `product_count > 0`, so if you
 category will be visible in menu sidebar.
 - Add support for reviews. Reviews are exported without ratings (VSF does not support ratings for now)  
 - Add support for custom options. 
+- Add option to enable/disable exporting data to ES. 
 
 ## [1.0.0] (2019.04.03)
 First version
