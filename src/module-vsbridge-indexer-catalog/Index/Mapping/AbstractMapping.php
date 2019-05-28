@@ -184,10 +184,10 @@ abstract class AbstractMapping
     {
         $attributeCode = $attribute->getAttributeCode();
 
-        if (strstr($attributeCode, 'is_')) {
+        if (substr($attributeCode, 0, 3) === 'is_') {
             return true;
         }
-
+        
         if ($attribute->getSourceModel() == 'eav/entity_attribute_source_boolean') {
             return true;
         }
