@@ -8,19 +8,17 @@
 
 namespace Divante\VsbridgeIndexerCms\Model;
 
-use \Magento\Framework\Filter\Template as TemplateFilter;
+use Divante\VsbridgeIndexerCms\Api\ContentProcessorInterface;
+use Magento\Framework\Filter\Template as TemplateFilter;
 
 /**
  * Class ContentProcessor
  */
-class ContentProcessor
+class ContentProcessor implements ContentProcessorInterface
 {
+
     /**
-     * @param TemplateFilter $templateFilter
-     * @param string $content
-     *
-     * @return string
-     * @throws \Exception
+     * @inheritdoc
      */
     public function parse(TemplateFilter $templateFilter, string $content)
     {
