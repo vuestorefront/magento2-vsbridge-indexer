@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCms\Model\Indexer\Action;
 
-use Divante\VsbridgeIndexerCms\Model\ContentProcessor;
+use Divante\VsbridgeIndexerCms\Api\ContentProcessorInterface;
 use Divante\VsbridgeIndexerCms\Model\ResourceModel\CmsBlock as CmsBlockResource;
 
 use Magento\Cms\Model\Template\FilterProvider;
@@ -36,7 +36,7 @@ class CmsBlock
     private $areaList;
 
     /**
-     * @var ContentProcessor
+     * @var ContentProcessorInterface
      */
     private $contentProcessor;
 
@@ -44,12 +44,13 @@ class CmsBlock
      * CmsBlock constructor.
      *
      * @param AreaList $areaList
+     * @param ContentProcessorInterface $contentProcessor
      * @param CmsBlockResource $cmsBlockResource
      * @param FilterProvider $filterProvider
      */
     public function __construct(
         AreaList $areaList,
-        ContentProcessor $contentProcessor,
+        ContentProcessorInterface $contentProcessor,
         CmsBlockResource $cmsBlockResource,
         FilterProvider $filterProvider
     ) {

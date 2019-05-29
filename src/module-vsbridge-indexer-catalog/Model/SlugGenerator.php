@@ -8,16 +8,15 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model;
 
+use Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface;
+
 /**
  * Class SlugGenerator
  */
-class SlugGenerator
+class SlugGenerator implements SlugGeneratorInterface
 {
     /**
-     * @param string $name
-     * @param int $id
-     *
-     * @return mixed|null|string|string[]
+     * @inheritdoc
      */
     public function generate($name, $id)
     {

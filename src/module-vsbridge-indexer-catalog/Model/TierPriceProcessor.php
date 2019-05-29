@@ -10,9 +10,9 @@ namespace Divante\VsbridgeIndexerCatalog\Model;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\TierPrices as TierPricesResource;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
-use Magento\Catalog\Model\Product\Visibility;
 use Magento\Customer\Model\Group;
 use Magento\Store\Model\StoreManagerInterface;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 
 /**
  * Class TierPriceProcessor
@@ -40,21 +40,21 @@ class TierPriceProcessor
     private $productMetaData;
 
     /**
-     * @var ConfigSettings
+     * @var CatalogConfigurationInterface
      */
     private $configSettings;
 
     /**
      * PriceData constructor.
      *
-     * @param ConfigSettings $configSettings
+     * @param CatalogConfigurationInterface $configSettings
      * @param TierPricesResource $tierPricesResource
      * @param StoreManagerInterface $storeManager
      * @param ProductMetaData $productMetaData
      * @param AttributeDataProvider $config
      */
     public function __construct(
-        ConfigSettings $configSettings,
+        CatalogConfigurationInterface $configSettings,
         TierPricesResource $tierPricesResource,
         StoreManagerInterface $storeManager,
         ProductMetaData $productMetaData,

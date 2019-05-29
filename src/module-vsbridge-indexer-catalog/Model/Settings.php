@@ -8,16 +8,15 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model;
 
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Config as ConfigResource;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
 
 /**
  * Class ConfigSettings
  */
-class ConfigSettings
+class Settings implements CatalogConfigurationInterface
 {
-    const CATALOG_SETTINGS_XML_PREFIX = 'vsbridge_indexer_settings/catalog_settings';
-
     /**
      * @var array
      */
@@ -53,7 +52,7 @@ class ConfigSettings
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function useMagentoUrlKeys()
     {
@@ -61,7 +60,7 @@ class ConfigSettings
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function syncTierPrices()
     {
@@ -69,9 +68,7 @@ class ConfigSettings
     }
 
     /**
-     * @param int $storeId
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getAllowedProductTypes($storeId)
     {
@@ -111,9 +108,7 @@ class ConfigSettings
     }
 
     /**
-     *
-     * @return array
-     * @throws \Exception
+     * @inheritdoc
      */
     public function getAttributesUsedForSortBy()
     {
@@ -128,9 +123,7 @@ class ConfigSettings
     }
 
     /**
-     * @param int $storeId
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getProductListDefaultSortBy($storeId)
     {

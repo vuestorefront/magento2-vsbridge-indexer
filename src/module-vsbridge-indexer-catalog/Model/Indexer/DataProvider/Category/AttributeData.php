@@ -1,12 +1,18 @@
 <?php
+/**
+ * @package  Divante\VsbridgeIndexerCatalog
+ * @author Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license See LICENSE_DIVANTE.txt for license details.
+ */
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\Children as CategoryChildrenResource;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryChildAttributes;
-use Divante\VsbridgeIndexerCatalog\Model\ConfigSettings;
-use Divante\VsbridgeIndexerCatalog\Model\SlugGenerator;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
 
@@ -69,12 +75,12 @@ class AttributeData
     private $childrenProductCount = [];
 
     /**
-     * @var ConfigSettings
+     * @var CatalogConfigurationInterface
      */
     private $settings;
 
     /**
-     * @var SlugGenerator
+     * @var SlugGeneratorInterface
      */
     private $slugGenerator;
 
@@ -83,8 +89,9 @@ class AttributeData
      *
      * @param AttributeDataProvider $attributeResource
      * @param CategoryChildrenResource $childrenResource
-     * @param SlugGenerator\Proxy $catalogHelper
-     * @param ConfigSettings $configSettings
+     * @param ProductCountResourceModel $productCountResource
+     * @param SlugGeneratorInterface $slugGenerator
+     * @param CatalogConfigurationInterface $configSettings
      * @param CategoryChildAttributes $categoryChildAttributes
      * @param DataFilter $dataFilter
      */
@@ -92,13 +99,13 @@ class AttributeData
         AttributeDataProvider $attributeResource,
         CategoryChildrenResource $childrenResource,
         ProductCountResourceModel $productCountResource,
-        SlugGenerator\Proxy $catalogHelper,
-        ConfigSettings $configSettings,
+        SlugGeneratorInterface $slugGenerator,
+        CatalogConfigurationInterface $configSettings,
         CategoryChildAttributes $categoryChildAttributes,
         DataFilter $dataFilter
     ) {
         $this->settings = $configSettings;
-        $this->slugGenerator = $catalogHelper;
+        $this->slugGenerator = $slugGenerator;
         $this->productCountResource = $productCountResource;
         $this->attributeResourceModel = $attributeResource;
         $this->childrenResourceModel = $childrenResource;
@@ -114,7 +121,7 @@ class AttributeData
      */
     public function addData(array $indexData, $storeId)
     {
-        $this->settings->getAttributesUsedForSortBy($storeId);
+        $this->settings->getAttributesUsedForSortBy();
         /**
          * TODO add option to load only specific categories
          */
