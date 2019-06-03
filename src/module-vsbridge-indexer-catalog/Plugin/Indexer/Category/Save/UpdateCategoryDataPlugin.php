@@ -12,9 +12,9 @@ use Divante\VsbridgeIndexerCatalog\Model\Indexer\CategoryProcessor;
 use Magento\Catalog\Model\Category;
 
 /**
- * Class UpdateCategoryData
+ * Class UpdateCategoryDataPlugin
  */
-class UpdateCategoryData
+class UpdateCategoryDataPlugin
 {
     /**
      * @var CategoryProcessor

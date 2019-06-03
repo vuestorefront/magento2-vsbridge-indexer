@@ -9,15 +9,14 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer;
 
 use Divante\VsbridgeIndexerCatalog\Model\Indexer\Action\Product as ProductAction;
-
-use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler;
+use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Cache\Processor as CacheProcessor;
 
 /**
- * Class Product
+ * Class ProductCategory
  */
-class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Framework\Mview\ActionInterface
+class ProductCategory implements \Magento\Framework\Indexer\ActionInterface, \Magento\Framework\Mview\ActionInterface
 {
     /**
      * @var GenericIndexerHandler
@@ -40,7 +39,7 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
     private $cacheProcessor;
 
     /**
-     * Product constructor.
+     * Category constructor.
      *
      * @param CacheProcessor $cacheProcessor
      * @param GenericIndexerHandler $indexerHandler
@@ -54,8 +53,8 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         ProductAction $action
     ) {
         $this->productAction = $action;
-        $this->indexHandler = $indexerHandler;
         $this->storeManager = $storeManager;
+        $this->indexHandler = $indexerHandler;
         $this->cacheProcessor = $cacheProcessor;
     }
 
@@ -67,10 +66,7 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         $stores = $this->storeManager->getStores();
 
         foreach ($stores as $store) {
-            $storeId = $store->getId();
-            $this->indexHandler->saveIndex($this->productAction->rebuild($storeId, $ids), $store);
-            $this->indexHandler->cleanUpByTransactionKey($store, $ids);
-            $this->cacheProcessor->cleanCacheByDocIds($storeId, $this->indexHandler->getTypeName(), $ids);
+            $this->rebuild($store, $ids);
         }
     }
 
@@ -82,10 +78,23 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         $stores = $this->storeManager->getStores();
 
         foreach ($stores as $store) {
-            $this->indexHandler->saveIndex($this->productAction->rebuild($store->getId()), $store);
-            $this->indexHandler->cleanUpByTransactionKey($store);
-            $this->cacheProcessor->cleanCacheByTags($store->getId(), [$this->indexHandler->getTypeName()]);
+            $this->rebuild($store);
         }
+    }
+
+    /**
+     * @param \Magento\Store\Api\Data\StoreInterface $store
+     * @param array $productIds
+     *
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function rebuild($store, array $productIds = [])
+    {
+        $this->indexHandler->updateIndex(
+            $this->productAction->rebuild($store->getId(), $productIds),
+            $store,
+            ['category_data']
+        );
     }
 
     /**
