@@ -135,7 +135,6 @@ Module was not tested on version 2.3.
 ### TODO
 - check the Vue Storefront - Magento 2 Indexer bridge for Magento 2.3 (for Commerce and Enterprise versions).
 - add MSI support
-- add rating review to ElasticSearch as a separate module @Agata 
 - add a limitation of the attributes (products, categories) sent to ElasticSearch
 - add a limitation of the categories sent to ElasticSearch, by adding new configurations: send only categories visible in the menu, send only active categories @Agata
 - add a new command enabling the full indexation, which will run all the indexes necessary for VSF   

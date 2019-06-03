@@ -10,12 +10,17 @@ namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\CatalogInventory\Api\StockConfigurationInterface;
 
 /**
  * Class Inventory
  */
 class Inventory
 {
+    /**
+     * @var StockConfigurationInterface
+     */
+    private $stockConfiguration;
 
     /**
      * @var array
@@ -59,15 +64,18 @@ class Inventory
     /**
      * Inventory constructor.
      *
+     * @param StockConfigurationInterface $stockConfiguration
      * @param StoreManagerInterface $storeManager
      * @param ResourceConnection $resourceModel
      */
     public function __construct(
+        StockConfigurationInterface $stockConfiguration,
         StoreManagerInterface $storeManager,
         ResourceConnection $resourceModel
     ) {
         $this->resource = $resourceModel;
         $this->storeManager = $storeManager;
+        $this->stockConfiguration = $stockConfiguration;
     }
 
     /**
@@ -107,10 +115,11 @@ class Inventory
      * @param array $fields
      *
      * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     private function getInventoryData($storeId, array $productIds, array $fields)
     {
-        $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
+        $websiteId = $this->getWebsiteId();
         $connection = $this->resource->getConnection();
 
         $select = $connection->select()
@@ -135,5 +144,19 @@ class Inventory
         );
 
         return $connection->fetchAssoc($select);
+    }
+
+    /**
+     * @param int|null $websiteId
+     *
+     * @return int|null
+     */
+    private function getWebsiteId($websiteId = null)
+    {
+        if (null === $websiteId) {
+            $websiteId = $this->stockConfiguration->getDefaultScopeId();
+        }
+
+        return (int)$websiteId;
     }
 }
