@@ -114,42 +114,46 @@ class GenericIndexerHandler
      */
     public function updateIndex(\Traversable $documents, StoreInterface $store, array $requireDataProvides)
     {
-        $index = $this->getIndex($store);
-        $type = $index->getType($this->typeName);
-        $dataProviders = [];
+        try {
+            $index = $this->getIndex($store);
+            $type = $index->getType($this->typeName);
+            $dataProviders = [];
 
-        foreach ($type->getDataProviders() as $name => $dataProvider) {
-            if (in_array($name, $requireDataProvides)) {
-                $dataProviders[] = $dataProvider;
-            }
-        }
-
-        if (empty($dataProviders)) {
-            return $this;
-        }
-
-        foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
-            /** @var \Divante\VsbridgeIndexerCore\Api\DataProviderInterface $datasource */
-            foreach ($dataProviders as $datasource) {
-                if (!empty($docs)) {
-                    $docs = $datasource->addData($docs, $store->getId());
+            foreach ($type->getDataProviders() as $name => $dataProvider) {
+                if (in_array($name, $requireDataProvides)) {
+                    $dataProviders[] = $dataProvider;
                 }
             }
 
-            $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
+            if (empty($dataProviders)) {
+                return $this;
+            }
 
-            $bulkRequest = $this->indexOperation->createBulk()->updateDocuments(
-                $index->getName(),
-                $this->typeName,
-                $docs
-            );
+            foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
+                /** @var \Divante\VsbridgeIndexerCore\Api\DataProviderInterface $datasource */
+                foreach ($dataProviders as $datasource) {
+                    if (!empty($docs)) {
+                        $docs = $datasource->addData($docs, $store->getId());
+                    }
+                }
 
-            $response = $this->indexOperation->executeBulk($bulkRequest);
-            $this->logErrors($response);
-            $docs = null;
+                $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
+
+                $bulkRequest = $this->indexOperation->createBulk()->updateDocuments(
+                    $index->getName(),
+                    $this->typeName,
+                    $docs
+                );
+
+                $response = $this->indexOperation->executeBulk($bulkRequest);
+                $this->logErrors($response);
+                $docs = null;
+            }
+
+            $this->indexOperation->refreshIndex($index);
+        }  catch (ConnectionDisabledException $exception) {
+            // do nothing, ES indexer disabled in configuration
         }
-
-        $this->indexOperation->refreshIndex($index);
     }
 
     /**

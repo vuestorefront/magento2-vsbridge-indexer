@@ -12,7 +12,7 @@ use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\Children as Cate
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryChildAttributes;
 use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
-use Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface;
+use Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
 
@@ -80,9 +80,9 @@ class AttributeData
     private $settings;
 
     /**
-     * @var SlugGeneratorInterface
+     * @var ApplyCategorySlugInterface
      */
-    private $slugGenerator;
+    private $applyCategorySlug;
 
     /**
      * AttributeData constructor.
@@ -90,7 +90,7 @@ class AttributeData
      * @param AttributeDataProvider $attributeResource
      * @param CategoryChildrenResource $childrenResource
      * @param ProductCountResourceModel $productCountResource
-     * @param SlugGeneratorInterface $slugGenerator
+     * @param ApplyCategorySlugInterface $applyCategorySlug
      * @param CatalogConfigurationInterface $configSettings
      * @param CategoryChildAttributes $categoryChildAttributes
      * @param DataFilter $dataFilter
@@ -99,13 +99,13 @@ class AttributeData
         AttributeDataProvider $attributeResource,
         CategoryChildrenResource $childrenResource,
         ProductCountResourceModel $productCountResource,
-        SlugGeneratorInterface $slugGenerator,
+        ApplyCategorySlugInterface $applyCategorySlug,
         CatalogConfigurationInterface $configSettings,
         CategoryChildAttributes $categoryChildAttributes,
         DataFilter $dataFilter
     ) {
         $this->settings = $configSettings;
-        $this->slugGenerator = $slugGenerator;
+        $this->applyCategorySlug = $applyCategorySlug;
         $this->productCountResource = $productCountResource;
         $this->attributeResourceModel = $attributeResource;
         $this->childrenResourceModel = $childrenResource;
@@ -274,23 +274,7 @@ class AttributeData
      */
     private function addSlug(array $categoryDTO)
     {
-        if ($this->settings->useMagentoUrlKeys()) {
-            if (!isset($categoryDTO['url_key'])) {
-                $slug = $this->slugGenerator->generate(
-                    $categoryDTO['name'],
-                    $categoryDTO['entity_id']
-                );
-                $categoryDTO['url_key'] = $slug;
-            }
-
-            $categoryDTO['slug'] = $categoryDTO['url_key'];
-        } else {
-            $slug = $this->slugGenerator->generate($categoryDTO['name'], $categoryDTO['entity_id']);
-            $categoryDTO['url_key'] = $slug;
-            $categoryDTO['slug'] = $slug;
-        }
-
-        return $categoryDTO;
+        return $this->applyCategorySlug->execute($categoryDTO);
     }
 
     /**
