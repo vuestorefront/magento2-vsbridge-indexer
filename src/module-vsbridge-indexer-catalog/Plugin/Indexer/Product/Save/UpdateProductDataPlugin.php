@@ -12,9 +12,9 @@ use Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductProcessor;
 use Magento\Catalog\Model\Product;
 
 /**
- * Class UpdateProductData
+ * Class UpdateProductDataPlugin
  */
-class UpdateProductData
+class UpdateProductDataPlugin
 {
     /**
      * @var ProductProcessor

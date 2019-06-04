@@ -108,6 +108,53 @@ class GenericIndexerHandler
     /**
      * @param \Traversable $documents
      * @param StoreInterface $store
+     * @param array $requireDataProvides
+     *
+     * @return $this
+     */
+    public function updateIndex(\Traversable $documents, StoreInterface $store, array $requireDataProvides)
+    {
+        $index = $this->getIndex($store);
+        $type = $index->getType($this->typeName);
+        $dataProviders = [];
+
+        foreach ($type->getDataProviders() as $name => $dataProvider) {
+            if (in_array($name, $requireDataProvides)) {
+                $dataProviders[] = $dataProvider;
+            }
+        }
+
+        if (empty($dataProviders)) {
+            return $this;
+        }
+
+        foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
+            /** @var \Divante\VsbridgeIndexerCore\Api\DataProviderInterface $datasource */
+            foreach ($dataProviders as $datasource) {
+                if (!empty($docs)) {
+                    $docs = $datasource->addData($docs, $store->getId());
+                }
+            }
+
+            $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
+
+            $bulkRequest = $this->indexOperation->createBulk()->updateDocuments(
+                $index->getName(),
+                $this->typeName,
+                $docs
+            );
+
+            $response = $this->indexOperation->executeBulk($bulkRequest);
+            $this->logErrors($response);
+            $docs = null;
+        }
+
+        $this->indexOperation->refreshIndex($index);
+    }
+
+    /**
+     * @param \Traversable $documents
+     * @param StoreInterface $store
      *
      * @return void
      */
