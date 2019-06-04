@@ -4,6 +4,8 @@
                 type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerReindexCommand"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface" type="Divante\VsbridgeIndexerCatalog\Model\SlugGenerator"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
+
     <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual"
                  type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
         <arguments>

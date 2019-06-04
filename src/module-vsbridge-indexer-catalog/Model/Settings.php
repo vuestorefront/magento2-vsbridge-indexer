@@ -94,7 +94,7 @@ class Settings implements CatalogConfigurationInterface
         $key = $configField . (string) $storeId;
 
         if (!isset($this->settings[$key])) {
-            $path = self::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
+            $path = CatalogConfigurationInterface::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
 
             if ($storeId) {
                 $configValue = $this->scopeConfig->getValue($path, 'stores', $storeId);
