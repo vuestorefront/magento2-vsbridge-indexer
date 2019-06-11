@@ -12,7 +12,7 @@ use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\InventoryProcessor;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Configurable as ConfigurableResource;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Inventory as InventoryResource;
+use Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface;
 use Divante\VsbridgeIndexerCatalog\Model\TierPriceProcessor;
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
@@ -55,9 +55,9 @@ class ConfigurableData implements DataProviderInterface
     private $resourceAttributeModel;
 
     /**
-     * @var InventoryResource
+     * @var LoadInventoryInterface
      */
-    private $inventoryResource;
+    private $loadInventory;
 
     /**
      * @var InventoryProcessor
@@ -80,7 +80,7 @@ class ConfigurableData implements DataProviderInterface
      * @param DataFilter $dataFilter
      * @param ConfigurableResource $configurableResource
      * @param AttributeDataProvider $attributeResource
-     * @param InventoryResource $inventoryResource
+     * @param LoadInventoryInterface $loadInventory
      * @param ConfigurableAttributes $configurableAttributes
      * @param TierPriceProcessor $tierPriceProcessor
      * @param InventoryProcessor $inventoryProcessor
@@ -89,7 +89,7 @@ class ConfigurableData implements DataProviderInterface
         DataFilter $dataFilter,
         ConfigurableResource $configurableResource,
         AttributeDataProvider $attributeResource,
-        InventoryResource $inventoryResource,
+        LoadInventoryInterface $loadInventory,
         ConfigurableAttributes $configurableAttributes,
         TierPriceProcessor $tierPriceProcessor,
         InventoryProcessor $inventoryProcessor
@@ -97,7 +97,7 @@ class ConfigurableData implements DataProviderInterface
         $this->dataFilter = $dataFilter;
         $this->configurableResource = $configurableResource;
         $this->resourceAttributeModel = $attributeResource;
-        $this->inventoryResource = $inventoryResource;
+        $this->loadInventory = $loadInventory;
         $this->inventoryProcessor = $inventoryProcessor;
         $this->tierPriceProcessor = $tierPriceProcessor;
         $this->configurableAttributes = $configurableAttributes;
@@ -142,9 +142,7 @@ class ConfigurableData implements DataProviderInterface
             return $indexData;
         }
 
-        $childIds = array_keys($allChildren);
-
-        $stockRowData = $this->inventoryResource->loadChildrenData($storeId, $childIds);
+        $stockRowData = $this->loadInventory->execute($allChildren, $storeId);
         $configurableAttributeCodes = $this->configurableResource->getConfigurableAttributeCodes();
 
         $requiredAttributes = array_merge(

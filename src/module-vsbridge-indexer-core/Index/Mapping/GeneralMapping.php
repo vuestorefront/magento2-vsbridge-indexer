@@ -61,7 +61,6 @@ class GeneralMapping
             'min_qty' => ['type' => FieldInterface::TYPE_DOUBLE],
             'min_sale_qty' => ['type' => FieldInterface::TYPE_DOUBLE],
             'notify_stock_qty' => ['type' => FieldInterface::TYPE_DOUBLE],
-            'product_id' => ['type' => FieldInterface::TYPE_LONG],
             'qty' => ['type' => FieldInterface::TYPE_DOUBLE],
             'qty_increments' => ['type' => FieldInterface::TYPE_DOUBLE],
             'stock_id' => ['type' => FieldInterface::TYPE_LONG],

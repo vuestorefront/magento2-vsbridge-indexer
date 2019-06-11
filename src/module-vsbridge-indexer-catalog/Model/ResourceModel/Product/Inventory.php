@@ -6,10 +6,12 @@
  * @license   See LICENSE_DIVANTE.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
+use Divante\VsbridgeIndexerCatalog\Model\Inventory\Fields as InventoryFields;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\CatalogInventory\Api\StockConfigurationInterface;
 
 /**
@@ -23,101 +25,60 @@ class Inventory
     private $stockConfiguration;
 
     /**
-     * @var array
-     */
-    private $fields = [
-        'product_id',
-        'item_id',
-        'stock_id',
-        'qty',
-        'is_in_stock',
-        'is_qty_decimal',
-        'use_config_min_qty',
-        'min_qty',
-        'use_config_min_sale_qty',
-        'min_sale_qty',
-        'use_config_max_sale_qty',
-        'max_sale_qty',
-        'use_config_notify_stock_qty',
-        'notify_stock_qty',
-        'use_config_qty_increments',
-        'backorders',
-        'use_config_backorders',
-        'qty_increments',
-        'use_config_enable_qty_inc',
-        'enable_qty_increments',
-        'use_config_manage_stock',
-        'manage_stock',
-        'low_stock_date',
-    ];
-
-    /**
      * @var ResourceConnection
      */
     private $resource;
 
     /**
-     * @var StoreManagerInterface
+     * @var InventoryFields
      */
-    private $storeManager;
+    private $inventoryFields;
 
     /**
      * Inventory constructor.
      *
      * @param StockConfigurationInterface $stockConfiguration
-     * @param StoreManagerInterface $storeManager
+     * @param InventoryFields $fields
      * @param ResourceConnection $resourceModel
      */
     public function __construct(
         StockConfigurationInterface $stockConfiguration,
-        StoreManagerInterface $storeManager,
+        InventoryFields $fields,
         ResourceConnection $resourceModel
     ) {
+        $this->inventoryFields = $fields;
         $this->resource = $resourceModel;
-        $this->storeManager = $storeManager;
         $this->stockConfiguration = $stockConfiguration;
     }
 
     /**
-     * @param int $storeId
      * @param array $productIds
      *
      * @return array
      */
-    public function loadInventoryData($storeId, array $productIds)
+    public function loadInventory(array $productIds): array
     {
-        return $this->getInventoryData($storeId, $productIds, $this->fields);
+        return $this->getInventoryData($productIds, $this->inventoryFields->getRequiredColumns());
     }
 
     /**
-     * @param int $storeId
      * @param array $productIds
      *
      * @return array
      */
-    public function loadChildrenData($storeId, array $productIds)
+    public function loadChildrenInventory(array $productIds): array
     {
-        $fields = [
-            'product_id',
-            'is_in_stock',
-            'min_qty',
-            'notify_stock_qty',
-            'use_config_notify_stock_qty',
-            'qty',
-        ];
-
-        return $this->getInventoryData($storeId, $productIds, $fields);
+        return $this->getInventoryData($productIds, $this->inventoryFields->getChildRequiredColumns());
     }
 
     /**
-     * @param int $storeId
      * @param array $productIds
      * @param array $fields
      *
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    private function getInventoryData($storeId, array $productIds, array $fields)
+    private function getInventoryData(array $productIds, array $fields): array
     {
         $websiteId = $this->getWebsiteId();
         $connection = $this->resource->getConnection();
@@ -147,16 +108,10 @@ class Inventory
     }
 
     /**
-     * @param int|null $websiteId
-     *
      * @return int|null
      */
-    private function getWebsiteId($websiteId = null)
+    private function getWebsiteId()
     {
-        if (null === $websiteId) {
-            $websiteId = $this->stockConfiguration->getDefaultScopeId();
-        }
-
-        return (int)$websiteId;
+        return $this->stockConfiguration->getDefaultScopeId();
     }
 }

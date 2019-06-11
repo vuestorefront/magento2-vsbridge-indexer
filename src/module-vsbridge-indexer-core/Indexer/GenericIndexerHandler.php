@@ -129,11 +129,13 @@ class GenericIndexerHandler
                 return $this;
             }
 
+            $storeId = (int)$store->getId();
+
             foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
                 /** @var \Divante\VsbridgeIndexerCore\Api\DataProviderInterface $datasource */
                 foreach ($dataProviders as $datasource) {
                     if (!empty($docs)) {
-                        $docs = $datasource->addData($docs, $store->getId());
+                        $docs = $datasource->addData($docs, $storeId);
                     }
                 }
 
@@ -167,11 +169,12 @@ class GenericIndexerHandler
         try {
             $index = $this->getIndex($store);
             $type = $index->getType($this->typeName);
+            $storeId = (int)$store->getId();
 
             foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
                 foreach ($type->getDataProviders() as $dataProvider) {
                     if (!empty($docs)) {
-                        $docs = $dataProvider->addData($docs, (int)$store->getId());
+                        $docs = $dataProvider->addData($docs, $storeId);
                     }
                 }
 

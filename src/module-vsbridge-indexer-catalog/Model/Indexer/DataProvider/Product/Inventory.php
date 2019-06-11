@@ -8,9 +8,9 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
-use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
+use Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface;
 use Divante\VsbridgeIndexerCatalog\Model\InventoryProcessor;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Inventory as Resource;
+use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 
 /**
  * Class Inventory
@@ -19,9 +19,9 @@ class Inventory implements DataProviderInterface
 {
 
     /**
-     * @var \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Inventory
+     * @var LoadInventoryInterface
      */
-    private $resourceModel;
+    private $getInventory;
 
     /**
      * @var InventoryProcessor
@@ -31,14 +31,14 @@ class Inventory implements DataProviderInterface
     /**
      * Inventory constructor.
      *
-     * @param Resource $resource
+     * @param LoadInventoryInterface $getInventory
      * @param InventoryProcessor $inventoryProcessor
      */
     public function __construct(
-        Resource $resource,
+        LoadInventoryInterface $getInventory,
         InventoryProcessor $inventoryProcessor
     ) {
-        $this->resourceModel = $resource;
+        $this->getInventory = $getInventory;
         $this->inventoryProcessor = $inventoryProcessor;
     }
 
@@ -50,10 +50,11 @@ class Inventory implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
-        $inventoryData = $this->resourceModel->loadInventoryData($storeId, array_keys($indexData));
+        $inventoryData = $this->getInventory->execute($indexData, $storeId);
 
         foreach ($inventoryData as $inventoryDataRow) {
             $productId = (int) $inventoryDataRow['product_id'];
+            unset($inventoryDataRow['product_id']);
             $indexData[$productId]['stock'] =
                 $this->inventoryProcessor->prepareInventoryData($storeId, $inventoryDataRow);
         }
