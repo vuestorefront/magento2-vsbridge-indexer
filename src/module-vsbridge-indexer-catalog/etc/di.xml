@@ -6,6 +6,14 @@
     <preference for="Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
 
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface" type="Divante\VsbridgeIndexerCatalog\Model\LoadInventory"/>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData">
+        <arguments>
+            <argument name="loadInventory" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\LoadChildrenInventory</argument>
+        </arguments>
+    </type>
+
     <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual"
                  type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
         <arguments>
