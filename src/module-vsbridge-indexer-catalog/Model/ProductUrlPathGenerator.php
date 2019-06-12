@@ -46,6 +46,8 @@ class ProductUrlPathGenerator
     }
 
     /**
+     * Add URL path
+     *
      * @param array $products
      * @param int $storeId
      *
@@ -59,7 +61,10 @@ class ProductUrlPathGenerator
         $rewrites = $this->rewriteResource->getRawRewritesData($productIds, $storeId);
 
         foreach ($rewrites as $productId => $rewrite) {
-            $rewrite = mb_substr($rewrite, 0, -strlen($urlSuffix));
+            if ($urlSuffix != "") {
+                $rewrite = mb_substr($rewrite, 0, -strlen($urlSuffix));
+            }
+
             $products[$productId]['url_path'] = $rewrite;
         }
 
