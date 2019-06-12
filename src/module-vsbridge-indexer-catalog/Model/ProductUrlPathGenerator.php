@@ -74,7 +74,7 @@ class ProductUrlPathGenerator
     private function getProductUrlSuffix()
     {
         if (null === $this->productUrlSuffix) {
-            $this->productUrlSuffix = $this->scopeConfig->getValue(
+            $this->productUrlSuffix = (string) $this->scopeConfig->getValue(
                 \Magento\CatalogUrlRewrite\Model\ProductUrlPathGenerator::XML_PATH_PRODUCT_URL_SUFFIX
             );
         }
