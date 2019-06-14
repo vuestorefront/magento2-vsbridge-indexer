@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Fix bug causing empty product URL paths  - [@indiebytes](https://github.com/indiebytes) ([#63](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/63))
+
 ### Added
 - Adding support for video data. Small change will be needed in VSF #19
 - Add support for "product_count" in category. When products are reassign to category, category data is not updated automatically in ES.
