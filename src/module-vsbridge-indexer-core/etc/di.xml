@@ -59,4 +59,12 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="rebuild" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
