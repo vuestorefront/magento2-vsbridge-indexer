@@ -75,7 +75,12 @@
                 </field>
                 <field id="index_name" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Index name prefix</label>
-                    <comment>For each store view, store id will be added to index name, e.g. "vue_storefront_magento_1"</comment>
+                    <comment>For each store view, store id or code will be added to index name, e.g. "vue_storefront_magento_1"</comment>
+                </field>
+                <field id="index_identifier" translate="label comment" type="select" sortOrder="250" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Index Identifier</label>
+                    <comment>Choose if the index will append the Store ID or Store Code to the index name, e.g. "vue_storefront_magento_1" or "vue_storefront_magento_default"</comment>
+                    <source_model>Divante\VsbridgeIndexerCore\Model\Config\Source\IndexIdentifier</source_model>
                 </field>
                 <field id="fields_limit" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>The maximum number of fields in an index</label>
