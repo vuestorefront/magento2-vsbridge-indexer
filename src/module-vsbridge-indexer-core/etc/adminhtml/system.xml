@@ -56,11 +56,12 @@
                         <field id="enable_http_auth">1</field>
                     </depends>
                 </field>
-                <field id="auth_pwd" translate="label comment" type="text" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="auth_pwd" translate="label comment" type="obscure" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Basic HTTP authentication password</label>
                     <depends>
                         <field id="enable_http_auth">1</field>
                     </depends>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
             </group>
 
