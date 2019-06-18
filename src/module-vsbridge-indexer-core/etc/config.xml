@@ -13,6 +13,7 @@
             <es_client>
                 <host>127.0.0.1</host>
                 <port>9200</port>
+                <auth_pwd backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
             </es_client>
             <indices_settings>
                 <batch_indexing_size>1000</batch_indexing_size>
