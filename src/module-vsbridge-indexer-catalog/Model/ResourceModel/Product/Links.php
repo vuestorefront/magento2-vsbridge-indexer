@@ -8,27 +8,15 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
-use Magento\Catalog\Model\Product\Link as ProductLink;
+use Divante\VsbridgeIndexerCatalog\Model\Product\LinkTypeMapper;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
-use Magento\GroupedProduct\Model\ResourceModel\Product\Link as GroupedLink;
 
 /**
  * Class Links
  */
 class Links
 {
-    /**
-     * Product link type mapping, used for references and validation
-     *
-     * @var array
-     */
-    private $typeMap = [
-        ProductLink::LINK_TYPE_RELATED => 'related',
-        ProductLink::LINK_TYPE_UPSELL => 'upsell',
-        ProductLink::LINK_TYPE_CROSSSELL => 'crosssell',
-        GroupedLink::LINK_TYPE_GROUPED => 'associated',
-    ];
 
     /**
      * @var array
@@ -46,6 +34,11 @@ class Links
     private $resource;
 
     /**
+     * @var LinkTypeMapper
+     */
+    private $linkTypeMapper;
+
+    /**
      * @var array
      */
     private $positionAttribute;
@@ -53,10 +46,14 @@ class Links
     /**
      * Links constructor.
      *
+     * @param LinkTypeMapper $linkTypeMapper
      * @param ResourceConnection $resourceConnection
      */
-    public function __construct(ResourceConnection $resourceConnection)
-    {
+    public function __construct(
+        LinkTypeMapper $linkTypeMapper,
+        ResourceConnection $resourceConnection
+    ) {
+        $this->linkTypeMapper = $linkTypeMapper;
         $this->resource = $resourceConnection;
     }
 
@@ -93,15 +90,18 @@ class Links
             $linkProductList = [];
 
             foreach ($links[$productId] as $linkData) {
-                $typeId = $linkData['link_type_id'];
+                $typeId = (int)$linkData['link_type_id'];
+                $linkType = $this->getLinkType($typeId);
 
-                $linkProductList[] = [
-                    'sku' => $product['sku'],
-                    'link_type' => $this->getLinkType($typeId),
-                    'linked_product_sku' => $linkData['sku'],
-                    'linked_product_type' => $linkData['type_id'],
-                    'position' => (int)$linkData['position'],
-                ];
+                if ($linkType) {
+                    $linkProductList[] = [
+                        'sku' => $product['sku'],
+                        'link_type' => $linkType,
+                        'linked_product_sku' => $linkData['sku'],
+                        'linked_product_type' => $linkData['type_id'],
+                        'position' => (int)$linkData['position'],
+                    ];
+                }
             }
 
             return $linkProductList;
@@ -117,11 +117,7 @@ class Links
      */
     private function getLinkType($typeId)
     {
-        if (isset($this->typeMap[$typeId])) {
-            return $this->typeMap[$typeId];
-        }
-
-        return null;
+        return $this->linkTypeMapper->map($typeId);
     }
 
     /**
