@@ -188,7 +188,7 @@ abstract class AbstractMapping
             return true;
         }
         
-        if ($attribute->getSourceModel() == 'eav/entity_attribute_source_boolean') {
+        if ($attribute->getSourceModel() == \Magento\Catalog\Model\Product\Attribute\Source\Boolean::class) {
             return true;
         }
 
