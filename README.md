@@ -140,7 +140,7 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
 
 1. Catalog Settings
     
-    Use Short Catalog Urls → by default this option is disabled. The short Catalog Urls must be aligned with the VSF configuration. After any changes in the VSF configuration, the configuration in the Magento Panel must be updated and all products and categories indexed anew.
+    Use Catalog Url Keys → by default this option is disabled. Use Magento Url Key attribute for url_key and slug field (for products and categories). Url Keys have to be unique
     
     Sync Tier Prices → by default this option is disabled. Used to sync products tier prices. 
     
@@ -192,6 +192,7 @@ Note: If a docker with ElasticSearch is disabled, Indexer will display error: "N
      
 ### Compatibility
 
+-- Vue Storefront >= 1.4.4
 Module was tested on:
  -- Magento Community version 2.2.7 It should perform without any issues on Magento 2.2.6 and above versions. 
  -- Magento Enterprise version 2.3.0. The bridge indexer cannot be installed on lower versions of Magento Enterprise.

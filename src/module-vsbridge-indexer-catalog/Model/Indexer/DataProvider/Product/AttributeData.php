@@ -87,6 +87,7 @@ class AttributeData implements DataProviderInterface
             } else {
                 $slug = $this->slugGenerator->generate($productData['name'], $entityId);
                 $productData['slug'] = $slug;
+                $productData['url_key'] = $slug;
             }
 
             $indexData[$entityId] = $productData;
