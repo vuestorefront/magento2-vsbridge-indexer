@@ -152,7 +152,13 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
             $attribute = $this->attributesById[$value['attribute_id']];
 
             if ($attribute->getFrontendInput() === 'multiselect') {
-                $value['value'] = explode(',', $value['value']);
+                $options = explode(',', $value['value']);
+
+                if (!empty($options)) {
+                    $options = array_map('intval', $options);
+                }
+
+                $value['value'] = $options;
             }
 
             $attributeCode = $attribute->getAttributeCode();
