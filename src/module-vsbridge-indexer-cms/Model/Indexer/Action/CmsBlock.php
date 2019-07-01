@@ -14,6 +14,7 @@ use Divante\VsbridgeIndexerCms\Model\ResourceModel\CmsBlock as CmsBlockResource;
 use Magento\Cms\Model\Template\FilterProvider;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\AreaList;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class CmsBlock
@@ -41,6 +42,11 @@ class CmsBlock
     private $contentProcessor;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * CmsBlock constructor.
      *
      * @param AreaList $areaList
@@ -52,12 +58,14 @@ class CmsBlock
         AreaList $areaList,
         ContentProcessorInterface $contentProcessor,
         CmsBlockResource $cmsBlockResource,
-        FilterProvider $filterProvider
+        FilterProvider $filterProvider,
+        StoreManagerInterface $storeManager
     ) {
         $this->areaList = $areaList;
         $this->filterProvider = $filterProvider;
         $this->resourceModel = $cmsBlockResource;
         $this->contentProcessor = $contentProcessor;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -69,6 +77,13 @@ class CmsBlock
     public function rebuild($storeId = 1, array $blockIds = [])
     {
         $this->areaList->getArea(Area::AREA_FRONTEND)->load(Area::PART_DESIGN);
+
+        $storeCode = $this->storeManager->getStore($storeId)->getCode();
+
+        if ($storeCode) {
+            $this->storeManager->setCurrentStore($storeCode);
+        }
+
         $templateFilter = $this->filterProvider->getBlockFilter()->setStoreId($storeId);
         $lastBlockId = 0;
 
