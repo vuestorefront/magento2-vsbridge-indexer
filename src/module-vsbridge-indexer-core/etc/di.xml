@@ -50,4 +50,21 @@
             <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCore\Cache\Logger\CacheLogger</argument>
         </arguments>
     </type>
+
+    <!-- Prevent sensitive fields from getting dumped with store config -->
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="vsbridge_indexer_settings/es_client/auth_pwd" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="rebuild" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

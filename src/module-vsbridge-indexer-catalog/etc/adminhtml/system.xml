@@ -16,8 +16,8 @@
                     <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
                 </depends>
                 <field id="use_magento_url_keys" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Use Short Catalog Urls</label>
-                    <comment>Set base on your setting products.useShortCatalogUrls from vsf. If you change this setting on vsf you have to reindex all product and categories for vsf.</comment>
+                    <label>Use Catalog Url Keys</label>
+                    <comment>Use Magento Url Key attribute for url_key and slug field (for products and categories). Url Keys have to be unique.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="allowed_product_types" translate="label comment" type="multiselect" sortOrder="101" showInDefault="1" showInWebsite="0" showInStore="0">

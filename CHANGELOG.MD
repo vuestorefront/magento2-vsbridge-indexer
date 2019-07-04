@@ -4,6 +4,9 @@
 
 ### Fixed
 - Fix bug causing empty product URL paths  - [@indiebytes](https://github.com/indiebytes) ([#63](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/63))
+- Changed ElasticSearch password to be obscured, encrypted, and considered sensitive (will dump to `env.php` instead of `config.php`) - [@rain2o](https://github.com/rain2o) ([#69](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/69))
+- Fix exporting values for multiselect option arrays as integers (instead of strings)
+- Change "Use Short Catalog Urls" setting option to "Use Catalog Url Keys" 
 
 ### Added
 - Adding support for video data. Small change will be needed in VSF #19
@@ -17,6 +20,19 @@ category will be visible in menu sidebar.
 - Fix getting stock_status value for products
 - Remove dependency from catalog_product_price and cataloginventory_stock indexer. On product save multiple request has been send   
 - Add the ability to choose between Store ID and Store Code to be used at the end of index names.
+- Add new command ```php bin/magento vsbridge:reindex``` which will run all Magento indices which names start with "vsbridge_".
+```php
+Description:
+  Rebuild indexer in ES.
+
+Usage:
+  vsbridge:reindex [options]
+
+Options:
+      --store=STORE     Store ID
+      --delete-index    Delete previous index and create new one (with new mapping)
+```
+
 
 ## [1.0.0] (2019.04.03)
 First version
