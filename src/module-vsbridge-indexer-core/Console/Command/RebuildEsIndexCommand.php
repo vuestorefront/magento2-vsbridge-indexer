@@ -8,18 +8,16 @@
 
 namespace Divante\VsbridgeIndexerCore\Console\Command;
 
-use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Magento\Backend\App\Area\FrontNameResolver;
-use Magento\Framework\ObjectManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Magento\Framework\Indexer\IndexerInterface;
-use Magento\Framework\App\ObjectManagerFactory;
 use Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategoryProcessor;
 use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Divante\VsbridgeIndexerCore\Index\IndexOperations;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Indexer\IndexerRegistry;
@@ -29,7 +27,8 @@ use Magento\Framework\Indexer\IndexerRegistry;
  */
 class RebuildEsIndexCommand extends Command
 {
-    const STORE_ID = 'store';
+    const INPUT_STORE = 'store';
+    const INPUT_DELETE_INDEX = 'delete-index';
 
     const INDEX_IDENTIFIER = 'vue_storefront_catalog';
 
@@ -54,6 +53,11 @@ class RebuildEsIndexCommand extends Command
     private $indexerRegistry;
 
     /**
+     * @var \Magento\Framework\App\State
+     */
+    private $state;
+
+    /**
      * Constructor
      *
      * @param \Magento\Indexer\Model\Indexer\CollectionFactory|null $collectionFactory
@@ -62,12 +66,14 @@ class RebuildEsIndexCommand extends Command
         IndexerRegistry $indexerRegistry,
         IndexOperations\Proxy $indexOperations,
         StoreManagerInterface\Proxy $storeManager,
+        \Magento\Framework\App\State\Proxy $state,
         \Magento\Indexer\Model\Indexer\CollectionFactory\Proxy $collectionFactory
     ) {
         $this->indexerRegistry = $indexerRegistry;
         $this->collectionFactory = $collectionFactory;
         $this->indexOperations = $indexOperations;
         $this->storeManager = $storeManager;
+        $this->state = $state;
         parent::__construct();
     }
 
@@ -77,9 +83,22 @@ class RebuildEsIndexCommand extends Command
     protected function configure()
     {
         $this->setName('vsbridge:reindex')
-            ->setDescription('Rebuild indexer. Delete index and create index with new mapping');
+            ->setDescription('Rebuild indexer in ES.');
 
-        $this->addArgument(self::STORE_ID, InputArgument::REQUIRED, 'Store Id');
+        $this->addOption(
+            self::INPUT_STORE,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Store ID'
+        );
+
+
+        $this->addOption(
+            self::INPUT_DELETE_INDEX,
+            null,
+            InputOption::VALUE_NONE,
+            'Delete previous index and create new one (with new mapping)'
+        );
 
         parent::configure();
     }
@@ -89,11 +108,17 @@ class RebuildEsIndexCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->hasArgument(self::STORE_ID)) {
-            $storeId = (int)$input->getArgument(self::STORE_ID);
+        $storeId = (int)$input->getOption(self::INPUT_STORE);
+
+        if ($storeId) {
+            $this->setAreaCode();
             $store = $this->storeManager->getStore($storeId);
-            $this->indexOperations->deleteIndex(self::INDEX_IDENTIFIER, $store);
-            $this->indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
+            $deleteIndex = $input->getOption(self::INPUT_DELETE_INDEX);
+
+            if ($deleteIndex) {
+                $this->indexOperations->deleteIndex(self::INDEX_IDENTIFIER, $store);
+                $this->indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
+            }
 
             $returnValue = Cli::RETURN_FAILURE;
 
@@ -117,6 +142,17 @@ class RebuildEsIndexCommand extends Command
             }
 
             return $returnValue;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function setAreaCode()
+    {
+        try {
+            $this->state->setAreaCode(FrontNameResolver::AREA_CODE);
+        } catch (\Exception $e) {
         }
     }
 

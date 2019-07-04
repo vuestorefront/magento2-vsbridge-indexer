@@ -174,6 +174,12 @@ Recommended for smaller databases. In the case of big databases it is better to 
 php bin/magento indexer:reindex
 ```
 
+or
+```php
+php bin/magento vsbridge:reindex --store=[STORE_ID]
+php bin/magento vsbridge:reindex --store=1
+```
+
 Note: If a docker with ElasticSearch is disabled, Indexer will display error: "No alive nodes found in your cluster".
 
 #### Update on Save Mode
