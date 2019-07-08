@@ -166,6 +166,8 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
     
     Use Catalog Url Keys → by default this option is disabled. Use Magento Url Key attribute for url_key and slug field (for products and categories). Url Keys have to be unique
     
+    Use Magento Url Key and ID to generate slug for VSF -> by default slug (and url_key) field is generated base on product/category NAME and ID
+    
     Sync Tier Prices → by default this option is disabled. Used to sync products tier prices. 
     
     Types of products to index → by default all product will be exported to ElasticSearch. This option allows for selecting certain product types that should be exported. 
