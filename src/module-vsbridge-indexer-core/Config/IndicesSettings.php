@@ -41,6 +41,14 @@ class IndicesSettings
     }
 
     /**
+     * @return string
+     */
+    public function getIndexIdentifier()
+    {
+        return (string) $this->getConfigParam('index_identifier');
+    }
+
+    /**
      * @return int
      */
     public function getBatchIndexingSize()

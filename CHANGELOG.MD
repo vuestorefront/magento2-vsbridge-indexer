@@ -19,6 +19,7 @@ category will be visible in menu sidebar.
 - Add ProductCategory indexer to partially update product data in ES (category, category_ids fields). Trigger after changing products positions in category.
 - Fix getting stock_status value for products
 - Remove dependency from catalog_product_price and cataloginventory_stock indexer. On product save multiple request has been send   
+- Add the ability to choose between Store ID and Store Code to be used at the end of index names.
 - Add new command ```php bin/magento vsbridge:reindex``` which will run all Magento indices which names start with "vsbridge_".
 ```php
 Description:

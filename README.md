@@ -96,11 +96,13 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
    Batch Indexing Size → select size of packages by which you intend to send data to ElasticSrearch. Depending on the project you might need to adjust package size to the number of products, attributes, configurable products variation, etc). By default Batch, Indexing Size is set up for 1000.
    Indicies settings
     
-   Index Name Prefix → define prefixes for ElasticSearch indexes. The panel allows adding prefix only to the catalog name e.g.: "vue_storefront_catalog". For each store (store view) index name is generated on the base of defined prefix and ID. Aliases cannot be created. 
+   Index Name Prefix → define prefixes for ElasticSearch indexes. The panel allows adding prefix only to the catalog name e.g.: "vue_storefront_catalog". For each store (store view) index name is generated on the base of defined prefix and either ID or Store Code. Aliases cannot be created. 
    Example: When we define following indexes: "vue_storefront_catalog_1", "vue_storefront_catalog_2", "vue_storefront_catalog_3".
    Important: It is crucial to update this configuration in the VSF and VSF-API (one change at the beginning of the whole configuration process).
+
+   Index Identifier → defines the unique store identifier to append to the ElasticSearch indexes. The default value is ID which will append the Store ID to the index name e.g.: "vue_storefront_catalog_1". You can choose to change this to Store Code which will add the Store Code to the index name e.g.: "vue_storefront_catalog_storecode".
    
-   Example
+   Example with Store ID
     
    VSF config (base on default index prefix name: vue_storefront_magento)
     ```json
@@ -123,6 +125,28 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
         ],
     ```
    
+   Example with Store Code
+    
+   VSF config (base on default index prefix name: vue_storefront_magento)
+    ```json
+    "elasticsearch": {
+      "httpAuth": "",
+      "host": "localhost:8080/api/catalog",
+      "index": "vue_storefront_magento_en_us" //index for store view with code "en_us"
+    }
+    ```
+   
+    VSF-API config
+    ```json
+      "elasticsearch": {
+        "host": "localhost",
+        "port": 9200,
+        "user": "elastic",
+        "password": "changeme",
+        "indices": [
+          "vue_storefront_magento_en_us" //index for store view with store code "en_us"
+        ],
+    ```
    
    ![](docs/images/config-indices.png)
    
