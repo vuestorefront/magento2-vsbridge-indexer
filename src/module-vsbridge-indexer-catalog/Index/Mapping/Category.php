@@ -45,11 +45,6 @@ class Category extends AbstractMapping implements MappingInterface
     private $resourceModel;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @var array
      */
     private $properties;
@@ -165,21 +160,5 @@ class Category extends AbstractMapping implements MappingInterface
     public function getAttributes()
     {
         return $this->resourceModel->initAttributes();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setType(string $type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 }
