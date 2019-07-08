@@ -151,7 +151,7 @@ class IndexOperations implements IndexOperationInterface
     public function getIndexName(StoreInterface $store)
     {
         $name = $this->indexSettings->getIndexNamePrefix();
-        $storeIdentifier = ($this->indexSettings->getIndexIdentifier() === 'code')
+        $storeIdentifier = ('code' === $this->indexSettings->getIndexIdentifier())
             ? $store->getCode()
             : $store->getId();
 

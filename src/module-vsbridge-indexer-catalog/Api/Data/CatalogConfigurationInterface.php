@@ -23,6 +23,11 @@ interface CatalogConfigurationInterface
     /**
      * @return bool
      */
+    public function useUrlKeyToGenerateSlug();
+
+    /**
+     * @return bool
+     */
     public function syncTierPrices();
 
     /**
@@ -31,6 +36,7 @@ interface CatalogConfigurationInterface
      * @return array
      */
     public function getAllowedProductTypes($storeId);
+
     /**
      *
      * @return array

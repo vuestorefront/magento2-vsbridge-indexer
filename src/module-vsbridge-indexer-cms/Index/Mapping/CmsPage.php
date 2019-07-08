@@ -24,11 +24,6 @@ class CmsPage implements MappingInterface
     private $eventManager;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @var array
      */
     private $textFields = [
@@ -50,22 +45,6 @@ class CmsPage implements MappingInterface
     public function __construct(EventManager $eventManager)
     {
         $this->eventManager = $eventManager;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setType(string $type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**

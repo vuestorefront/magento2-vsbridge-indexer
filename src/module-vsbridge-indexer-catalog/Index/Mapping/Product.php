@@ -26,11 +26,6 @@ class Product extends AbstractMapping implements MappingInterface
     private $generalMapping;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @var array
      */
     private $properties;
@@ -222,7 +217,15 @@ class Product extends AbstractMapping implements MappingInterface
                 'properties' => [
                     'category_id' => ['type' => FieldInterface::TYPE_LONG],
                     'position' => ['type' => FieldInterface::TYPE_LONG],
-                    'name' => ['type' => FieldInterface::TYPE_TEXT],
+                    'name' => [
+                        'type' => FieldInterface::TYPE_TEXT,
+                        'fields' => [
+                            'keyword' => [
+                                'type' => FieldInterface::TYPE_KEYWORD,
+                                'ignore_above' => 256,
+                            ]
+                        ],
+                    ],
                 ],
             ],
             'custom_options' => [
@@ -264,22 +267,6 @@ class Product extends AbstractMapping implements MappingInterface
                 ],
             ],
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setType(string $type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**

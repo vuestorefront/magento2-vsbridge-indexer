@@ -62,6 +62,14 @@ class Settings implements CatalogConfigurationInterface
     /**
      * @inheritdoc
      */
+    public function useUrlKeyToGenerateSlug()
+    {
+        return (bool) $this->getConfigParam('use_url_key_to_generate_slug');
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function syncTierPrices()
     {
         return (bool) $this->getConfigParam('sync_tier_prices');

@@ -85,7 +85,13 @@ class AttributeData implements DataProviderInterface
             if ($this->settings->useMagentoUrlKeys()) {
                 $productData['slug'] = $productData['url_key'];
             } else {
-                $slug = $this->slugGenerator->generate($productData['name'], $entityId);
+                $text = $productData['name'];
+
+                if ($this->settings->useUrlKeyToGenerateSlug()) {
+                    $text = $productData['url_key'];
+                }
+
+                $slug = $this->slugGenerator->generate($text, $entityId);
                 $productData['slug'] = $slug;
                 $productData['url_key'] = $slug;
             }

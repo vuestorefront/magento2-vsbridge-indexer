@@ -58,7 +58,13 @@ class ApplyCategorySlug implements ApplyCategorySlugInterface
 
             $category['slug'] = $category['url_key'];
         } else {
-            $slug = $this->slugGenerator->generate($category['name'], $category['entity_id']);
+            $text = $category['name'];
+
+            if ($this->settings->useUrlKeyToGenerateSlug() && isset($category['url_key'])) {
+                $text = $category['url_key'];
+            }
+
+            $slug = $this->slugGenerator->generate($text, $category['entity_id']);
             $category['url_key'] = $slug;
             $category['slug'] = $slug;
         }
