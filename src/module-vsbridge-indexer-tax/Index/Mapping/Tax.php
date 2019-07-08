@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerTax
  * @author    Vladimir Plastovets <vladimir.plastovets@phoenix-media.eu>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -14,7 +14,6 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
 
 /**
  * Class Tax
- * @package Divante\VsbridgeIndexerTax\Index\Mapping
  */
 class Tax implements MappingInterface
 {
