@@ -8,6 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
+use Divante\VsbridgeIndexerCatalog\Model\Attribute\LoadOptionLabelById;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\InventoryProcessor;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
@@ -75,12 +76,18 @@ class ConfigurableData implements DataProviderInterface
     private $tierPriceProcessor;
 
     /**
+     * @var LoadOptionLabelById
+     */
+    private $loadOptionLabelById;
+
+    /**
      * ConfigurableData constructor.
      *
      * @param DataFilter $dataFilter
      * @param ConfigurableResource $configurableResource
      * @param AttributeDataProvider $attributeResource
      * @param LoadInventoryInterface $loadInventory
+     * @param LoadOptionLabelById $loadOptionLabelById
      * @param ConfigurableAttributes $configurableAttributes
      * @param TierPriceProcessor $tierPriceProcessor
      * @param InventoryProcessor $inventoryProcessor
@@ -90,6 +97,7 @@ class ConfigurableData implements DataProviderInterface
         ConfigurableResource $configurableResource,
         AttributeDataProvider $attributeResource,
         LoadInventoryInterface $loadInventory,
+        LoadOptionLabelById $loadOptionLabelById,
         ConfigurableAttributes $configurableAttributes,
         TierPriceProcessor $tierPriceProcessor,
         InventoryProcessor $inventoryProcessor
@@ -100,6 +108,7 @@ class ConfigurableData implements DataProviderInterface
         $this->loadInventory = $loadInventory;
         $this->inventoryProcessor = $inventoryProcessor;
         $this->tierPriceProcessor = $tierPriceProcessor;
+        $this->loadOptionLabelById = $loadOptionLabelById;
         $this->configurableAttributes = $configurableAttributes;
     }
 
@@ -118,7 +127,7 @@ class ConfigurableData implements DataProviderInterface
                 continue;
             }
 
-            $productDTO = $this->applyConfigurableOptions($productDTO);
+            $productDTO = $this->applyConfigurableOptions($productDTO, $storeId);
             $indexData[$productId]  = $this->prepareConfigurableProduct($productDTO);
         }
 
@@ -198,11 +207,12 @@ class ConfigurableData implements DataProviderInterface
     /**
      * Apply attributes to product variants + extra options for products necessary for vsf
      * @param array $productDTO
+     * @param $storeId
      *
      * @return array
      * @throws \Exception
      */
-    private function applyConfigurableOptions(array $productDTO)
+    private function applyConfigurableOptions(array $productDTO, $storeId)
     {
         $configurableChildren = $productDTO['configurable_children'];
         $productAttributeOptions =
@@ -231,7 +241,11 @@ class ConfigurableData implements DataProviderInterface
             $values = array_values(array_unique($values));
 
             foreach ($values as $value) {
-                $productAttribute['values'][] = ['value_index' => $value];
+                $label = $this->loadOptionLabelById->execute($attributeCode, $value, $storeId);
+                $productAttribute['values'][] = [
+                    'value_index' => $value,
+                    'label' => $label,
+                ];
             }
 
             $productDTO['configurable_options'][] = $productAttribute;
