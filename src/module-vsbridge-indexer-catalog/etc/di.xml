@@ -1,6 +1,27 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Indexer\Console\Command\IndexerReindexCommand"
+                type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerReindexCommand"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface" type="Divante\VsbridgeIndexerCatalog\Model\SlugGenerator"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
+
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface" type="Divante\VsbridgeIndexerCatalog\Model\LoadInventory"/>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData">
+        <arguments>
+            <argument name="loadInventory" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\LoadChildrenInventory</argument>
+        </arguments>
+    </type>
+
     <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual"
+                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+        <arguments>
+            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
+            <argument name="typeName" xsi:type="string">product</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\ProductCategoryHandlerVirtual"
                  type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
         <arguments>
             <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
@@ -25,6 +46,11 @@
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Product">
         <arguments>
             <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual</argument>
+        </arguments>
+    </type>
+    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategory">
+        <arguments>
+            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\ProductCategoryHandlerVirtual</argument>
         </arguments>
     </type>
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Category">
@@ -76,14 +102,26 @@
     </type>
 
     <type name="Magento\Catalog\Model\Product">
-        <plugin name="update_product_data_in_elastic" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Product\Save\UpdateProductData"/>
+        <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Product\Save\UpdateProductDataPlugin"/>
     </type>
 
     <type name="Magento\Catalog\Model\Category">
-        <plugin name="update_category_data_in_elastic" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Category\Save\UpdateCategoryData"/>
+        <plugin name="update_category_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Category\Save\UpdateCategoryDataPlugin"/>
+        <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Category\Save\UpdateProductPlugin"/>
     </type>
 
     <type name="Magento\Catalog\Model\ResourceModel\Eav\Attribute">
-        <plugin name="update_attribute_data_in_elastic" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Attribute\Save\UpdateAttributeData"/>
+        <plugin name="update_attribute_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Attribute\Save\UpdateAttributeDataPlugin"/>
+    </type>
+
+    <type name="Magento\CatalogInventory\Model\ResourceModel\QtyCounterInterface">
+        <plugin name="register_products" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\CatalogInventory\QtyCorrectPlugin"/>
+    </type>
+
+    <type name="Magento\CatalogInventory\Observer\RevertQuoteInventoryObserver">
+        <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\CatalogInventory\RevertQuoteInventoryObserverPlugin"/>
+    </type>
+    <type name="Magento\CatalogInventory\Observer\ReindexQuoteInventoryObserver">
+        <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\CatalogInventory\ReindexQuoteInventoryObserverPlugin"/>
     </type>
 </config>

@@ -184,11 +184,11 @@ abstract class AbstractMapping
     {
         $attributeCode = $attribute->getAttributeCode();
 
-        if (strstr($attributeCode, 'is_')) {
+        if (substr($attributeCode, 0, 3) === 'is_') {
             return true;
         }
-
-        if ($attribute->getSourceModel() == 'eav/entity_attribute_source_boolean') {
+        
+        if ($attribute->getSourceModel() == \Magento\Catalog\Model\Product\Attribute\Source\Boolean::class) {
             return true;
         }
 

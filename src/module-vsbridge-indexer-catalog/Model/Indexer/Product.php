@@ -1,9 +1,9 @@
 <?php
 /**
- * @package   magento-2-1.dev
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @package  Divante\VsbridgeIndexerCatalog
+ * @author Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
+ * @license See LICENSE_DIVANTE.txt for license details.
  */
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer;

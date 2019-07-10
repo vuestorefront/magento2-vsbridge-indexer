@@ -26,11 +26,6 @@ class Review implements MappingInterface
     private $eventManager;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * CmsBlock constructor.
      *
      * @param EventManager $eventManager
@@ -38,22 +33,6 @@ class Review implements MappingInterface
     public function __construct(EventManager $eventManager)
     {
         $this->eventManager = $eventManager;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setType(string $type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**

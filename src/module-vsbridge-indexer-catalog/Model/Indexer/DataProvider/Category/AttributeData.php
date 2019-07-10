@@ -1,12 +1,18 @@
 <?php
+/**
+ * @package  Divante\VsbridgeIndexerCatalog
+ * @author Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @copyright 2019 Divante Sp. z o.o.
+ * @license See LICENSE_DIVANTE.txt for license details.
+ */
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\Children as CategoryChildrenResource;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryChildAttributes;
-use Divante\VsbridgeIndexerCatalog\Model\ConfigSettings;
-use Divante\VsbridgeIndexerCatalog\Model\SlugGenerator;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
 
@@ -69,22 +75,23 @@ class AttributeData
     private $childrenProductCount = [];
 
     /**
-     * @var ConfigSettings
+     * @var CatalogConfigurationInterface
      */
     private $settings;
 
     /**
-     * @var SlugGenerator
+     * @var ApplyCategorySlugInterface
      */
-    private $slugGenerator;
+    private $applyCategorySlug;
 
     /**
      * AttributeData constructor.
      *
      * @param AttributeDataProvider $attributeResource
      * @param CategoryChildrenResource $childrenResource
-     * @param SlugGenerator\Proxy $catalogHelper
-     * @param ConfigSettings $configSettings
+     * @param ProductCountResourceModel $productCountResource
+     * @param ApplyCategorySlugInterface $applyCategorySlug
+     * @param CatalogConfigurationInterface $configSettings
      * @param CategoryChildAttributes $categoryChildAttributes
      * @param DataFilter $dataFilter
      */
@@ -92,13 +99,13 @@ class AttributeData
         AttributeDataProvider $attributeResource,
         CategoryChildrenResource $childrenResource,
         ProductCountResourceModel $productCountResource,
-        SlugGenerator\Proxy $catalogHelper,
-        ConfigSettings $configSettings,
+        ApplyCategorySlugInterface $applyCategorySlug,
+        CatalogConfigurationInterface $configSettings,
         CategoryChildAttributes $categoryChildAttributes,
         DataFilter $dataFilter
     ) {
         $this->settings = $configSettings;
-        $this->slugGenerator = $catalogHelper;
+        $this->applyCategorySlug = $applyCategorySlug;
         $this->productCountResource = $productCountResource;
         $this->attributeResourceModel = $attributeResource;
         $this->childrenResourceModel = $childrenResource;
@@ -114,7 +121,7 @@ class AttributeData
      */
     public function addData(array $indexData, $storeId)
     {
-        $this->settings->getAttributesUsedForSortBy($storeId);
+        $this->settings->getAttributesUsedForSortBy();
         /**
          * TODO add option to load only specific categories
          */
@@ -267,23 +274,7 @@ class AttributeData
      */
     private function addSlug(array $categoryDTO)
     {
-        if ($this->settings->useMagentoUrlKeys()) {
-            if (!isset($categoryDTO['url_key'])) {
-                $slug = $this->slugGenerator->generate(
-                    $categoryDTO['name'],
-                    $categoryDTO['entity_id']
-                );
-                $categoryDTO['url_key'] = $slug;
-            }
-
-            $categoryDTO['slug'] = $categoryDTO['url_key'];
-        } else {
-            $slug = $this->slugGenerator->generate($categoryDTO['name'], $categoryDTO['entity_id']);
-            $categoryDTO['url_key'] = $slug;
-            $categoryDTO['slug'] = $slug;
-        }
-
-        return $categoryDTO;
+        return $this->applyCategorySlug->execute($categoryDTO);
     }
 
     /**

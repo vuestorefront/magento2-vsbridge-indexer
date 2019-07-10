@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
-use Divante\VsbridgeIndexerCatalog\Model\ConfigSettings;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Framework\App\ResourceConnection;
@@ -44,7 +44,7 @@ class Product
     private $attributeDataProvider;
 
     /**
-     * @var ConfigSettings
+     * @var CatalogConfigurationInterface
      */
     private $productSettings;
 
@@ -61,7 +61,7 @@ class Product
     /**
      * Product constructor.
      *
-     * @param ConfigSettings $configSettings
+     * @param CatalogConfigurationInterface $configSettings
      * @param AttributeDataProvider $attributeDataProvider
      * @param ResourceConnection $resourceConnection
      * @param StoreManagerInterface $storeManager
@@ -69,7 +69,7 @@ class Product
      * @param DbHelper $dbHelper
      */
     public function __construct(
-        ConfigSettings $configSettings,
+        CatalogConfigurationInterface $configSettings,
         AttributeDataProvider $attributeDataProvider,
         ResourceConnection $resourceConnection,
         StoreManagerInterface $storeManager,

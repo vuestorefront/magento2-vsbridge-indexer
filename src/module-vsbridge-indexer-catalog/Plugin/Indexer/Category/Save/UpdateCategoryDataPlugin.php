@@ -1,6 +1,6 @@
 <?php
 /**
- * @package  magento-2-1.dev
+ * @package  Divante\VsbridgeIndexerCatalog
  * @author Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license See LICENSE_DIVANTE.txt for license details.
@@ -12,9 +12,9 @@ use Divante\VsbridgeIndexerCatalog\Model\Indexer\CategoryProcessor;
 use Magento\Catalog\Model\Category;
 
 /**
- * Class UpdateCategoryData
+ * Class UpdateCategoryDataPlugin
  */
-class UpdateCategoryData
+class UpdateCategoryDataPlugin
 {
     /**
      * @var CategoryProcessor

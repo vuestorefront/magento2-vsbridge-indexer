@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -15,7 +15,7 @@ use Magento\Framework\EntityManager\EntityMetadataInterface;
 /**
  * Class EavAttributes
  */
-abstract class AbstractEavAttributes
+abstract class AbstractEavAttributes implements EavAttributesInterface
 {
     /**
      * @var array
@@ -152,7 +152,13 @@ abstract class AbstractEavAttributes
             $attribute = $this->attributesById[$value['attribute_id']];
 
             if ($attribute->getFrontendInput() === 'multiselect') {
-                $value['value'] = explode(',', $value['value']);
+                $options = explode(',', $value['value']);
+
+                if (!empty($options)) {
+                    $options = array_map('intval', $options);
+                }
+
+                $value['value'] = $options;
             }
 
             $attributeCode = $attribute->getAttributeCode();

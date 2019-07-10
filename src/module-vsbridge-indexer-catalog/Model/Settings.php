@@ -8,16 +8,15 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model;
 
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Config as ConfigResource;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
 
 /**
  * Class ConfigSettings
  */
-class ConfigSettings
+class Settings implements CatalogConfigurationInterface
 {
-    const CATALOG_SETTINGS_XML_PREFIX = 'vsbridge_indexer_settings/catalog_settings';
-
     /**
      * @var array
      */
@@ -53,7 +52,7 @@ class ConfigSettings
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function useMagentoUrlKeys()
     {
@@ -61,7 +60,15 @@ class ConfigSettings
     }
 
     /**
-     * @return bool
+     * @inheritdoc
+     */
+    public function useUrlKeyToGenerateSlug()
+    {
+        return (bool) $this->getConfigParam('use_url_key_to_generate_slug');
+    }
+
+    /**
+     * @inheritdoc
      */
     public function syncTierPrices()
     {
@@ -69,9 +76,7 @@ class ConfigSettings
     }
 
     /**
-     * @param int $storeId
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getAllowedProductTypes($storeId)
     {
@@ -97,7 +102,7 @@ class ConfigSettings
         $key = $configField . (string) $storeId;
 
         if (!isset($this->settings[$key])) {
-            $path = self::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
+            $path = CatalogConfigurationInterface::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
 
             if ($storeId) {
                 $configValue = $this->scopeConfig->getValue($path, 'stores', $storeId);
@@ -111,9 +116,7 @@ class ConfigSettings
     }
 
     /**
-     *
-     * @return array
-     * @throws \Exception
+     * @inheritdoc
      */
     public function getAttributesUsedForSortBy()
     {
@@ -128,9 +131,7 @@ class ConfigSettings
     }
 
     /**
-     * @param int $storeId
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getProductListDefaultSortBy($storeId)
     {

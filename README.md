@@ -23,6 +23,48 @@ composer config repositories.divante vcs https://github.com/DivanteLtd/magento2-
 composer require divante/magento2-vsbridge-indexer:dev-master
 ```
 
+## Installation/Getting Started - MSI support
+- Install with composer changes from develop branch
+```json
+composer config repositories.divante vcs https://github.com/DivanteLtd/magento2-vsbridge-indexer
+composer require divante/magento2-vsbridge-indexer:dev-develop
+```
+- Install also second module which will support MSI
+```json
+composer config repositories.divante-msi vcs https://github.com/DivanteLtd/magento2-vsbridge-indexer-msi
+composer require divante/magento2-vsbridge-indexer-msi:dev-develop
+```
+Not fully supported, few fields are exported to ES.
+From inventory indexer:
+ -- qty => qty, 
+ -- is_salable => is_in_stock/stock_status
+ 
+#### Example
+
+Website 1
+```json
+{
+    "sku": "24-MB01",
+    "stock": {
+      "qty": 100,
+      "is_in_stock": false,
+      "stock_status": 0
+    }
+}
+```
+
+Website 2
+```json
+{
+    "sku": "24-MB01",
+    "stock": {
+      "qty": 73,
+      "is_in_stock": true,
+      "stock_status": 1
+    }
+}
+```
+
 ```php
 php bin/magento setup:upgrade
 ```
@@ -30,7 +72,12 @@ php bin/magento setup:upgrade
 
 
 ### Configuration
-Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront → Indexer), available now in the in the Magento Panel, and configure it in the listed areas: 
+Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront → Indexer), available now in the in the Magento Panel, and configure it in the listed areas:
+1. General settings → Enable VS Bridge
+ 
+   Enable to export data to elasticsearch. By default indexing is disable.
+
+    ![](docs/images/config-general-enable.png) 
  
 1. General settings → List of stores to reindex
  
@@ -49,9 +96,57 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
    Batch Indexing Size → select size of packages by which you intend to send data to ElasticSrearch. Depending on the project you might need to adjust package size to the number of products, attributes, configurable products variation, etc). By default Batch, Indexing Size is set up for 1000.
    Indicies settings
     
-   Index Name Prefix → define prefixes for ElasticSearch indexes. The panel allows adding prefix only to the catalog name e.g.: "vue_storefront_catalog". For each store (store view) index name is generated on the base of defined prefix and ID. Aliases cannot be created. 
-   Example: When we define following indexes: "vue_storefront_catalog_1", "vue_storefront_catalog_2", "vue_storefront_catalog_3", their name will remain unchanged, and only product and category names will be updated. 
+   Index Name Prefix → define prefixes for ElasticSearch indexes. The panel allows adding prefix only to the catalog name e.g.: "vue_storefront_catalog". For each store (store view) index name is generated on the base of defined prefix and either ID or Store Code. Aliases cannot be created. 
+   Example: When we define following indexes: "vue_storefront_catalog_1", "vue_storefront_catalog_2", "vue_storefront_catalog_3".
    Important: It is crucial to update this configuration in the VSF and VSF-API (one change at the beginning of the whole configuration process).
+
+   Index Identifier → defines the unique store identifier to append to the ElasticSearch indexes. The default value is ID which will append the Store ID to the index name e.g.: "vue_storefront_catalog_1". You can choose to change this to Store Code which will add the Store Code to the index name e.g.: "vue_storefront_catalog_storecode".
+   
+   Example with Store ID
+    
+   VSF config (base on default index prefix name: vue_storefront_magento)
+    ```json
+    "elasticsearch": {
+      "httpAuth": "",
+      "host": "localhost:8080/api/catalog",
+      "index": "vue_storefront_magento_1" //index for store view with id 1
+    }
+    ```
+   
+    VSF-API config
+    ```json
+      "elasticsearch": {
+        "host": "localhost",
+        "port": 9200,
+        "user": "elastic",
+        "password": "changeme",
+        "indices": [
+          "vue_storefront_magento_1" //index for store view with id 1
+        ],
+    ```
+   
+   Example with Store Code
+    
+   VSF config (base on default index prefix name: vue_storefront_magento)
+    ```json
+    "elasticsearch": {
+      "httpAuth": "",
+      "host": "localhost:8080/api/catalog",
+      "index": "vue_storefront_magento_en_us" //index for store view with code "en_us"
+    }
+    ```
+   
+    VSF-API config
+    ```json
+      "elasticsearch": {
+        "host": "localhost",
+        "port": 9200,
+        "user": "elastic",
+        "password": "changeme",
+        "indices": [
+          "vue_storefront_magento_en_us" //index for store view with store code "en_us"
+        ],
+    ```
    
    ![](docs/images/config-indices.png)
    
@@ -69,7 +164,9 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
 
 1. Catalog Settings
     
-    Use Short Catalog Urls → by default this option is disabled. The short Catalog Urls must be aligned with the VSF configuration. After any changes in the VSF configuration, the configuration in the Magento Panel must be updated and all products and categories indexed anew.
+    Use Catalog Url Keys → by default this option is disabled. Use Magento Url Key attribute for url_key and slug field (for products and categories). Url Keys have to be unique
+    
+    Use Magento Url Key and ID to generate slug for VSF -> by default slug (and url_key) field is generated base on product/category NAME and ID
     
     Sync Tier Prices → by default this option is disabled. Used to sync products tier prices. 
     
@@ -103,6 +200,12 @@ Recommended for smaller databases. In the case of big databases it is better to 
 php bin/magento indexer:reindex
 ```
 
+or
+```php
+php bin/magento vsbridge:reindex --store=[STORE_ID]
+php bin/magento vsbridge:reindex --store=1
+```
+
 Note: If a docker with ElasticSearch is disabled, Indexer will display error: "No alive nodes found in your cluster".
 
 #### Update on Save Mode
@@ -121,8 +224,9 @@ Note: If a docker with ElasticSearch is disabled, Indexer will display error: "N
      
 ### Compatibility
 
+-- Vue Storefront >= 1.4.4
 Module was tested on:
- -- Magento Community version 2.2.0 and 2.2.4. It should perform without any issues on all Magento 2.2.x versions. 
+ -- Magento Community version 2.2.7 It should perform without any issues on Magento 2.2.6 and above versions. 
  -- Magento Enterprise version 2.3.0. The bridge indexer cannot be installed on lower versions of Magento Enterprise.
 
 Module was not tested on version 2.3.
@@ -130,7 +234,6 @@ Module was not tested on version 2.3.
 ### TODO
 - check the Vue Storefront - Magento 2 Indexer bridge for Magento 2.3 (for Commerce and Enterprise versions).
 - add MSI support
-- add rating review to ElasticSearch as a separate module @Agata 
 - add a limitation of the attributes (products, categories) sent to ElasticSearch
 - add a limitation of the categories sent to ElasticSearch, by adding new configurations: send only categories visible in the menu, send only active categories @Agata
 - add a new command enabling the full indexation, which will run all the indexes necessary for VSF   
