@@ -1,6 +1,7 @@
 # Changelog
 
-## [Unreleased]
+
+## [1.1.0] (2019.07.10)
 
 ### Fixed
 - Fix bug causing empty product URL paths  - [@indiebytes](https://github.com/indiebytes) ([#63](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/63))
@@ -47,7 +48,7 @@ category will be visible in menu sidebar.
   ]
 }
 ```
-- Add new command ```php bin/magento vsbridge:reindex``` which will run all Magento indices which names start with "vsbridge_".
+- Add new command ```php bin/magento vsbridge:reindex``` which will run all Magento indices which names start with "vsbridge_" (experimental).
 ```php
 Description:
   Rebuild indexer in ES.
@@ -61,7 +62,7 @@ Options:
 ```
 
 
-## [v1.0.0] (2019.04.03)
+## [1.0.0] (2019.04.03)
 First version
 
 ## March 2019
