@@ -7,6 +7,7 @@
 - Changed ElasticSearch password to be obscured, encrypted, and considered sensitive (will dump to `env.php` instead of `config.php`) - [@rain2o](https://github.com/rain2o) ([#69](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/69))
 - Fix exporting values for multiselect option arrays as integers (instead of strings)
 - Fix getting stock_status value for products
+- Magento Commerce - fix getting configurable_children 
 
 ### Changed/Improved
 - Change mapping for "category.name" field in product type
@@ -24,6 +25,28 @@ category will be visible in menu sidebar.
 - Add option to enable/disable exporting data to ES.
 - Add ProductCategory indexer to partially update product data in ES (category, category_ids fields). Trigger after changing products positions in category.
 - Add the ability to choose between Store ID and Store Code to be used at the end of index names.
+- Add label for configurable option value.  **Note:** When You modify any configurable attribute label or option label in Magento You should reindex all products manually.
+```json
+{
+  "attribute_id": 93,
+  "attribute_code": "color",
+  "label": "Color",
+  "values": [
+    {
+      "value_index": 61,
+      "label": "Gray"
+    },
+    {
+      "value_index": 66,
+      "label": "Purple"
+    },
+    {
+      "value_index": 69,
+      "label": "Yellow"
+    }
+  ]
+}
+```
 - Add new command ```php bin/magento vsbridge:reindex``` which will run all Magento indices which names start with "vsbridge_".
 ```php
 Description:
