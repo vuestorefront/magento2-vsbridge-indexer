@@ -285,12 +285,19 @@ class ConfigurableData implements DataProviderInterface
      */
     private function hasPrice(array $product)
     {
-        if (!isset($product['price'])) {
-            return false;
-        }
+        $priceFields = [
+            'price',
+            'final_price',
+        ];
 
-        if (0 === (int)$product['price']) {
-            return false;
+        foreach ($priceFields as $field) {
+            if (!isset($product[$field])) {
+                return false;
+            }
+
+            if (0 === (int)$product[$field]) {
+                return false;
+            }
         }
 
         return true;

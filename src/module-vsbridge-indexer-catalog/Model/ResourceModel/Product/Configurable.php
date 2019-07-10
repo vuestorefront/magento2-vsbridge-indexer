@@ -7,6 +7,7 @@ use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Helper as DbHelper;
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 
 /**
  * Class Configurable
@@ -33,6 +34,11 @@ class Configurable
      * @var Product
      */
     private $productResource;
+
+    /**
+     * @var ProductMetaData
+     */
+    private $productMetaData;
 
     /**
      * Array of the ids of configurable products from $productCollection
@@ -80,17 +86,20 @@ class Configurable
      *
      * @param AttributeDataProvider $attributeDataProvider
      * @param Product $productResource
+     * @param ProductMetaData $productMetaData
      * @param ResourceConnection $resourceConnection
      * @param DbHelper $dbHelper
      */
     public function __construct(
         AttributeDataProvider $attributeDataProvider,
         Product $productResource,
+        ProductMetaData $productMetaData,
         ResourceConnection $resourceConnection,
         DbHelper $dbHelper
     ) {
         $this->attributeDataProvider = $attributeDataProvider;
         $this->resource = $resourceConnection;
+        $this->productMetaData = $productMetaData;
         $this->productResource = $productResource;
         $this->dbHelper = $dbHelper;
     }
@@ -155,7 +164,8 @@ class Configurable
     private function getProductConfigurableAttributeIds(array $product)
     {
         $attributes = $this->getConfigurableProductAttributes();
-        $productId = $product['id'];
+        $linkField = $this->productMetaData->get()->getLinkField();
+        $productId = $product[$linkField];
 
         if (!isset($attributes[$productId])) {
             throw new \Exception(
@@ -175,7 +185,7 @@ class Configurable
     private function getConfigurableProductAttributes()
     {
         if (!$this->configurableProductAttributes) {
-            $productIds = $this->getConfigurableProductIds();
+            $productIds = $this->getParentIds();
             $attributes = $this->getConfigurableAttributesForProductsFromResource($productIds);
             $this->configurableProductAttributes = $attributes;
         }
@@ -262,17 +272,32 @@ class Configurable
     private function getConfigurableProductIds()
     {
         if (null === $this->configurableProductIds) {
+            $linkField = $this->productMetaData->get()->getLinkField();
+            $entityField = $this->productMetaData->get()->getIdentifierField();
+
             $this->configurableProductIds = [];
             $products = $this->productsData;
 
             foreach ($products as $product) {
                 if ($product['type_id'] == ConfigurableType::TYPE_CODE) {
-                    $this->configurableProductIds[] = $product['id'];
+                    $entityId = $product[$entityField];
+                    $linkId = $product[$linkField];
+                    $this->configurableProductIds[$linkId] = $entityId;
                 }
             }
         }
 
         return $this->configurableProductIds;
+    }
+
+    /**
+     * @return array
+     */
+    private function getParentIds()
+    {
+        $productIds = $this->getConfigurableProductIds();
+
+        return array_keys($productIds);
     }
 
     /**
@@ -288,19 +313,36 @@ class Configurable
     public function getSimpleProducts($storeId)
     {
         if (null === $this->simpleProducts) {
-            $parentIds = $this->getConfigurableProductIds();
+            $parentIds = $this->getParentIds();
             $childProduct = $this->productResource->loadChildrenProducts($parentIds, $storeId);
 
             /** @var Product $product */
             foreach ($childProduct as $product) {
                 $simpleId = $product['entity_id'];
                 $parentIds = explode(',', $product['parent_ids']);
+                $parentIds = $this->mapLinkFieldToEntityId($parentIds);
                 $product['parent_ids'] = $parentIds;
                 $this->simpleProducts[$simpleId] = $product;
             }
         }
 
         return $this->simpleProducts;
+    }
+
+    /**
+     * @param array $linkIds
+     *
+     * @return array
+     */
+    private function mapLinkFieldToEntityId(array $linkIds)
+    {
+        $productIds = [];
+
+        foreach ($linkIds as $id) {
+            $productIds[] = $this->configurableProductIds[$id];
+        }
+
+        return $productIds;
     }
 
     /**
