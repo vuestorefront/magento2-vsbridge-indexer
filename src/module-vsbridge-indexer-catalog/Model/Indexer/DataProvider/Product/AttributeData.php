@@ -81,21 +81,7 @@ class AttributeData implements DataProviderInterface
 
         foreach ($attributes as $entityId => $attributesData) {
             $productData = array_merge($indexData[$entityId], $attributesData);
-
-            if ($this->settings->useMagentoUrlKeys()) {
-                $productData['slug'] = $productData['url_key'];
-            } else {
-                $text = $productData['name'];
-
-                if ($this->settings->useUrlKeyToGenerateSlug()) {
-                    $text = $productData['url_key'];
-                }
-
-                $slug = $this->slugGenerator->generate($text, $entityId);
-                $productData['slug'] = $slug;
-                $productData['url_key'] = $slug;
-            }
-
+            $productData = $this->applySlug($productData);
             $indexData[$entityId] = $productData;
         }
 
@@ -103,5 +89,31 @@ class AttributeData implements DataProviderInterface
         $indexData = $this->productUrlPathGenerator->addUrlPath($indexData, $storeId);
 
         return $indexData;
+    }
+
+    /**
+     * @param array $productData
+     *
+     * @return array
+     */
+    private function applySlug(array $productData): array
+    {
+        $entityId = $productData['id'];
+
+        if ($this->settings->useMagentoUrlKeys()) {
+            $productData['slug'] = $productData['url_key'];
+        } else {
+            $text = $productData['name'];
+
+            if ($this->settings->useUrlKeyToGenerateSlug()) {
+                $text = $productData['url_key'];
+            }
+
+            $slug = $this->slugGenerator->generate($text, $entityId);
+            $productData['slug'] = $slug;
+            $productData['url_key'] = $slug;
+        }
+
+        return $productData;
     }
 }

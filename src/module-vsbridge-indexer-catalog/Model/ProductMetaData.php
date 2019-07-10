@@ -37,7 +37,6 @@ class ProductMetaData
 
     /**
      * @return \Magento\Framework\EntityManager\EntityMetadataInterface
-     * @throws \Exception
      */
     public function get()
     {
