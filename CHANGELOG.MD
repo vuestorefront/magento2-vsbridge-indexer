@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Uncaught TypeError in CMS indexer  - [@indiebytes](https://github.com/indiebytes) ([#85](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/85))
 
 ## [1.1.0] (2019.07.10)
 
