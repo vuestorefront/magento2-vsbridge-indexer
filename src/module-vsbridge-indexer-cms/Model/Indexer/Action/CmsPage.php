@@ -78,7 +78,7 @@ class CmsPage
             foreach ($cmsPages as $pageData) {
                 $lastPageId = $pageData['page_id'];
                 $pageData['id'] = $pageData['page_id'];
-                $pageData['content'] = $this->contentProcessor->parse($templateFilter, $pageData['content']);
+                $pageData['content'] = $this->contentProcessor->parse($templateFilter, (string) $pageData['content']);
                 $pageData['active'] = (bool)$pageData['is_active'];
 
                 unset($pageData['creation_time'], $pageData['update_time'], $pageData['page_id']);
