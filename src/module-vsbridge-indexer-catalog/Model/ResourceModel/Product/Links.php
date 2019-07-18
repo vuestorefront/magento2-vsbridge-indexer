@@ -94,12 +94,13 @@ class Links
                 $linkType = $this->getLinkType($typeId);
 
                 if ($linkType) {
+                    $position = isset($linkData['position']) ? (int)$linkData['position'] : 0;
                     $linkProductList[] = [
                         'sku' => $product['sku'],
                         'link_type' => $linkType,
                         'linked_product_sku' => $linkData['sku'],
                         'linked_product_type' => $linkData['type_id'],
-                        'position' => (int)$linkData['position'],
+                        'position' => $position,
                     ];
                 }
             }
