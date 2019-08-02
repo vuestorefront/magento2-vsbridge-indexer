@@ -4,6 +4,7 @@
 
 ### Fixed
 - Uncaught TypeError in CMS indexer  - [@indiebytes](https://github.com/indiebytes) ([#85](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/85))
+- Multiselect attribute values check if they are numeric before casting to `int` type to avoid casting strings to `int` and therefore causing the value to be `0` always. - [@rain2o](https://github.com/rain2o)
 
 ## [1.1.0] (2019.07.10)
 

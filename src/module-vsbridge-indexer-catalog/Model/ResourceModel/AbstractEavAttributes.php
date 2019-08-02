@@ -155,7 +155,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
                 $options = explode(',', $value['value']);
 
                 if (!empty($options)) {
-                    $options = array_map('intval', $options);
+                    $options = array_map([$this, 'parseValue'], $options);
                 }
 
                 $value['value'] = $options;
@@ -166,6 +166,19 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
         }
 
         return $this->valuesByEntityId;
+    }
+
+    /**
+     * Parse the option value - Cast to int if it's numeric
+     * otherwise leave it as-is
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function parseValue($value)
+    {
+        return is_numeric($value) ? intval($value) : $value;
     }
 
     /**
