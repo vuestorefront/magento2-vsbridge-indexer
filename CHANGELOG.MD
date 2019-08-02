@@ -5,6 +5,13 @@
 ### Fixed
 - Uncaught TypeError in CMS indexer  - [@indiebytes](https://github.com/indiebytes) ([#85](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/85))
 
+### Changed/Improved
+- Provide more verbose feedback in console when running `bin/magento vsbridge:reindex`.  Removed `int` type cast from `--store` value to allow for store code or store ID since StoreManagerInterface allows both types. - [@rain2o](https://github.com/rain2o)
+
+### Added
+- New optional parameter for `bin/magento vsbridge:reindex` command `--all` to allow reindexing all stores. - [@rain2o](https://github.com/rain2o)
+
+
 ## [1.1.0] (2019.07.10)
 
 ### Fixed
