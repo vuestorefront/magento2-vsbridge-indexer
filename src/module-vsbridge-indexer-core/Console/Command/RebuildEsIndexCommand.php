@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Divante\VsbridgeIndexerCore\Index\IndexOperations;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Indexer\IndexerRegistry;
+use Magento\Store\Api\Data\StoreInterface;
 
 /**
  * Class IndexerReindexCommand
@@ -28,6 +29,7 @@ use Magento\Framework\Indexer\IndexerRegistry;
 class RebuildEsIndexCommand extends Command
 {
     const INPUT_STORE = 'store';
+    const INPUT_ALL_STORES = 'all';
     const INPUT_DELETE_INDEX = 'delete-index';
 
     const INDEX_IDENTIFIER = 'vue_storefront_catalog';
@@ -58,9 +60,13 @@ class RebuildEsIndexCommand extends Command
     private $state;
 
     /**
-     * Constructor
+     * Construct
      *
-     * @param \Magento\Indexer\Model\Indexer\CollectionFactory|null $collectionFactory
+     * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
+     * @param IndexOperations\Proxy $indexOperations
+     * @param StoreManagerInterface\Proxy $storeManager
+     * @param \Magento\Framework\App\State\Proxy $state
+     * @param \Magento\Indexer\Model\Indexer\CollectionFactory\Proxy $collectionFactory
      */
     public function __construct(
         IndexerRegistry $indexerRegistry,
@@ -89,7 +95,14 @@ class RebuildEsIndexCommand extends Command
             self::INPUT_STORE,
             null,
             InputOption::VALUE_REQUIRED,
-            'Store ID'
+            'Store ID or Store Code'
+        );
+
+        $this->addOption(
+            self::INPUT_ALL_STORES,
+            null,
+            InputOption::VALUE_NONE,
+            'Reindex all stores'
         );
 
 
@@ -108,41 +121,80 @@ class RebuildEsIndexCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $storeId = (int)$input->getOption(self::INPUT_STORE);
+        $output->setDecorated(true);
+        $storeId = $input->getOption(self::INPUT_STORE);
+        $allStores = $input->getOption(self::INPUT_ALL_STORES);
+        $deleteIndex = $input->getOption(self::INPUT_DELETE_INDEX);
 
         if ($storeId) {
-            $this->setAreaCode();
+            /** @var \Magento\Store\Api\Data\StoreInterface $store */
             $store = $this->storeManager->getStore($storeId);
-            $deleteIndex = $input->getOption(self::INPUT_DELETE_INDEX);
+            $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
 
-            if ($deleteIndex) {
-                $this->indexOperations->deleteIndex(self::INDEX_IDENTIFIER, $store);
-                $this->indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
-            }
+            $this->setAreaCode();
+            $returnValue = $this->reindexStore($store, $deleteIndex, $output);
 
-            $returnValue = Cli::RETURN_FAILURE;
-
-            foreach ($this->getIndexers($input) as $indexer) {
-                try {
-                    $startTime = microtime(true);
-
-                    $indexer->reindexAll();
-
-                    $resultTime = microtime(true) - $startTime;
-                    $output->writeln(
-                        $indexer->getTitle() . ' index has been rebuilt successfully in ' . gmdate('H:i:s', $resultTime)
-                    );
-                    $returnValue = Cli::RETURN_SUCCESS;
-                } catch (LocalizedException $e) {
-                    $output->writeln($e->getMessage());
-                } catch (\Exception $e) {
-                    $output->writeln($indexer->getTitle() . ' indexer process unknown error:');
-                    $output->writeln($e->getMessage());
-                }
-            }
-
+            $output->writeln("<info>Reindexing has completed!</info>");
             return $returnValue;
+        } elseif ($allStores) {
+            $output->writeln("<info>Reindexing all stores...</info>");
+            $returnValues = [];
+
+            /** @var \Magento\Store\Api\Data\StoreInterface $store */
+            foreach ($this->storeManager->getStores() as $store) {
+                $output->writeln("<info>Reindexing store " . $store->getName() . "...</info>");
+                $returnValues[] = $this->reindexStore($store, $deleteIndex, $output);
+            }
+
+            $output->writeln("<info>All stores have been reindexed!</info>");
+            // If failure returned in any store return failure now
+            return in_array(Cli::RETURN_FAILURE, $returnValues) ? Cli::RETURN_FAILURE : Cli::RETURN_SUCCESS;
+        } else {
+            $output->writeln(
+                "<comment>Not enough information provided, nothing has been reindexed. Try using --help for more information.</comment>"
+            );
         }
+    }
+
+    /**
+     * Reindex each vsbridge index for the specified store
+     *
+     * @param \Magento\Store\Api\Data\StoreInterface $store
+     * @param bool $deleteIndex
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     * @return int
+     */
+    private function reindexStore(StoreInterface $store, bool $deleteIndex, OutputInterface $output)
+    {
+        if ($deleteIndex) {
+            $output->writeln("<comment>Deleting and recreating the index first...</comment>");
+            $this->indexOperations->deleteIndex(self::INDEX_IDENTIFIER, $store);
+            $this->indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
+        }
+
+        $returnValue = Cli::RETURN_FAILURE;
+
+        foreach ($this->getIndexers() as $indexer) {
+            try {
+                $startTime = microtime(true);
+
+                $indexer->reindexAll();
+
+                $resultTime = microtime(true) - $startTime;
+                $output->writeln(
+                    $indexer->getTitle() . ' index has been rebuilt successfully in ' . gmdate('H:i:s', $resultTime)
+                );
+                $returnValue = Cli::RETURN_SUCCESS;
+            } catch (LocalizedException $e) {
+                $output->writeln("<error>" . $e->getMessage() . "</error>");
+            } catch (\Exception $e) {
+                $output->writeln("<error>" . $indexer->getTitle() . ' indexer process unknown error:</error>');
+                $output->writeln("<error>" . $e->getMessage() . "</error>");
+            }
+        }
+
+        return $returnValue;
     }
 
     /**
@@ -159,7 +211,7 @@ class RebuildEsIndexCommand extends Command
     /**
      * @return IndexerInterface[]
      */
-    protected function getIndexers(InputInterface $input)
+    protected function getIndexers()
     {
         /** @var IndexerInterface[] */
         $indexers = $this->collectionFactory->create()->getItems();
