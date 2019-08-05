@@ -5,6 +5,7 @@
 ### Fixed
 - Uncaught TypeError in CMS indexer  - [@indiebytes](https://github.com/indiebytes) ([#85](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/85))
 - Multiselect attribute values check if they are numeric before casting to `int` type to avoid casting strings to `int` and therefore causing the value to be `0` always. - [@rain2o](https://github.com/rain2o)
+- Fix running `bin/magento vsbridge:reindex --store` per store. Only data for given store will be updated in ES. ([#91](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/91))
 
 ### Changed/Improved
 - Provide more verbose feedback in console when running `bin/magento vsbridge:reindex`.  Removed `int` type cast from `--store` value to allow for store code or store ID since StoreManagerInterface allows both types. - [@rain2o](https://github.com/rain2o)
