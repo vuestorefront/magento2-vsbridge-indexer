@@ -64,10 +64,10 @@ class RebuildEsIndexCommand extends Command
      */
     public function __construct(
         IndexerRegistry $indexerRegistry,
-        IndexOperations\Proxy $indexOperations,
-        StoreManagerInterface\Proxy $storeManager,
-        \Magento\Framework\App\State\Proxy $state,
-        \Magento\Indexer\Model\Indexer\CollectionFactory\Proxy $collectionFactory
+        IndexOperations $indexOperations,
+        StoreManagerInterface $storeManager,
+        \Magento\Framework\App\State $state,
+        \Magento\Indexer\Model\Indexer\CollectionFactory $collectionFactory
     ) {
         $this->indexerRegistry = $indexerRegistry;
         $this->collectionFactory = $collectionFactory;
