@@ -8,20 +8,19 @@
 
 namespace Divante\VsbridgeIndexerCore\Console\Command;
 
-use Magento\Backend\App\Area\FrontNameResolver;
-use Symfony\Component\Console\Command\Command;
-use Magento\Framework\Indexer\IndexerInterface;
 use Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategoryProcessor;
-use Magento\Framework\Console\Cli;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Magento\Framework\Exception\LocalizedException;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
+use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Index\IndexOperations;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Backend\App\Area\FrontNameResolver;
+use Magento\Framework\Indexer\IndexerInterface;
+use Magento\Framework\Console\Cli;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Store\Api\Data\StoreInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class IndexerReindexCommand
@@ -45,7 +44,7 @@ class RebuildEsIndexCommand extends Command
     private $indexOperations;
 
     /**
-     * @var StoreManagerInterface
+     * @var StoreManager
      */
     private $storeManager;
 
@@ -64,14 +63,14 @@ class RebuildEsIndexCommand extends Command
      *
      * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
      * @param IndexOperations\Proxy $indexOperations
-     * @param StoreManagerInterface\Proxy $storeManager
+     * @param StoreManager\Proxy $storeManager
      * @param \Magento\Framework\App\State\Proxy $state
      * @param \Magento\Indexer\Model\Indexer\CollectionFactory\Proxy $collectionFactory
      */
     public function __construct(
         IndexerRegistry $indexerRegistry,
         IndexOperations $indexOperations,
-        StoreManagerInterface $storeManager,
+        StoreManager $storeManager,
         \Magento\Framework\App\State $state,
         \Magento\Indexer\Model\Indexer\CollectionFactory $collectionFactory
     ) {
@@ -127,17 +126,23 @@ class RebuildEsIndexCommand extends Command
         $deleteIndex = $input->getOption(self::INPUT_DELETE_INDEX);
 
         if ($storeId) {
-            /** @var \Magento\Store\Api\Data\StoreInterface $store */
-            $store = $this->storeManager->getStore($storeId);
-            $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+            $stores = $this->storeManager->getStores($storeId);
 
-            $this->setAreaCode();
-            $returnValue = $this->reindexStore($store, $deleteIndex, $output);
+            if (!empty($stores)) {
+                /** @var \Magento\Store\Api\Data\StoreInterface $store */
+                $store = $stores[0];
+                $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
 
-            $output->writeln("<info>Reindexing has completed!</info>");
-            return $returnValue;
+                $this->setAreaCode();
+                $returnValue = $this->reindexStore($store, $deleteIndex, $output);
+
+                $output->writeln("<info>Reindexing has completed!</info>");
+
+                return $returnValue;
+            }
         } elseif ($allStores) {
             $output->writeln("<info>Reindexing all stores...</info>");
+            $this->setAreaCode();
             $returnValues = [];
 
             /** @var \Magento\Store\Api\Data\StoreInterface $store */

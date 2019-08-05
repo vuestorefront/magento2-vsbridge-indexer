@@ -72,7 +72,7 @@
     <type name="Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand">
         <arguments>
             <argument name="indexOperations" xsi:type="object">Divante\VsbridgeIndexerCore\Index\IndexOperations\Proxy</argument>
-            <argument name="storeManager" xsi:type="object">Magento\Store\Model\StoreManagerInterface\Proxy</argument>
+            <argument name="storeManager" xsi:type="object">Divante\VsbridgeIndexerCore\Indexer\StoreManager\Proxy</argument>
             <argument name="state" xsi:type="object">Magento\Framework\App\State\Proxy</argument>
             <argument name="collectionFactory" xsi:type="object">Magento\Indexer\Model\Indexer\CollectionFactory\Proxy</argument>
         </arguments>

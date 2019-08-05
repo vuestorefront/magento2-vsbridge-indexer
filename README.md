@@ -236,7 +236,5 @@ Module was not tested on version 2.3.
 - add MSI support
 - add a limitation of the attributes (products, categories) sent to ElasticSearch
 - add a limitation of the categories sent to ElasticSearch, by adding new configurations: send only categories visible in the menu, send only active categories @Agata
-- add a new command enabling the full indexation, which will run all the indexes necessary for VSF   
 - add a new command allowing to enable/disable following indexes: CMS Block, CMS Page.
 - add an option to exclude the default Magento indexes (which do not impact new indexes operations)
-- adding "label" for configurable_options: configurable_options.label https://github.com/DivanteLtd/mage2vuestorefront/commit/ee77819aca915cc324a1b54d621c904ac8bc8fde @Agata
