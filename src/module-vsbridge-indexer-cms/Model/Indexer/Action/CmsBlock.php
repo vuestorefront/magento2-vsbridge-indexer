@@ -78,7 +78,7 @@ class CmsBlock
             foreach ($cmsBlocks as $blockData) {
                 $lastBlockId = $blockData['block_id'];
                 $blockData['id'] = $blockData['block_id'];
-                $blockData['content'] = $this->contentProcessor->parse($templateFilter, $blockData['content']);
+                $blockData['content'] = $this->contentProcessor->parse($templateFilter, (string) $blockData['content']);
                 $blockData['active'] = (bool)$blockData['is_active'];
 
                 unset($blockData['creation_time'], $blockData['update_time'], $blockData['block_id']);

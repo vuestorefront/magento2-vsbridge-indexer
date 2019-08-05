@@ -43,7 +43,7 @@ class CategoryData implements DataProviderInterface
             $categoryId = (int)$categoryDataRow['category_id'];
             $position = (int)$categoryDataRow['position'];
 
-            $categoryData = [
+            $productCategoryData = [
                 'category_id' => $categoryId,
                 'name' => (string)$categoryDataRow['name'],
                 'position' => $position,
@@ -57,7 +57,7 @@ class CategoryData implements DataProviderInterface
                 $indexData[$productId]['category_ids'] = [];
             }
 
-            $indexData[$productId]['category'][] = $categoryData;
+            $indexData[$productId]['category'][] = $productCategoryData;
             $indexData[$productId]['category_ids'][] = $categoryId;
         }
 
