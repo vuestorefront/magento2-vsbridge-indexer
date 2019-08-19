@@ -289,6 +289,11 @@ class ConfigurableData implements DataProviderInterface
             $productDTO['stock']['stock_status'] = 0;
         }
 
+        if (!$areChildInStock) {
+            $productDTO['stock']['is_in_stock'] = false;
+            $productDTO['visibility'] = 1;
+        }
+
         return $productDTO;
     }
 
