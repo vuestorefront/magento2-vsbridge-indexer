@@ -105,7 +105,7 @@ class AttributeData implements DataProviderInterface
         } else {
             $text = $productData['name'];
 
-            if ($this->settings->useUrlKeyToGenerateSlug()) {
+            if ($this->settings->useUrlKeyToGenerateSlug() && isset($productData['url_key'])) {
                 $text = $productData['url_key'];
             }
 
