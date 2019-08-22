@@ -282,10 +282,10 @@ class ConfigurableData implements DataProviderInterface
             $productDTO['regular_price'] = $minPrice;
         }
 
-        $productStockStatus = $productDTO['stock']['stock_status'];
         $isInStock = $productDTO['stock']['is_in_stock'];
 
-        if (!$isInStock || ($productStockStatus && !$areChildInStock)) {
+        if (!$isInStock || !$areChildInStock) {
+            $productDTO['stock']['is_in_stock'] = false;
             $productDTO['stock']['stock_status'] = 0;
         }
 
