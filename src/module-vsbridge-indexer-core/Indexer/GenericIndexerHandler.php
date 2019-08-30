@@ -178,22 +178,24 @@ class GenericIndexerHandler
                     }
                 }
 
-                $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
-                $bulkRequest = $this->indexOperation->createBulk()->addDocuments(
-                    $index->getName(),
-                    $this->typeName,
-                    $docs
-                );
+                if (!empty($docs)) {
+                    $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
+                    $bulkRequest = $this->indexOperation->createBulk()->addDocuments(
+                        $index->getName(),
+                        $this->typeName,
+                        $docs
+                    );
 
-                $response = $this->indexOperation->executeBulk($bulkRequest);
-                $this->logErrors($response);
-                $this->eventManager->dispatch(
-                    'search_engine_save_documents_after',
-                    [
-                        'data_type' => $this->typeName,
-                        'bulk_response' => $response,
-                    ]
-                );
+                    $response = $this->indexOperation->executeBulk($bulkRequest);
+                    $this->logErrors($response);
+                    $this->eventManager->dispatch(
+                        'search_engine_save_documents_after',
+                        [
+                            'data_type' => $this->typeName,
+                            'bulk_response' => $response,
+                        ]
+                    );
+                }
 
                 $docs = null;
             }
