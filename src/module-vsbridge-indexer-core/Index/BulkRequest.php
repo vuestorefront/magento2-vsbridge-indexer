@@ -56,10 +56,22 @@ class BulkRequest implements BulkRequestInterface
     public function addDocuments($index, $type, array $data)
     {
         foreach ($data as $docId => $documentData) {
+            $documentData = $this->prepareDocument($documentData);
             $this->addDocument($index, $type, $docId, $documentData);
         }
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareDocument(array $data)
+    {
+        unset($data['entity_id']);
+        unset($data['row_id']);
+
+        return $data;
     }
 
     /**
@@ -86,6 +98,7 @@ class BulkRequest implements BulkRequestInterface
     public function updateDocuments($index, $type, array $data)
     {
         foreach ($data as $docId => $documentData) {
+            $documentData = $this->prepareDocument($documentData);
             $this->updateDocument($index, $type, $docId, $documentData);
         }
 

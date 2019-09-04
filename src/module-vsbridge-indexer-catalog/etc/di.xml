@@ -5,8 +5,21 @@
     <preference for="Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface" type="Divante\VsbridgeIndexerCatalog\Model\SlugGenerator"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
-
     <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface" type="Divante\VsbridgeIndexerCatalog\Model\LoadInventory"/>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Logger\CatalogIndexerLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">vsbridgeCatalogIndexerLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="error" xsi:type="object">Divante\VsbridgeIndexerCatalog\Logger\Handler\Error</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Configurable">
+        <arguments>
+            <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCatalog\Logger\CatalogIndexerLogger</argument>
+        </arguments>
+    </type>
 
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData">
         <arguments>

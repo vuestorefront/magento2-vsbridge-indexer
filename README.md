@@ -226,7 +226,7 @@ Note: If a docker with ElasticSearch is disabled, Indexer will display error: "N
 
 -- Vue Storefront >= 1.4.4
 Module was tested on:
- -- Magento Community version 2.2.7 It should perform without any issues on Magento 2.2.6 and above versions. 
+ -- Magento Community version 2.2.7. It should perform without any issues on Magento 2.2.* and above versions. 
  -- Magento Enterprise version 2.3.0. The bridge indexer cannot be installed on lower versions of Magento Enterprise.
 
 Module was not tested on version 2.3.

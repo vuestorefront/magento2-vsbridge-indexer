@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Fixes
+- Fixed Backward compatibility with 2.2.x (< 2.2.6)  ([#53](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/53))
+
+### Changed/Improved
+- Skip exporting configurable products without "configurable_options".
+
 ## [1.2.0] (2019.08.05)
 
 ### Fixed
@@ -27,7 +33,7 @@
 
 ### Changed/Improved
 - Change mapping for "category.name" field in product type
-- Remove dependency from catalog_product_price and cataloginventory_stock indexer. On product save multiple request has been send   
+- Remove dependency from catalog_product_price and cataloginventory_stock indexer. On product save multiple request has been send to ES
 - Change "Use Short Catalog Urls" setting option to "Use Catalog Url Keys" 
 - Add option to generate product/category slug base on Magento Url Key and ID. By default slug (and url_key) field is generated base on NAME and ID.
 

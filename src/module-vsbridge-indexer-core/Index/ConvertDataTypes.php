@@ -42,9 +42,6 @@ class ConvertDataTypes implements ConvertDataTypesInterface
             $mappingProperties = $mapping->getMappingProperties()['properties'];
 
             foreach ($docs as $docId => $indexData) {
-                unset($indexData['entity_id']);
-                unset($indexData['row_id']);
-
                 $indexData = $this->convert($indexData, $mappingProperties);
 
                 if (isset($indexData['configurable_children'])) {
