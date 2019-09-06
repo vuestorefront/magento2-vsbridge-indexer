@@ -112,4 +112,13 @@ class ProductCategory implements \Magento\Framework\Indexer\ActionInterface, \Ma
     {
         $this->execute([$id]);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNewIndex($index, $storeId)
+    {
+        $this->indexHandler->setNewIndex($index, $storeId);
+        return $this;
+    }
 }

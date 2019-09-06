@@ -49,6 +49,14 @@ class IndicesSettings
     }
 
     /**
+     * @return string
+     */
+    public function getUseVersioning()
+    {
+        return (bool) $this->getConfigParam('use_versioning');
+    }    
+
+    /**
      * @return int
      */
     public function getBatchIndexingSize()

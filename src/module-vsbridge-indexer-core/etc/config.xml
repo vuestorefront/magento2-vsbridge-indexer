@@ -18,6 +18,7 @@
             <indices_settings>
                 <batch_indexing_size>1000</batch_indexing_size>
                 <index_name>vue_storefront_magento</index_name>
+                <use_versioning>1</use_versioning>
                 <index_identifier>id</index_identifier>
                 <fields_limit>1000</fields_limit>
                 <category_products_update>0</category_products_update>

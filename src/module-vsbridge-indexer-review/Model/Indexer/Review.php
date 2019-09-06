@@ -91,4 +91,13 @@ class Review implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fra
     {
         $this->execute([$id]);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNewIndex($index, $storeId)
+    {
+        $this->indexHandler->setNewIndex($index, $storeId);
+        return $this;
+    }
 }

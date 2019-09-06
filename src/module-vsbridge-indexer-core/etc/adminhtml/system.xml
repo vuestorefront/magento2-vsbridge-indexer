@@ -83,6 +83,11 @@
                     <comment>Choose if the index will append the Store ID or Store Code to the index name, e.g. "vue_storefront_magento_1" or "vue_storefront_magento_default"</comment>
                     <source_model>Divante\VsbridgeIndexerCore\Model\Config\Source\IndexIdentifier</source_model>
                 </field>
+                <field id="use_versioning" translate="label comment" type="select" sortOrder="270" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Use Versioning</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Uses only in case of running bin/magento vsbridge:reindex from shell</comment>
+                </field>
                 <field id="fields_limit" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>The maximum number of fields in an index</label>
                     <comment>min value: 1000</comment>

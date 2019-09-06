@@ -90,4 +90,13 @@ class CmsBlock implements \Magento\Framework\Indexer\ActionInterface, \Magento\F
     {
         $this->execute([$id]);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNewIndex($index, $storeId)
+    {
+        $this->indexHandler->setNewIndex($index, $storeId);
+        return $this;
+    }
 }

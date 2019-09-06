@@ -21,6 +21,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Magento\Framework\Indexer\StateInterface;
+use Magento\Framework\Indexer\ActionFactory;
+use Magento\Framework\Indexer\StructureFactory;
 
 /**
  * Class IndexerReindexCommand
@@ -61,16 +64,20 @@ class RebuildEsIndexCommand extends Command
     /**
      * Construct
      *
-     * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
-     * @param IndexOperations\Proxy $indexOperations
-     * @param StoreManager\Proxy $storeManager
-     * @param \Magento\Framework\App\State\Proxy $state
-     * @param \Magento\Indexer\Model\Indexer\CollectionFactory\Proxy $collectionFactory
+     * @param IndexerRegistry $indexerRegistry
+     * @param IndexOperations $indexOperations
+     * @param StoreManager $storeManager
+     * @param ActionFactory $actionFactory
+     * @param StructureFactory $structureFactory
+     * @param \Magento\Framework\App\State $state
+     * @param \Magento\Indexer\Model\Indexer\CollectionFactory $collectionFactory
      */
     public function __construct(
         IndexerRegistry $indexerRegistry,
         IndexOperations $indexOperations,
         StoreManager $storeManager,
+        ActionFactory $actionFactory,
+        StructureFactory $structureFactory,
         \Magento\Framework\App\State $state,
         \Magento\Indexer\Model\Indexer\CollectionFactory $collectionFactory
     ) {
@@ -79,6 +86,8 @@ class RebuildEsIndexCommand extends Command
         $this->indexOperations = $indexOperations;
         $this->storeManager = $storeManager;
         $this->state = $state;
+        $this->actionFactory = $actionFactory;
+        $this->structureFactory = $structureFactory;
         parent::__construct();
     }
 
@@ -172,7 +181,10 @@ class RebuildEsIndexCommand extends Command
      */
     private function reindexStore(StoreInterface $store, bool $deleteIndex, OutputInterface $output)
     {
-        if ($deleteIndex) {
+        $useVersioning = $this->indexOperations->getUseVersioning($store);
+        if ($useVersioning) {
+            $index = $this->indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
+        } else if ($deleteIndex) {
             $output->writeln("<comment>Deleting and recreating the index first...</comment>");
             $this->indexOperations->deleteIndex(self::INDEX_IDENTIFIER, $store);
             $this->indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
@@ -184,7 +196,32 @@ class RebuildEsIndexCommand extends Command
             try {
                 $startTime = microtime(true);
 
-                $indexer->reindexAll();
+                if ($useVersioning) {
+                    if ($indexer->getState()->getStatus() != StateInterface::STATUS_WORKING) {
+                        $state = $indexer->getState();
+                        $state->setStatus(StateInterface::STATUS_WORKING);
+                        $state->save();
+                        if ($indexer->getView()->isEnabled()) {
+                            $indexer->getView()->suspend();
+                        }
+                        try {
+                            $this
+                                ->getActionInstance($indexer)
+                                ->setNewIndex($index, $store->getId())
+                                ->executeFull();
+                            $state->setStatus(StateInterface::STATUS_VALID);
+                            $state->save();
+                            $indexer->getView()->resume();
+                        } catch (\Throwable $exception) {
+                            $state->setStatus(StateInterface::STATUS_INVALID);
+                            $state->save();
+                            $indexer->getView()->resume();
+                            throw $exception;
+                        }
+                    }
+                } else {
+                    $indexer->reindexAll();
+                }
 
                 $resultTime = microtime(true) - $startTime;
                 $output->writeln(
@@ -197,6 +234,11 @@ class RebuildEsIndexCommand extends Command
                 $output->writeln("<error>" . $indexer->getTitle() . ' indexer process unknown error:</error>');
                 $output->writeln("<error>" . $e->getMessage() . "</error>");
             }
+        }
+
+        if ($useVersioning && $returnValue == Cli::RETURN_SUCCESS) {
+            // create a new index with version
+            $this->indexOperations->deleteOldIndexesAndRealiasToNew($store, $index->getName());
         }
 
         return $returnValue;
@@ -231,4 +273,35 @@ class RebuildEsIndexCommand extends Command
 
         return $vsbridgeIndexers;
     }
+
+    /**
+     * Return indexer action instance
+     *
+     * @return ActionInterface
+     * @throws \InvalidArgumentException
+     */
+    protected function getActionInstance($indexer)
+    {
+        return $this->actionFactory->create(
+            $indexer->getActionClass(),
+            [
+                'indexStructure' => $this->getStructureInstance($indexer),
+                'data' => $indexer->getData(),
+            ]
+        );
+    }
+
+    /**
+     * Return indexer structure instance
+     *
+     * @return IndexStructureInterface
+     */
+    protected function getStructureInstance($indexer)
+    {
+        if (!$indexer->getData('structure')) {
+            return null;
+        }
+        return $this->structureFactory->create($indexer->getData('structure'));
+    }
+
 }

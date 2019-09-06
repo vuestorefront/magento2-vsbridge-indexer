@@ -71,6 +71,11 @@ class GenericIndexerHandler
     private $logger;
 
     /**
+     * @var array
+     */
+    protected $newIndex;
+
+    /**
      * IndexerHandler constructor.
      *
      * @param ClientInterface $client
@@ -254,6 +259,10 @@ class GenericIndexerHandler
      */
     private function getIndex(StoreInterface $store)
     {
+        $storeId = $store->getId();
+        if (isset($this->newIndex[$storeId])) {
+            return $this->newIndex[$storeId];
+        }
         try {
             $index = $this->indexOperation->getIndexByName($this->indexIdentifier, $store);
         } catch (\Exception $e) {
@@ -261,6 +270,18 @@ class GenericIndexerHandler
         }
 
         return $index;
+    }
+
+    /**
+     * @param IndexInterface $index
+     *
+     * @return $this
+     */
+    public function setNewIndex(IndexInterface $index, $storeId)
+    {
+        $this->newIndex[$storeId] = $index;
+
+        return $this;
     }
 
     /**

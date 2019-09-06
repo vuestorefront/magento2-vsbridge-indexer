@@ -89,6 +89,14 @@ class IndexSettings
     }
 
     /**
+     * @return string
+     */
+    public function getUseVersioning()
+    {
+        return $this->settingConfig->getUseVersioning();
+    }
+
+    /**
      * @return int
      */
     public function getBatchIndexingSize()

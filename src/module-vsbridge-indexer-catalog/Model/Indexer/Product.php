@@ -103,4 +103,13 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
     {
         $this->execute([$id]);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNewIndex($index, $storeId)
+    {
+        $this->indexHandler->setNewIndex($index, $storeId);
+        return $this;
+    }
 }

@@ -141,4 +141,54 @@ class Client implements ClientInterface
 
         return $this->client;
     }
+
+    /**
+     * $params['index']   = (list) A comma-separated list of index names to filter aliases
+     *        ['timeout'] = (time) Explicit timestamp for the document
+     *        ['body']    = (time) Explicit timestamp for the document
+     *
+     * @param $params array Associative array of parameters
+     *
+     */
+    public function updateAliases($params = array()) {
+        $this->getClient()->indices()->updateAliases($params);
+    }
+
+    /**
+     * $params['local']   = (bool) Return local information, do not retrieve the state from master node (default: false)
+     *        ['timeout'] = (time) Explicit timestamp for the document
+     *
+     * @param $params array Associative array of parameters
+     *
+     * @return array
+     */
+    public function getAliases($params)
+    {
+        return $this->getClient()->indices()->getAliases($params);
+    }
+
+    /**
+     * $params['index'] = (list) A comma-separated list of index names; use `_all` or empty string to perform the operation on all indices
+     *
+     * @param $params array Associative array of parameters
+     *
+     * @return array
+     */
+    public function getSettings($params)
+    {
+        return $this->getClient()->indices()->getSettings($params);
+    }
+
+    /**
+     * $params['index'] = (list) A comma-separated list of index names; use `_all` or empty string for all indices
+     *        ['type']  = (list) A comma-separated list of document types
+     *
+     * @param $params array Associative array of parameters
+     *
+     * @return array
+     */
+    public function getMapping($params = array())
+    {
+        return $this->getClient()->indices()->getMapping($params);
+    }
 }
