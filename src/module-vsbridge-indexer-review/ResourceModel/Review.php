@@ -26,9 +26,9 @@ class Review
     private $resource;
 
     /**
-     * @var array
+     * @var int
      */
-    private $entityIdByCode = [];
+    private $entityId;
 
     /**
      * Rates constructor.
@@ -70,8 +70,7 @@ class Review
             $select->where('main_table.review_id IN (?)', $reviewIds);
         }
 
-        $entityId = $this->getEntityIdByCode(\Magento\Review\Model\Review::ENTITY_PRODUCT_CODE);
-        $select->where('entity_id = ? ', $entityId);
+        $select->where('entity_id = ? ', $this->getEntityId());
         $select = $this->joinReviewDetails($select);
 
         $select->where('main_table.status_id = ?', 1);
@@ -104,22 +103,25 @@ class Review
     }
 
     /**
-     * @param string $entityCode
-     *
      * @return int
      */
-    private function getEntityIdByCode(string $entityCode): int
+    public function getEntityId(): int
     {
-        if (!isset($this->entityIdByCode[$entityCode])) {
+        if (null === $this->entityId) {
             $connection = $this->getConnection();
             $select = $connection->select()
                 ->from('review_entity', ['entity_id'])
                 ->where('entity_code = :entity_code');
 
-            $this->entityIdByCode[$entityCode] = (int) $connection->fetchOne($select, [':entity_code' => $entityCode]);
+            $entityId = $connection->fetchOne(
+                $select,
+                [':entity_code' => \Magento\Review\Model\Review::ENTITY_PRODUCT_CODE]
+            );
+
+            $this->entityId = (int) $entityId;
         }
 
-        return $this->entityIdByCode[$entityCode];
+        return $this->entityId;
     }
 
     /**

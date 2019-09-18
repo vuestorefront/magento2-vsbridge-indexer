@@ -52,6 +52,7 @@ class Review implements MappingInterface
             'nickname' => ['type' => FieldInterface::TYPE_TEXT],
             'review_status' => ['type' => FieldInterface::TYPE_INTEGER],
             'customer_id' => ['type' => FieldInterface::TYPE_INTEGER],
+            'ratings' => $this->getRatingMapping(),
         ];
 
         $mappingObject = new \Magento\Framework\DataObject();
@@ -63,5 +64,19 @@ class Review implements MappingInterface
         );
 
         return $mappingObject->getData();
+    }
+
+    /**
+     * @return array
+     */
+    private function getRatingMapping(): array
+    {
+        return [
+            'properties' => [
+                'title' => ['type' => FieldInterface::TYPE_TEXT],
+                'percent' => ['type' => FieldInterface::TYPE_SHORT],
+                'value' => ['type' => FieldInterface::TYPE_SHORT],
+            ]
+        ];
     }
 }
