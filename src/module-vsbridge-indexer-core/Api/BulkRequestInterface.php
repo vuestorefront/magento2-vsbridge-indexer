@@ -28,6 +28,13 @@ interface BulkRequestInterface
     public function getOperations();
 
     /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public function prepareDocument(array $data);
+
+    /**
      * Add a several documents to the index.
      *
      * $data format have to be an array of all documents with document id as key.

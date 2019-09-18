@@ -13,10 +13,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
-use Magento\Catalog\Model\Indexer\Product\Price\PriceTableResolver;
-use Magento\Framework\Indexer\DimensionFactory;
-use Magento\Store\Model\Indexer\WebsiteDimensionProvider;
-use Magento\Customer\Model\Indexer\CustomerGroupDimensionProvider;
+use Divante\VsbridgeIndexerCatalog\Model\Product\PriceTableResolverProxy;
 
 /**
  * Class Prices
@@ -39,19 +36,9 @@ class Prices
     private $productMetaData;
 
     /**
-     * @var \Magento\Catalog\Model\Indexer\Product\Price\PriceTableResolver
+     * @var PriceTableResolverProxy
      */
     private $priceTableResolver;
-
-    /**
-     * @var \Magento\Framework\Indexer\DimensionFactory
-     */
-    private $dimensionFactory;
-
-    /**
-     * @var array
-     */
-    private $priceIndexTableName = [];
 
     /**
      * Prices constructor.
@@ -59,21 +46,18 @@ class Prices
      * @param ResourceConnection $resourceModel
      * @param StoreManagerInterface $storeManager
      * @param ProductMetaData $productMetaData
-     * @param PriceTableResolver $priceTableResolver
-     * @param DimensionFactory $dimensionFactory
+     * @param PriceTableResolverProxy $priceTableResolver
      */
     public function __construct(
         ResourceConnection $resourceModel,
         StoreManagerInterface $storeManager,
         ProductMetaData $productMetaData,
-        PriceTableResolver $priceTableResolver,
-        DimensionFactory $dimensionFactory
+        PriceTableResolverProxy $priceTableResolver
     ) {
         $this->resource = $resourceModel;
         $this->storeManager = $storeManager;
         $this->productMetaData = $productMetaData;
         $this->priceTableResolver = $priceTableResolver;
-        $this->dimensionFactory = $dimensionFactory;
     }
 
     /**
@@ -116,27 +100,7 @@ class Prices
      */
     private function getPriceIndexTableName(int $websiteId, int $customerGroupId): string
     {
-        $key = $websiteId . '_' . $customerGroupId;
-
-        if (!isset($this->priceIndexTableName[$key])) {
-            $priceIndexTableName = $this->priceTableResolver->resolve(
-                'catalog_product_index_price',
-                [
-                    $this->dimensionFactory->create(
-                        WebsiteDimensionProvider::DIMENSION_NAME,
-                        (string)$websiteId
-                    ),
-                    $this->dimensionFactory->create(
-                        CustomerGroupDimensionProvider::DIMENSION_NAME,
-                        (string)$customerGroupId
-                    ),
-                ]
-            );
-            
-            $this->priceIndexTableName[$key] = (string)$priceIndexTableName;
-        }
-
-        return $this->priceIndexTableName[$key];
+        return $this->priceTableResolver->resolve($websiteId, $customerGroupId);
     }
 
     /**

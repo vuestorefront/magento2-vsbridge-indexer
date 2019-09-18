@@ -2,12 +2,13 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Helper as DbHelper;
-use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Configurable
@@ -82,8 +83,14 @@ class Configurable
     private $productsData;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Configurable constructor.
      *
+     * @param LoggerInterface $logger
      * @param AttributeDataProvider $attributeDataProvider
      * @param Product $productResource
      * @param ProductMetaData $productMetaData
@@ -91,6 +98,7 @@ class Configurable
      * @param DbHelper $dbHelper
      */
     public function __construct(
+        LoggerInterface $logger,
         AttributeDataProvider $attributeDataProvider,
         Product $productResource,
         ProductMetaData $productMetaData,
@@ -101,6 +109,7 @@ class Configurable
         $this->resource = $resourceConnection;
         $this->productMetaData = $productMetaData;
         $this->productResource = $productResource;
+        $this->logger = $logger;
         $this->dbHelper = $dbHelper;
     }
 
@@ -142,6 +151,11 @@ class Configurable
         }
 
         $attributeIds = $this->getProductConfigurableAttributeIds($product);
+
+        if (empty($attributeIds)) {
+            return [];
+        }
+
         $attributes = $this->getConfigurableAttributeFullInfo();
         $data = [];
 
@@ -159,28 +173,29 @@ class Configurable
      * @param array $product
      *
      * @return array
-     * @throws \Exception
      */
     private function getProductConfigurableAttributeIds(array $product)
     {
         $attributes = $this->getConfigurableProductAttributes();
         $linkField = $this->productMetaData->get()->getLinkField();
-        $productId = $product[$linkField];
+        $linkFieldValue = $product[$linkField];
 
-        if (!isset($attributes[$productId])) {
-            throw new \Exception(
-                sprintf('Product %d is not part of the current product collection', $productId)
+        if (!isset($attributes[$linkFieldValue])) {
+            $entityField = $this->productMetaData->get()->getIdentifierField();
+            $this->logger->error(
+                sprintf('Cannot find super attribute for Product %d [%s]', $linkFieldValue, $entityField)
             );
+
+            return [];
         }
 
-        return explode(',', $attributes[$productId]['attribute_ids']);
+        return explode(',', $attributes[$linkFieldValue]['attribute_ids']);
     }
 
     /**
      * Load all configurable attributes used in the current product collection.
      *
      * @return array
-     * @throws \Exception
      */
     private function getConfigurableProductAttributes()
     {
@@ -314,10 +329,10 @@ class Configurable
     {
         if (null === $this->simpleProducts) {
             $parentIds = $this->getParentIds();
-            $childProduct = $this->productResource->loadChildrenProducts($parentIds, $storeId);
+            $childrenProducts = $this->productResource->loadChildrenProducts($parentIds, $storeId);
 
-            /** @var Product $product */
-            foreach ($childProduct as $product) {
+            /** @var array $product */
+            foreach ($childrenProducts as $product) {
                 $simpleId = $product['entity_id'];
                 $parentIds = explode(',', $product['parent_ids']);
                 $parentIds = $this->mapLinkFieldToEntityId($parentIds);

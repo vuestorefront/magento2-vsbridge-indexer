@@ -17,6 +17,7 @@ use Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface;
 use Divante\VsbridgeIndexerCatalog\Model\TierPriceProcessor;
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 
 /**
  * Class ConfigurableData
@@ -121,19 +122,31 @@ class ConfigurableData implements DataProviderInterface
         $this->configurableResource->setProducts($indexData);
         $indexData = $this->prepareConfigurableChildrenAttributes($indexData, $storeId);
 
+        $productsList = [];
+
         foreach ($indexData as $productId => $productDTO) {
             if (!isset($productDTO['configurable_children'])) {
-                $indexData[$productId]['configurable_children'] = [];
+                $productDTO['configurable_children'] = [];
+
+                if (ConfigurableType::TYPE_CODE !== $productDTO['type_id']) {
+                    $productsList[$productId] = $productDTO;
+                }
                 continue;
             }
 
             $productDTO = $this->applyConfigurableOptions($productDTO, $storeId);
-            $indexData[$productId]  = $this->prepareConfigurableProduct($productDTO);
+
+            /**
+             * Skip exporting configurable products without options
+             */
+            if (!empty($productDTO['configurable_options'])) {
+                $productsList[$productId] = $this->prepareConfigurableProduct($productDTO);;
+            }
         }
 
         $this->configurableResource->clear();
 
-        return $indexData;
+        return $productsList;
     }
 
     /**
@@ -282,10 +295,10 @@ class ConfigurableData implements DataProviderInterface
             $productDTO['regular_price'] = $minPrice;
         }
 
-        $productStockStatus = $productDTO['stock']['stock_status'];
         $isInStock = $productDTO['stock']['is_in_stock'];
 
-        if (!$isInStock || ($productStockStatus && !$areChildInStock)) {
+        if (!$isInStock || !$areChildInStock) {
+            $productDTO['stock']['is_in_stock'] = false;
             $productDTO['stock']['stock_status'] = 0;
         }
 
