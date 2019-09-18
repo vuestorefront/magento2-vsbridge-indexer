@@ -2,11 +2,18 @@
 
 ## Unreleased
 
+
+
+## [1.3.0] (2019.09.18)
+
 ### Fixes
 - Fixed Backward compatibility with 2.2.x (< 2.2.6)  ([#53](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/53))
 
 ### Changed/Improved
 - Skip exporting configurable products without "configurable_options".
+
+### Added
+- Export ratings for reviews. 
 
 ## [1.2.0] (2019.08.05)
 

@@ -50,6 +50,7 @@ class Review
                 $review['id'] = (int)($review['review_id']);
                 $review['product_id'] = (int)$review['entity_pk_value'];
                 $review['review_status'] = $review['status_id'];
+                $review['ratings'] = [];
                 unset($review['review_id'], $review['entity_pk_value'], $review['status_id']);
                 $lastReviewId = $review['id'];
 
