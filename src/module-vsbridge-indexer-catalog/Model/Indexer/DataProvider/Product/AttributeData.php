@@ -100,7 +100,7 @@ class AttributeData implements DataProviderInterface
     {
         $entityId = $productData['id'];
 
-        if ($this->settings->useMagentoUrlKeys()) {
+        if ($this->settings->useMagentoUrlKeys() && isset($productData['url_key'])) {
             $productData['slug'] = $productData['url_key'];
         } else {
             $text = $productData['name'];
