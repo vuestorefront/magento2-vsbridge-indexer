@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCms
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -78,7 +78,7 @@ class CmsPage
             foreach ($cmsPages as $pageData) {
                 $lastPageId = $pageData['page_id'];
                 $pageData['id'] = $pageData['page_id'];
-                $pageData['content'] = $this->contentProcessor->parse($templateFilter, $pageData['content']);
+                $pageData['content'] = $this->contentProcessor->parse($templateFilter, (string) $pageData['content']);
                 $pageData['active'] = (bool)$pageData['is_active'];
 
                 unset($pageData['creation_time'], $pageData['update_time'], $pageData['page_id']);

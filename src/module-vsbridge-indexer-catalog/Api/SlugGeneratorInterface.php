@@ -15,10 +15,10 @@ interface SlugGeneratorInterface
 {
 
     /**
-     * @param string $name
+     * @param string $text
      * @param int $id
      *
      * @return string
      */
-    public function generate($name, $id);
+    public function generate($text, $id);
 }

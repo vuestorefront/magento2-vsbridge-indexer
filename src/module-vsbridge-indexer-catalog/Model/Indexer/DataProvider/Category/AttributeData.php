@@ -15,11 +15,12 @@ use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
+use Divante\VsbridgeIndexerCatalog\Api\DataProvider\Category\AttributeDataProviderInterface;
 
 /**
  * Class AttributeData
  */
-class AttributeData
+class AttributeData implements AttributeDataProviderInterface
 {
     /**
      * List of fields from category
@@ -132,7 +133,7 @@ class AttributeData
 
         foreach ($attributes as $entityId => $attributesData) {
             $categoryData = array_merge($indexData[$entityId], $attributesData);
-            $categoryData = $this->prepareCategory($categoryData);
+            $categoryData = $this->prepareParentCategory($categoryData);
             $categoryData = $this->addSortOptions($categoryData, $storeId);
             $categoryData['product_count'] = $productCount[$entityId];
 
@@ -217,7 +218,7 @@ class AttributeData
                 }
 
                 $categoryData['product_count'] = $this->childrenProductCount[$categoryId];
-                $categoryData = $this->prepareCategory($categoryData);
+                $categoryData = $this->prepareChildCategory($categoryData);
                 $categoryData['children_data'] = $this->plotTree($categories, $categoryId);
                 $categoryData['children_count'] = count($categoryData['children_data']);
                 $categoryTree[] = $categoryData;
@@ -225,6 +226,26 @@ class AttributeData
         }
 
         return empty($categoryTree) ? [] : $categoryTree;
+    }
+
+    /**
+     * @param array $categoryDTO
+     *
+     * @return array
+     */
+    public function prepareParentCategory(array $categoryDTO)
+    {
+        return $this->prepareCategory($categoryDTO);
+    }
+
+    /**
+     * @param array $categoryDTO
+     *
+     * @return array
+     */
+    public function prepareChildCategory(array $categoryDTO)
+    {
+        return $this->prepareCategory($categoryDTO);
     }
 
     /**

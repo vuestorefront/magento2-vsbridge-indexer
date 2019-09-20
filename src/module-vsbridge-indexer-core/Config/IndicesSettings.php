@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCore
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -38,6 +38,14 @@ class IndicesSettings
     public function getIndexNamePrefix()
     {
         return (string) $this->getConfigParam('index_name');
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndexIdentifier()
+    {
+        return (string) $this->getConfigParam('index_identifier');
     }
 
     /**

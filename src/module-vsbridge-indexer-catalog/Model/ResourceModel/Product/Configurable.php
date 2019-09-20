@@ -2,11 +2,13 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Helper as DbHelper;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Configurable
@@ -33,6 +35,11 @@ class Configurable
      * @var Product
      */
     private $productResource;
+
+    /**
+     * @var ProductMetaData
+     */
+    private $productMetaData;
 
     /**
      * Array of the ids of configurable products from $productCollection
@@ -76,22 +83,33 @@ class Configurable
     private $productsData;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Configurable constructor.
      *
+     * @param LoggerInterface $logger
      * @param AttributeDataProvider $attributeDataProvider
      * @param Product $productResource
+     * @param ProductMetaData $productMetaData
      * @param ResourceConnection $resourceConnection
      * @param DbHelper $dbHelper
      */
     public function __construct(
+        LoggerInterface $logger,
         AttributeDataProvider $attributeDataProvider,
         Product $productResource,
+        ProductMetaData $productMetaData,
         ResourceConnection $resourceConnection,
         DbHelper $dbHelper
     ) {
         $this->attributeDataProvider = $attributeDataProvider;
         $this->resource = $resourceConnection;
+        $this->productMetaData = $productMetaData;
         $this->productResource = $productResource;
+        $this->logger = $logger;
         $this->dbHelper = $dbHelper;
     }
 
@@ -133,6 +151,11 @@ class Configurable
         }
 
         $attributeIds = $this->getProductConfigurableAttributeIds($product);
+
+        if (empty($attributeIds)) {
+            return [];
+        }
+
         $attributes = $this->getConfigurableAttributeFullInfo();
         $data = [];
 
@@ -150,32 +173,34 @@ class Configurable
      * @param array $product
      *
      * @return array
-     * @throws \Exception
      */
     private function getProductConfigurableAttributeIds(array $product)
     {
         $attributes = $this->getConfigurableProductAttributes();
-        $productId = $product['id'];
+        $linkField = $this->productMetaData->get()->getLinkField();
+        $linkFieldValue = $product[$linkField];
 
-        if (!isset($attributes[$productId])) {
-            throw new \Exception(
-                sprintf('Product %d is not part of the current product collection', $productId)
+        if (!isset($attributes[$linkFieldValue])) {
+            $entityField = $this->productMetaData->get()->getIdentifierField();
+            $this->logger->error(
+                sprintf('Cannot find super attribute for Product %d [%s]', $linkFieldValue, $entityField)
             );
+
+            return [];
         }
 
-        return explode(',', $attributes[$productId]['attribute_ids']);
+        return explode(',', $attributes[$linkFieldValue]['attribute_ids']);
     }
 
     /**
      * Load all configurable attributes used in the current product collection.
      *
      * @return array
-     * @throws \Exception
      */
     private function getConfigurableProductAttributes()
     {
         if (!$this->configurableProductAttributes) {
-            $productIds = $this->getConfigurableProductIds();
+            $productIds = $this->getParentIds();
             $attributes = $this->getConfigurableAttributesForProductsFromResource($productIds);
             $this->configurableProductAttributes = $attributes;
         }
@@ -262,17 +287,32 @@ class Configurable
     private function getConfigurableProductIds()
     {
         if (null === $this->configurableProductIds) {
+            $linkField = $this->productMetaData->get()->getLinkField();
+            $entityField = $this->productMetaData->get()->getIdentifierField();
+
             $this->configurableProductIds = [];
             $products = $this->productsData;
 
             foreach ($products as $product) {
                 if ($product['type_id'] == ConfigurableType::TYPE_CODE) {
-                    $this->configurableProductIds[] = $product['id'];
+                    $entityId = $product[$entityField];
+                    $linkId = $product[$linkField];
+                    $this->configurableProductIds[$linkId] = $entityId;
                 }
             }
         }
 
         return $this->configurableProductIds;
+    }
+
+    /**
+     * @return array
+     */
+    private function getParentIds()
+    {
+        $productIds = $this->getConfigurableProductIds();
+
+        return array_keys($productIds);
     }
 
     /**
@@ -288,19 +328,36 @@ class Configurable
     public function getSimpleProducts($storeId)
     {
         if (null === $this->simpleProducts) {
-            $parentIds = $this->getConfigurableProductIds();
-            $childProduct = $this->productResource->loadChildrenProducts($parentIds, $storeId);
+            $parentIds = $this->getParentIds();
+            $childrenProducts = $this->productResource->loadChildrenProducts($parentIds, $storeId);
 
-            /** @var Product $product */
-            foreach ($childProduct as $product) {
+            /** @var array $product */
+            foreach ($childrenProducts as $product) {
                 $simpleId = $product['entity_id'];
                 $parentIds = explode(',', $product['parent_ids']);
+                $parentIds = $this->mapLinkFieldToEntityId($parentIds);
                 $product['parent_ids'] = $parentIds;
                 $this->simpleProducts[$simpleId] = $product;
             }
         }
 
         return $this->simpleProducts;
+    }
+
+    /**
+     * @param array $linkIds
+     *
+     * @return array
+     */
+    private function mapLinkFieldToEntityId(array $linkIds)
+    {
+        $productIds = [];
+
+        foreach ($linkIds as $id) {
+            $productIds[] = $this->configurableProductIds[$id];
+        }
+
+        return $productIds;
     }
 
     /**

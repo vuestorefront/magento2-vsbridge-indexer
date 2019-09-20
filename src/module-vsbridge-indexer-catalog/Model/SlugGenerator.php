@@ -18,9 +18,9 @@ class SlugGenerator implements SlugGeneratorInterface
     /**
      * @inheritdoc
      */
-    public function generate($name, $id)
+    public function generate($text, $id)
     {
-        $text = $name . '-' . $id;
+        $text = $text . '-' . $id;
 
         return $this->slugify($text);
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -155,7 +155,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
                 $options = explode(',', $value['value']);
 
                 if (!empty($options)) {
-                    $options = array_map('intval', $options);
+                    $options = array_map([$this, 'parseValue'], $options);
                 }
 
                 $value['value'] = $options;
@@ -166,6 +166,19 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
         }
 
         return $this->valuesByEntityId;
+    }
+
+    /**
+     * Parse the option value - Cast to int if it's numeric
+     * otherwise leave it as-is
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function parseValue($value)
+    {
+        return is_numeric($value) ? intval($value) : $value;
     }
 
     /**
