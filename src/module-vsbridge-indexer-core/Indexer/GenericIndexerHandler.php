@@ -174,7 +174,11 @@ class GenericIndexerHandler
             foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
                 foreach ($type->getDataProviders() as $dataProvider) {
                     if (!empty($docs)) {
-                        $docs = $dataProvider->addData($docs, $storeId);
+                        if ('Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData' == get_class($dataProvider)) {
+                            $docs = $dataProvider->addDataWithMediaGallery($docs, $storeId, $type->getDataProvider('media_gallery'));
+                        } else {
+                            $docs = $dataProvider->addData($docs, $storeId);
+                        }
                     }
                 }
 
