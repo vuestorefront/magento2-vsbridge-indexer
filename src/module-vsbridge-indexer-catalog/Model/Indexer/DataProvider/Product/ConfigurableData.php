@@ -151,12 +151,41 @@ class ConfigurableData implements DataProviderInterface
 
     /**
      * @param array $indexData
+     * @param $storeId
+     * @param \Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData $dataProvider
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function addDataWithMediaGallery(array $indexData, $storeId, \Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\MediaGalleryData $dataProviderMG)
+    {
+        $this->configurableResource->clear();
+        $this->configurableResource->setProducts($indexData);
+        $indexData = $this->prepareConfigurableChildrenAttributes($indexData, $storeId, $dataProviderMG);
+
+        foreach ($indexData as $productId => $productDTO) {
+            if (!isset($productDTO['configurable_children'])) {
+                $indexData[$productId]['configurable_children'] = [];
+                continue;
+            }
+
+            $productDTO = $this->applyConfigurableOptions($productDTO, $storeId);
+            $indexData[$productId]  = $this->prepareConfigurableProduct($productDTO);
+        }
+
+        $this->configurableResource->clear();
+
+        return $indexData;
+    }
+
+    /**
+     * @param array $indexData
      * @param int $storeId
      *
      * @return array
      * @throws \Exception
      */
-    private function prepareConfigurableChildrenAttributes(array $indexData, $storeId)
+    private function prepareConfigurableChildrenAttributes(array $indexData, $storeId, \Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\MediaGalleryData $dataProviderMG)
     {
         $allChildren = $this->configurableResource->getSimpleProducts($storeId);
 
@@ -174,6 +203,9 @@ class ConfigurableData implements DataProviderInterface
 
         $requiredAttribute = array_unique($requiredAttributes);
         $allChildren = $this->loadChildrenRawAttributesInBatches($storeId, $allChildren, $requiredAttribute);
+
+        // add Media Gallery
+        $allChildren = $dataProviderMG->addData($allChildren, $storeId);
 
         foreach ($allChildren as $child) {
             $childId = $child['entity_id'];
@@ -410,4 +442,4 @@ class ConfigurableData implements DataProviderInterface
     {
         return $this->dataFilter->execute($productData, $this->childBlackListConfig);
     }
-}
+} 
