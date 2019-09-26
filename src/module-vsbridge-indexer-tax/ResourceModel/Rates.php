@@ -50,7 +50,7 @@ class Rates
             ->where('tax_calculation_rule_id IN (?)', $ruleIds);
         $select->distinct(true);
 
-        return $this->getConnection()->fetchAssoc($select);
+        return $this->getConnection()->fetchAll($select);
     }
 
     /**
