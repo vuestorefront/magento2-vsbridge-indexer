@@ -13,16 +13,17 @@ abstract class AbstractMapping
     /**
      * @var array
      */
-    private $staticFieldMapping = [
-        'status' => FieldInterface::TYPE_INTEGER,
-        'visibility' => FieldInterface::TYPE_INTEGER,
-        'position' => FieldInterface::TYPE_LONG,
-        'level' => FieldInterface::TYPE_INTEGER,
-        'category_ids' => FieldInterface::TYPE_LONG,
-        'sku' => FieldInterface::TYPE_KEYWORD,
-        'url_path' => FieldInterface::TYPE_KEYWORD,
-        'url_key' => FieldInterface::TYPE_KEYWORD,
-    ];
+    private $staticFieldMapping;
+
+    /**
+     * AbstractMapping constructor.
+     *
+     * @param array $staticFieldMapping
+     */
+    public function __construct(array $staticFieldMapping)
+    {
+        $this->staticFieldMapping = $staticFieldMapping;
+    }
 
     /**
      * @var array
