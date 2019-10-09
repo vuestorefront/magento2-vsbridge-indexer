@@ -140,7 +140,7 @@ class ConfigurableData implements DataProviderInterface
              * Skip exporting configurable products without options
              */
             if (!empty($productDTO['configurable_options'])) {
-                $productsList[$productId] = $this->prepareConfigurableProduct($productDTO);;
+                $productsList[$productId] = $this->prepareConfigurableProduct($productDTO);
             }
         }
 
@@ -220,7 +220,7 @@ class ConfigurableData implements DataProviderInterface
     /**
      * Apply attributes to product variants + extra options for products necessary for vsf
      * @param array $productDTO
-     * @param $storeId
+     * @param int $storeId
      *
      * @return array
      * @throws \Exception

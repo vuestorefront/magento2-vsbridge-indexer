@@ -175,6 +175,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
      * @param mixed $value
      *
      * @return mixed
+     * @SuppressWarnings("unused")
      */
     private function parseValue($value)
     {
