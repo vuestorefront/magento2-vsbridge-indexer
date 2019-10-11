@@ -14,7 +14,6 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
  */
 class Product extends AbstractMapping implements MappingInterface
 {
-
     /**
      * @var EventManager
      */
@@ -52,12 +51,14 @@ class Product extends AbstractMapping implements MappingInterface
         EventManager $eventManager,
         GeneralMapping $generalMapping,
         ConfigurableAttributes $configurableAttributes,
-        AttributeDataProvider $resourceModel
+        AttributeDataProvider $resourceModel,
+        array $staticFieldMapping
     ) {
         $this->eventManager = $eventManager;
         $this->generalMapping = $generalMapping;
         $this->resourceModel = $resourceModel;
         $this->configurableAttributes = $configurableAttributes;
+        parent::__construct($staticFieldMapping);
     }
 
     /**

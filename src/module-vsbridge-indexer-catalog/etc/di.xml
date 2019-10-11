@@ -137,4 +137,18 @@
     <type name="Magento\CatalogInventory\Observer\ReindexQuoteInventoryObserver">
         <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\CatalogInventory\ReindexQuoteInventoryObserverPlugin"/>
     </type>
+    <type name="Divante\VsbridgeIndexerCatalog\Index\Mapping\AbstractMapping">
+        <arguments>
+            <argument name="staticFieldMapping" xsi:type="array">
+                <item name="status" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_INTEGER</item>
+                <item name="visibility" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_INTEGER</item>
+                <item name="position" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_LONG</item>
+                <item name="level" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_INTEGER</item>
+                <item name="category_ids" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_LONG</item>
+                <item name="sku" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_KEYWORD</item>
+                <item name="url_path" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_KEYWORD</item>
+                <item name="url_key" xsi:type="const">Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface::TYPE_KEYWORD</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
