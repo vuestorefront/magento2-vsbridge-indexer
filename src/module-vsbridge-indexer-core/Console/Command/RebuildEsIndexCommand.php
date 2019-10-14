@@ -11,7 +11,6 @@ namespace Divante\VsbridgeIndexerCore\Console\Command;
 use Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategoryProcessor;
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Index\IndexOperations;
-use Magento\Backend\App\Area\FrontNameResolver;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\LocalizedException;
@@ -19,9 +18,9 @@ use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Indexer\Console\Command\AbstractIndexerCommand;
 use Magento\Store\Api\Data\StoreInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
 
 /**
  * Class IndexerReindexCommand
@@ -42,23 +41,20 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     /**
      * @var StoreManager
      */
+    private $indexerStoreManager;
+
+    /**
+     * @var StoreManagerInterface
+     */
     private $storeManager;
 
     /**
      * RebuildEsIndexCommand constructor.
      *
      * @param ObjectManagerFactory $objectManagerFactory
-     * @param IndexOperations $indexOperations
-     * @param StoreManager $storeManager
      */
-    public function __construct(
-        ObjectManagerFactory $objectManagerFactory,
-        IndexOperations $indexOperations,
-        StoreManager $storeManager
-    ) {
-        $this->indexOperations = $indexOperations;
-        $this->storeManager = $storeManager;
-
+    public function __construct(ObjectManagerFactory $objectManagerFactory)
+    {
         parent::__construct($objectManagerFactory);
     }
 
@@ -107,25 +103,21 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         $deleteIndex = $input->getOption(self::INPUT_DELETE_INDEX);
 
         if ($storeId) {
-            $stores = $this->storeManager->getStores($storeId);
+            $store = $this->getStoreManager()->getStore($storeId);
+            $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
 
-            if (!empty($stores)) {
-                /** @var \Magento\Store\Api\Data\StoreInterface $store */
-                $store = $stores[0];
-                $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+            $returnValue = $this->reindexStore($store, $deleteIndex, $output);
 
-                $returnValue = $this->reindexStore($store, $deleteIndex, $output);
+            $output->writeln("<info>Reindexing has completed!</info>");
 
-                $output->writeln("<info>Reindexing has completed!</info>");
+            return $returnValue;
 
-                return $returnValue;
-            }
         } elseif ($allStores) {
             $output->writeln("<info>Reindexing all stores...</info>");
             $returnValues = [];
 
             /** @var \Magento\Store\Api\Data\StoreInterface $store */
-            foreach ($this->storeManager->getStores() as $store) {
+            foreach ($this->getStoreManager()->getStores() as $store) {
                 $output->writeln("<info>Reindexing store " . $store->getName() . "...</info>");
                 $returnValues[] = $this->reindexStore($store, $deleteIndex, $output);
             }
@@ -141,6 +133,42 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     }
 
     /**
+     * @return StoreManagerInterface
+     */
+    private function getStoreManager()
+    {
+        if (null === $this->storeManager) {
+            $this->storeManager = $this->getObjectManager()->get(StoreManagerInterface::class);
+        }
+
+        return $this->storeManager;
+    }
+
+    /**
+     * @return StoreManager
+     */
+    private function getIndexerStoreManager()
+    {
+        if (null === $this->indexerStoreManager) {
+            $this->indexerStoreManager = $this->getObjectManager()->get(StoreManager::class);
+        }
+
+        return $this->indexerStoreManager;
+    }
+
+    /**
+     * @return IndexOperations
+     */
+    private function getIndexOperations()
+    {
+        if (null === $this->indexOperations) {
+            $this->indexOperations = $this->getObjectManager()->get(IndexOperations::class);
+        }
+
+        return $this->indexOperations;
+    }
+
+    /**
      * Reindex each vsbridge index for the specified store
      *
      * @param \Magento\Store\Api\Data\StoreInterface $store
@@ -151,10 +179,12 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
      */
     private function reindexStore(StoreInterface $store, bool $deleteIndex, OutputInterface $output)
     {
+        $this->getIndexerStoreManager()->setLoadedStores([$store]);
+
         if ($deleteIndex) {
             $output->writeln("<comment>Deleting and recreating the index first...</comment>");
-            $this->indexOperations->deleteIndex(self::INDEX_IDENTIFIER, $store);
-            $this->indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
+            $this->getIndexOperations()->deleteIndex(self::INDEX_IDENTIFIER, $store);
+            $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store);
         }
 
         $returnValue = Cli::RETURN_FAILURE;

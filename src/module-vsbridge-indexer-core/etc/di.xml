@@ -67,12 +67,4 @@
             </argument>
         </arguments>
     </type>
-
-    <!-- Lazy load proxies -->
-    <type name="Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand">
-        <arguments>
-            <argument name="indexOperations" xsi:type="object">Divante\VsbridgeIndexerCore\Index\IndexOperations\Proxy</argument>
-            <argument name="storeManager" xsi:type="object">Divante\VsbridgeIndexerCore\Indexer\StoreManager\Proxy</argument>
-        </arguments>
-    </type>
 </config>
