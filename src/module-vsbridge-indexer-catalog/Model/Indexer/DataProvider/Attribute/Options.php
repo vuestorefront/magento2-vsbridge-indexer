@@ -9,12 +9,8 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Attribute;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
-use Magento\Eav\Model\Entity\AttributeFactory;
-use Magento\Eav\Model\Entity\Attribute\Source\Table as SourceTable;
+use Divante\VsbridgeIndexerCatalog\Model\Attribute\LoadOptions;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute as EntityResource;
-use Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\Collection as OptionCollection;
-use Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\CollectionFactory;
-use Magento\Framework\Validator\UniversalFactory;
 
 /**
  * Class Options
@@ -23,19 +19,9 @@ class Options implements DataProviderInterface
 {
 
     /**
-     * @var UniversalFactory
+     * @var LoadOptions
      */
-    private $universalFactory;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-
-    /**
-     * @var AttributeFactory
-     */
-    private $attributeFactory;
+    private $loadOptions;
 
     /**
      * @var EntityResource
@@ -45,20 +31,14 @@ class Options implements DataProviderInterface
     /**
      * Options constructor.
      *
-     * @param CollectionFactory $collectionFactory
-     * @param AttributeFactory $attributeFactory
-     * @param UniversalFactory $universalFactory
+     * @param LoadOptions $loadOptions
      * @param EntityResource $entityResource
      */
     public function __construct(
-        CollectionFactory $collectionFactory,
-        AttributeFactory $attributeFactory,
-        UniversalFactory $universalFactory,
+        LoadOptions $loadOptions,
         EntityResource $entityResource
     ) {
-        $this->attributeFactory = $attributeFactory;
-        $this->collectionFactory = $collectionFactory;
-        $this->universalFactory = $universalFactory;
+        $this->loadOptions = $loadOptions;
         $this->entityAttributeResource = $entityResource;
     }
 
@@ -93,73 +73,9 @@ class Options implements DataProviderInterface
      */
     public function getAttributeOptions(array $attributeData, $storeId)
     {
-        $values = [];
-        $source = (string)$attributeData['source_model'];
-        $attributeId = $attributeData['attribute_id'];
-
-        if ('' !== $source && SourceTable::class !== $source) {
-            $sourceModel = $this->universalFactory->create($source);
-
-            if (false !== $sourceModel) {
-                if ($sourceModel instanceof \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource) {
-                    ///** @var Attribute $attribute */
-                    $attribute = $this->attributeFactory->create($attributeData);
-                    $attribute->setStoreId($storeId);
-                    $sourceModel->setAttribute($attribute);
-                }
-
-                $values = $sourceModel->getAllOptions(false);
-            }
-        } else {
-            /** @var OptionCollection $options */
-            $options = $this->collectionFactory->create();
-            $options->setOrder('sort_order', 'asc');
-            $options->setAttributeFilter($attributeId)->setStoreFilter($storeId);
-            $values = $this->toOptionArray($options);
-        }
-
-        return $values;
+        return $this->loadOptions->execute($attributeData['attribute_code'], $storeId);
     }
-
-    /**
-     * @param OptionCollection $collection
-     *
-     * @param array $additional
-     *
-     * @return array
-     */
-    public function toOptionArray(OptionCollection $collection, array $additional = [])
-    {
-        $res = [];
-        $additional['value'] = 'option_id';
-        $additional['label'] = 'value';
-        $additional['sort_order'] = 'sort_order';
-
-        foreach ($collection as $item) {
-            $data = [];
-
-            foreach ($additional as $code => $field) {
-                $value = $item->getData($field);
-
-                if ($field === 'sort_order') {
-                    $value = (int)$value;
-                }
-
-                if ($field === 'option_id') {
-                    $value = (string)$value;
-                }
-
-                $data[$code] = $value;
-            }
-
-            if ($data) {
-                $res[] = $data;
-            }
-        }
-
-        return $res;
-    }
-
+    
     /**
      * @param array $attributeData
      *
