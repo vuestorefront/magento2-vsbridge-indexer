@@ -4,6 +4,7 @@
 
 ### Changed/Improved
 - Vsbridge Category Indexer - Save Mode: reindex subcategories if url_key has change in category ([#122](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/122)).
+- Sort configurable options by option sort order. 
 
 ## [1.3.0] (2019.09.18)
 
