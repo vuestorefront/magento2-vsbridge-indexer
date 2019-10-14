@@ -52,7 +52,6 @@ class StoreManager
      * @return array|\Magento\Store\Api\Data\StoreInterface[]
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-
     public function getStores($storeId = null)
     {
         if (null === $this->loadedStores) {
@@ -79,5 +78,13 @@ class StoreManager
         }
 
         return $this->loadedStores;
+    }
+
+    /**
+     * @param array $stores
+     */
+    public function setLoadedStores(array $stores)
+    {
+        $this->loadedStores = $stores;
     }
 }
