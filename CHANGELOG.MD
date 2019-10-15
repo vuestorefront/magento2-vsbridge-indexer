@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+### Fixes
+- Fix `vsbridge:reindex` command, fix initialize right areacode, loading di.xml files for adminhtml areacode. ([#127](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/127))
+- Fix `vsbridge:reindex --all` command, data will be reindex store by store. ([#130](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/130))
+
 ### Changed/Improved
+- Rework abstract mapper to allow configure static type map in di.xml ([#125](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/125))
+- Minor refactoring for product resource model ([#126](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/126/)).
 - Vsbridge Category Indexer - Save Mode: reindex subcategories if url_key has change in category ([#122](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/122)).
-- Sort configurable options by option sort order. 
+- Sort configurable options by option sort order. ([#129](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/129))
 
 ## [1.3.0] (2019.09.18)
 
