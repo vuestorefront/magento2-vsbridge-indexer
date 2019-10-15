@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [1.4.0] (2019.10.15)
+
 ### Fixes
 - Fix `vsbridge:reindex` command, fix initialize right areacode, loading di.xml files for adminhtml areacode. ([#127](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/127))
 - Fix `vsbridge:reindex --all` command, data will be reindex store by store. ([#130](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/130))
