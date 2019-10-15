@@ -19,20 +19,13 @@ Sign up for a demo at https://vuestorefront.io/ (Vue Storefront integrated with 
 
 - Install with composer
 ```json
-composer config repositories.divante vcs https://github.com/DivanteLtd/magento2-vsbridge-indexer
-composer require divante/magento2-vsbridge-indexer:dev-master
+composer require divante/magento2-vsbridge-indexer
 ```
 
 ## Installation/Getting Started - MSI support
-- Install with composer changes from develop branch
+- Install second module which will support MSI
 ```json
-composer config repositories.divante vcs https://github.com/DivanteLtd/magento2-vsbridge-indexer
-composer require divante/magento2-vsbridge-indexer:dev-develop
-```
-- Install also second module which will support MSI
-```json
-composer config repositories.divante-msi vcs https://github.com/DivanteLtd/magento2-vsbridge-indexer-msi
-composer require divante/magento2-vsbridge-indexer-msi:dev-develop
+composer require divante/magento2-vsbridge-indexer-msi:0.1.0
 ```
 Not fully supported, few fields are exported to ES.
 From inventory indexer:
@@ -256,6 +249,7 @@ php bin/magento indexer:reindex vsbridge_product_indexer
 php bin/magento indexer:reindex vsbridge_category_indexer
 php bin/magento indexer:reindex vsbridge_cms_block_indexer
 php bin/magento indexer:reindex vsbridge_cms_page_indexer
+php bin/magento indexer:reindex vsbridge_review_indexer
 ```
 
 
@@ -283,6 +277,7 @@ Note: If a docker with ElasticSearch is disabled, Indexer will display error: "N
 - save/delete the static block 
 - save/delete the static page 
 - save/delete the attribute (deleting the attribute causes displaying “invalid” status for vsbridge products indexer).
+- save/delete the review
 
 #### Update on Schedule Mode
 

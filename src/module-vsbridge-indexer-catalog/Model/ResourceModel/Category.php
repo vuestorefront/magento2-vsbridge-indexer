@@ -171,6 +171,28 @@ class Category
     }
 
     /**
+     * @param int $categoryId
+     *
+     * @return int[]
+     * @throws \Exception
+     */
+    public function getAllSubCategories(int $categoryId): array
+    {
+        $metaData = $this->categoryMetaData->get();
+        $entityField = $metaData->getIdentifierField();
+        $connection = $this->getConnection();
+        $select = $connection->select()->from(
+            ['entity' => $metaData->getEntityTable()],
+            [$entityField]
+        );
+
+        $catIdExpr = $connection->quote("%/{$categoryId}/%");
+        $select->where("path like {$catIdExpr}");
+
+        return $connection->fetchCol($select);
+    }
+
+    /**
      * @return \Magento\Framework\DB\Adapter\AdapterInterface
      */
     private function getConnection()

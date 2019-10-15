@@ -20,7 +20,6 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
  */
 class Category extends AbstractMapping implements MappingInterface
 {
-
     /**
      * @var array
      */
@@ -61,17 +60,20 @@ class Category extends AbstractMapping implements MappingInterface
      * @param GeneralMapping $generalMapping
      * @param CategoryChildAttributes $categoryChildAttributes
      * @param AttributeDataProvider $resourceModel
+     * @param array $staticFieldMapping
      */
     public function __construct(
         EventManager $eventManager,
         GeneralMapping $generalMapping,
         CategoryChildAttributes $categoryChildAttributes,
-        AttributeDataProvider $resourceModel
+        AttributeDataProvider $resourceModel,
+        array $staticFieldMapping
     ) {
         $this->eventManager = $eventManager;
         $this->generalMapping = $generalMapping;
         $this->resourceModel = $resourceModel;
         $this->childAttributes = $categoryChildAttributes;
+        parent::__construct($staticFieldMapping);
     }
 
     /**
