@@ -8,9 +8,8 @@
 
 namespace Divante\VsbridgeIndexerCore\Console\Command;
 
-use Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategoryProcessor;
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
-use Divante\VsbridgeIndexerCore\Index\IndexOperations;
+use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\LocalizedException;
@@ -29,12 +28,11 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
 {
     const INPUT_STORE = 'store';
     const INPUT_ALL_STORES = 'all';
-    const INPUT_DELETE_INDEX = 'delete-index';
 
     const INDEX_IDENTIFIER = 'vue_storefront_catalog';
 
     /**
-     * @var IndexOperations
+     * @var IndexOperationInterface
      */
     private $indexOperations;
 
@@ -49,12 +47,21 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     private $storeManager;
 
     /**
+     * @var array
+     */
+    private $excludeIndices = [];
+
+    /**
      * RebuildEsIndexCommand constructor.
      *
      * @param ObjectManagerFactory $objectManagerFactory
+     * @param array $excludeIndices
      */
-    public function __construct(ObjectManagerFactory $objectManagerFactory)
-    {
+    public function __construct(
+        ObjectManagerFactory $objectManagerFactory,
+        array $excludeIndices = []
+    ) {
+        $this->excludeIndices = $excludeIndices;
         parent::__construct($objectManagerFactory);
     }
 
@@ -80,14 +87,6 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             'Reindex all stores'
         );
 
-
-        $this->addOption(
-            self::INPUT_DELETE_INDEX,
-            null,
-            InputOption::VALUE_NONE,
-            'Delete previous index and create new one (with new mapping)'
-        );
-
         parent::configure();
     }
 
@@ -100,13 +99,12 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         $output->setDecorated(true);
         $storeId = $input->getOption(self::INPUT_STORE);
         $allStores = $input->getOption(self::INPUT_ALL_STORES);
-        $deleteIndex = $input->getOption(self::INPUT_DELETE_INDEX);
 
         if ($storeId) {
             $store = $this->getStoreManager()->getStore($storeId);
             $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
 
-            $returnValue = $this->reindexStore($store, $deleteIndex, $output);
+            $returnValue = $this->reindexStore($store, $output);
 
             $output->writeln("<info>Reindexing has completed!</info>");
 
@@ -119,7 +117,7 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             /** @var \Magento\Store\Api\Data\StoreInterface $store */
             foreach ($this->getStoreManager()->getStores() as $store) {
                 $output->writeln("<info>Reindexing store " . $store->getName() . "...</info>");
-                $returnValues[] = $this->reindexStore($store, $deleteIndex, $output);
+                $returnValues[] = $this->reindexStore($store, $output);
             }
 
             $output->writeln("<info>All stores have been reindexed!</info>");
@@ -130,6 +128,72 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
                 "<comment>Not enough information provided, nothing has been reindexed. Try using --help for more information.</comment>"
             );
         }
+    }
+
+    /**
+     * Reindex each vsbridge index for the specified store
+     *
+     * @param \Magento\Store\Api\Data\StoreInterface $store
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     * @return int
+     */
+    private function reindexStore(StoreInterface $store, OutputInterface $output)
+    {
+        $this->getIndexerStoreManager()->setLoadedStores([$store]);
+        $index = $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store, false);
+
+        $returnValue = Cli::RETURN_FAILURE;
+
+        foreach ($this->getIndexers() as $indexer) {
+            if ($indexer->isWorking()) {
+                $output->writeln($indexer->getTitle() . ' has been skipped. Change indexer status to valid.');
+                continue;
+            }
+
+            try {
+                $startTime = microtime(true);
+                $indexer->reindexAll();
+
+                $resultTime = microtime(true) - $startTime;
+                $output->writeln(
+                    $indexer->getTitle() . ' index has been rebuilt successfully in ' . gmdate('H:i:s', $resultTime)
+                );
+                $returnValue = Cli::RETURN_SUCCESS;
+            } catch (LocalizedException $e) {
+                $output->writeln("<error>" . $e->getMessage() . "</error>");
+            } catch (\Exception $e) {
+                $output->writeln("<error>" . $indexer->getTitle() . ' indexer process unknown error:</error>');
+                $output->writeln("<error>" . $e->getMessage() . "</error>");
+            }
+        }
+
+        $output->writeln(
+            sprintf('<info>Index name: %s, index alias: %s</info>', $index->getName(), $index->getIdentifier())
+        );
+        $this->getIndexOperations()->switchIndexer($index->getName(), $index->getIdentifier());
+
+        return $returnValue;
+    }
+
+    /**
+     * @return IndexerInterface[]
+     */
+    private function getIndexers()
+    {
+        /** @var IndexerInterface[] */
+        $indexers = $this->getAllIndexers();
+        $vsbridgeIndexers = [];
+
+        foreach ($indexers as $indexer) {
+            $indexId = $indexer->getId();
+
+            if (substr($indexId, 0, 9) === 'vsbridge_' && !in_array($indexId, $this->excludeIndices)) {
+                $vsbridgeIndexers[] = $indexer;
+            }
+        }
+
+        return $vsbridgeIndexers;
     }
 
     /**
@@ -157,78 +221,15 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     }
 
     /**
-     * @return IndexOperations
+     * @return IndexOperationInterface
      */
     private function getIndexOperations()
     {
         if (null === $this->indexOperations) {
-            $this->indexOperations = $this->getObjectManager()->get(IndexOperations::class);
+            $this->indexOperations = $this->getObjectManager()->get(IndexOperationInterface::class);
         }
 
         return $this->indexOperations;
-    }
-
-    /**
-     * Reindex each vsbridge index for the specified store
-     *
-     * @param \Magento\Store\Api\Data\StoreInterface $store
-     * @param bool $deleteIndex
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return int
-     */
-    private function reindexStore(StoreInterface $store, bool $deleteIndex, OutputInterface $output)
-    {
-        $this->getIndexerStoreManager()->setLoadedStores([$store]);
-
-        if ($deleteIndex) {
-            $output->writeln("<comment>Deleting and recreating the index first...</comment>");
-            $this->getIndexOperations()->deleteIndex(self::INDEX_IDENTIFIER, $store);
-            $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store);
-        }
-
-        $returnValue = Cli::RETURN_FAILURE;
-
-        foreach ($this->getIndexers() as $indexer) {
-            try {
-                $startTime = microtime(true);
-
-                $indexer->reindexAll();
-
-                $resultTime = microtime(true) - $startTime;
-                $output->writeln(
-                    $indexer->getTitle() . ' index has been rebuilt successfully in ' . gmdate('H:i:s', $resultTime)
-                );
-                $returnValue = Cli::RETURN_SUCCESS;
-            } catch (LocalizedException $e) {
-                $output->writeln("<error>" . $e->getMessage() . "</error>");
-            } catch (\Exception $e) {
-                $output->writeln("<error>" . $indexer->getTitle() . ' indexer process unknown error:</error>');
-                $output->writeln("<error>" . $e->getMessage() . "</error>");
-            }
-        }
-
-        return $returnValue;
-    }
-
-    /**
-     * @return IndexerInterface[]
-     */
-    private function getIndexers()
-    {
-        /** @var IndexerInterface[] */
-        $indexers = $this->getAllIndexers();
-
-        unset($indexers[ProductCategoryProcessor::INDEXER_ID]);
-        $vsbridgeIndexers = [];
-
-        foreach ($indexers as $indexer) {
-            if (substr($indexer->getId(), 0, 9) === 'vsbridge_') {
-                $vsbridgeIndexers[] = $indexer;
-            }
-        }
-
-        return $vsbridgeIndexers;
     }
 
     /**

@@ -121,7 +121,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
      * @return bool
      * @throws \Exception
      */
-    private function canReindex(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null)
+    public function canReindex(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null)
     {
         if ($attribute->isStatic()) {
             return false;

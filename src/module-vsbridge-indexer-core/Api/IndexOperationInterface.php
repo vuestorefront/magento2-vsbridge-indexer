@@ -49,7 +49,7 @@ interface IndexOperationInterface
      *
      * @return string
      */
-    public function getIndexName(StoreInterface $store);
+    public function getIndexAlias(StoreInterface $store);
 
     /**
      * @param string $indexIdentifier
@@ -60,17 +60,19 @@ interface IndexOperationInterface
     public function createIndex($indexIdentifier, StoreInterface $store);
 
     /**
-     * @param string $indexIdentifier
-     * @param StoreInterface $store
-     */
-    public function deleteIndex($indexIdentifier, StoreInterface $store);
-
-    /**
      * @param IndexInterface $index
      *
-     * @return $this
+     * @return void
      */
     public function refreshIndex(IndexInterface $index);
+
+    /**
+     * @param string $indexName
+     * @param string $indexAlias
+     *
+     * @return void
+     */
+    public function switchIndexer(string $indexName, string $indexAlias);
 
     /**
      * @return BulkRequestInterface

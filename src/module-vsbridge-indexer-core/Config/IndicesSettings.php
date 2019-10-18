@@ -49,6 +49,14 @@ class IndicesSettings
     }
 
     /**
+     * @return bool
+     */
+    public function addIdentifierToDefaultStoreView()
+    {
+        return (bool) $this->getConfigParam('add_identifier_to_default');
+    }
+
+    /**
      * @return int
      */
     public function getBatchIndexingSize()

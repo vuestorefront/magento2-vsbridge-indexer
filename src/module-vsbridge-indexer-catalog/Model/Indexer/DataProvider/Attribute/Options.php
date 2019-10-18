@@ -75,7 +75,7 @@ class Options implements DataProviderInterface
     {
         return $this->loadOptions->execute($attributeData['attribute_code'], $storeId);
     }
-    
+
     /**
      * @param array $attributeData
      *
