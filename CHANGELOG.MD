@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [1.5.0]
+
+### Changed/Improved
+-  Change method `AbstractEavAttributes:canReindex:canReindex` to public ([#136](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/136)) 
+
+### Added
+- Add support for aliases ([#3](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/3)).
+
 ## [1.4.0] (2019.10.15)
 
 ### Fixes

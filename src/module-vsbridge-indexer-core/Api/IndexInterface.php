@@ -19,6 +19,16 @@ interface IndexInterface
     public function getName();
 
     /**
+     * @return string
+     */
+    public function getIdentifier();
+
+    /**
+     * @return boolean
+     */
+    public function isNew();
+
+    /**
      * @return \Divante\VsbridgeIndexerCore\Api\Index\TypeInterface[]
      */
     public function getTypes();

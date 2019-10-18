@@ -27,20 +27,54 @@ class Index implements IndexInterface
     /**
      * Index types.
      *
-     * @var
+     * @var \Divante\VsbridgeIndexerCore\Api\Index\TypeInterface[]
      */
     private $types;
 
     /**
+     * @var string
+     */
+    private $identifier;
+
+    /**
+     * @var bool
+     */
+    private $newIndex = false;
+
+    /**
      * Index constructor.
      *
-     * @param string $name Index name
-     * @param TypeInterface[] $types index types
+     * @param string $name
+     * @param string $identifier
+     * @param bool $newIndex
+     * @param array $types
      */
-    public function __construct($name, array $types)
-    {
+    public function __construct(
+        string $name,
+        string $identifier,
+        bool $newIndex,
+        array $types
+    ) {
+        $this->newIndex = $newIndex;
         $this->name = $name;
+        $this->identifier = $identifier;
         $this->types = $this->prepareTypes($types);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isNew()
+    {
+        return $this->newIndex;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
     }
 
     /**

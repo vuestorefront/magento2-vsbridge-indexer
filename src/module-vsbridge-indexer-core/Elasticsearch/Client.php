@@ -80,6 +80,28 @@ class Client implements ClientInterface
     /**
      * @inheritdoc
      */
+    public function getIndicesNameByAlias(string $indexAlias): array
+    {
+        $indices = [];
+
+        try {
+            $indices = $this->getClient()->indices()->getMapping(['index' => $indexAlias]);
+        } catch (\Elasticsearch\Common\Exceptions\Missing404Exception $e) {
+        }
+
+        return array_keys($indices);
+    }
+    /**
+     * @inheritdoc
+     */
+    public function updateAliases(array $aliasActions)
+    {
+        $this->getClient()->indices()->updateAliases(['body' => ['actions' => $aliasActions]]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function refreshIndex($indexName)
     {
         $this->getClient()->indices()->refresh(['index' => $indexName]);

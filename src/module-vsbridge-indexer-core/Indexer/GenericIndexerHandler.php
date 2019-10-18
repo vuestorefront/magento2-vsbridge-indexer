@@ -31,7 +31,7 @@ class GenericIndexerHandler
     private $batch;
 
     /**
-     * @var IndexOperationInterface
+     * @var \Divante\VsbridgeIndexerCore\Index\IndexOperations
      */
     private $indexOperation;
 
@@ -169,6 +169,7 @@ class GenericIndexerHandler
         try {
             $index = $this->getIndex($store);
             $type = $index->getType($this->typeName);
+
             $storeId = (int)$store->getId();
 
             foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
@@ -200,6 +201,10 @@ class GenericIndexerHandler
                 $docs = null;
             }
 
+            if ($index->isNew()) {
+                $this->indexOperation->switchIndexer($index->getName(), $index->getIdentifier());
+            }
+
             $this->indexOperation->refreshIndex($index);
         } catch (ConnectionDisabledException $exception) {
             // do nothing, ES indexer disabled in configuration
@@ -215,9 +220,9 @@ class GenericIndexerHandler
     public function cleanUpByTransactionKey(StoreInterface $store, array $docIds = null)
     {
         try {
-            $indexName = $this->indexOperation->getIndexName($store);
+            $indexAlias = $this->indexOperation->getIndexAlias($store);
 
-            if ($this->indexOperation->indexExists($indexName)) {
+            if ($this->indexOperation->indexExists($indexAlias)) {
                 $index = $this->indexOperation->getIndexByName($this->indexIdentifier, $store);
                 $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey]]];
                 $query = ['query' => ['bool' => $transactionKeyQuery]];
