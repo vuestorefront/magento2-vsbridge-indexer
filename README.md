@@ -22,6 +22,12 @@ Sign up for a demo at https://vuestorefront.io/ (Vue Storefront integrated with 
 composer require divante/magento2-vsbridge-indexer
 ```
 
+After installation, enable the modules involved:
+```bash
+bin/magento module:enable Divante_VsbridgeIndexerCatalog Divante_VsbridgeIndexerCms Divante_VsbridgeIndexerCore Divante_VsbridgeIndexerReview Divante_VsbridgeIndexerTax
+bin/magento setup:upgrade
+```
+
 ## Installation/Getting Started - MSI support
 - Install second module which will support MSI
 ```json
