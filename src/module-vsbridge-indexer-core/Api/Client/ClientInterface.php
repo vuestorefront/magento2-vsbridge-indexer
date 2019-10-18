@@ -33,6 +33,22 @@ interface ClientInterface
     public function createIndex($indexName, array $indexSettings);
 
     /**
+     * Retrieve the list of all index having a specified alias.
+     *
+     * @param string $indexAlias Index alias.
+     *
+     * @return string[]
+     */
+    public function getIndicesNameByAlias(string $indexAlias): array;
+
+    /**
+     * @param array $aliasActions
+     *
+     * @return void
+     */
+    public function updateAliases(array $aliasActions);
+
+    /**
      * @param string $indexName
      *
      * @return void

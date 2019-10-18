@@ -151,4 +151,11 @@
             </argument>
         </arguments>
     </type>
+    <type name="Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand">
+        <arguments>
+            <argument name="excludeIndices" xsi:type="array">
+                <item name="product_category" xsi:type="const">Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategoryProcessor::INDEXER_ID</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
