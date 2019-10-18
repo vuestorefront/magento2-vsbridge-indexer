@@ -23,4 +23,12 @@ interface EavAttributesInterface
      * @throws \Exception
      */
     public function loadAttributesData($storeId, array $entityIds, array $requiredAttributes = null);
+
+    /**
+     * @param \Magento\Eav\Model\Entity\Attribute $attribute
+     * @param array|null $allowedAttributes
+     *
+     * @return bool
+     */
+    public function canReindex(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null);
 }
