@@ -30,5 +30,5 @@ interface EavAttributesInterface
      *
      * @return bool
      */
-    public function canReindex(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null);
+    public function canReindexAttribute(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null);
 }

@@ -216,7 +216,7 @@ class IndexOperations implements IndexOperationInterface
                 ];
             }
         }
-
+        
         $this->client->updateAliases($aliasActions);
 
         foreach ($deletedIndices as $deletedIndex) {
@@ -227,6 +227,7 @@ class IndexOperations implements IndexOperationInterface
     /**
      * @param $indexIdentifier
      * @param StoreInterface $store
+     * @param bool $existingIndex
      *
      * @return Index
      */
