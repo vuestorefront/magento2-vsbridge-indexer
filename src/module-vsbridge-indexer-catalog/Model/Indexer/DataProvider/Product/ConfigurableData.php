@@ -249,6 +249,10 @@ class ConfigurableData implements DataProviderInterface
             $values = [];
 
             foreach ($options as $option) {
+                if(empty($option['value'])){
+                    contunue;
+                }
+
                 $values[] = (int)$option['value'];
                 $productAttribute['values'][] = [
                     'value_index' => $option['value'],
