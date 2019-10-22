@@ -250,7 +250,7 @@ class ConfigurableData implements DataProviderInterface
 
             foreach ($options as $option) {
                 if(empty($option['value'])){
-                    contunue;
+                    continue;
                 }
 
                 $values[] = (int)$option['value'];
