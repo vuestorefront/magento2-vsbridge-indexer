@@ -15,7 +15,7 @@ Sign up for a demo at https://vuestorefront.io/ (Vue Storefront integrated with 
 
 ## Overview
 
-### Version 1.5.1 - support for aliases.
+### Version 1.5.0/1.5.1 - support for aliases.
 Command ` php bin/magento vsbridge:reindex` will reindex all data to new index.
 It will create new index and update aliases at the end.
 
