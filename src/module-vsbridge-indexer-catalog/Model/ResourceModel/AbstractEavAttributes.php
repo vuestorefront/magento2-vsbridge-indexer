@@ -88,7 +88,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
         $selects = [];
 
         foreach ($this->attributesById as $attributeId => $attribute) {
-            if ($this->canReindex($attribute, $requiredAttributes)) {
+            if ($this->canReindexAttribute($attribute, $requiredAttributes)) {
                 $tableAttributes[$attribute->getBackendTable()][] = $attributeId;
 
                 if (!isset($attributeTypes[$attribute->getBackendTable()])) {
@@ -121,7 +121,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
      * @return bool
      * @throws \Exception
      */
-    public function canReindex(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null)
+    public function canReindexAttribute(\Magento\Eav\Model\Entity\Attribute $attribute, array $allowedAttributes = null)
     {
         if ($attribute->isStatic()) {
             return false;

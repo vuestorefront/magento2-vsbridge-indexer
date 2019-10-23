@@ -10,6 +10,7 @@ namespace Divante\VsbridgeIndexerCore\Console\Command;
 
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
+use Divante\VsbridgeIndexerCore\Model\IndexerRegistry as IndexerRegistry;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\LocalizedException;
@@ -45,6 +46,11 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
      * @var StoreManagerInterface
      */
     private $storeManager;
+
+    /**
+     * @var IndexerRegistry
+     */
+    private $indexerRegistry;
 
     /**
      * @var array
@@ -141,7 +147,8 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     private function reindexStore(StoreInterface $store, OutputInterface $output)
     {
         $this->getIndexerStoreManager()->setLoadedStores([$store]);
-        $index = $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store, false);
+        $index = $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store);
+        $this->getIndexerRegistry()->setFullReIndexationIsInProgress();
 
         $returnValue = Cli::RETURN_FAILURE;
 
@@ -167,6 +174,8 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
                 $output->writeln("<error>" . $e->getMessage() . "</error>");
             }
         }
+
+        $this->indexOperations->switchIndexer($index->getName(), $index->getIdentifier());
 
         $output->writeln(
             sprintf('<info>Index name: %s, index alias: %s</info>', $index->getName(), $index->getIdentifier())
@@ -218,6 +227,18 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         }
 
         return $this->indexerStoreManager;
+    }
+
+    /**
+     * @return IndexerRegistry
+     */
+    private function getIndexerRegistry()
+    {
+        if (null === $this->indexerRegistry) {
+            $this->indexerRegistry = $this->getObjectManager()->get(IndexerRegistry::class);
+        }
+
+        return $this->indexerRegistry;
     }
 
     /**
