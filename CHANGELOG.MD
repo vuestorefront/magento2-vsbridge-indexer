@@ -7,12 +7,12 @@
 ### Fixes
 -  Fix Notice: Undefined index: value in ConfigurableData.php on line 254 ([#139](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/139))
 -  Switch indices when all types will be reindex ([#138](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/138))
--  Change method name `AbstractEavAttributes:canReindex:canReindex` to 'cantReindexAttribute'
+-  Change method name `AbstractEavAttributes:canReindex` to '`AbstractEavAttributes:canIndexAttribute`
 
 ## [1.5.0]
 
 ### Changed/Improved
--  Change method `AbstractEavAttributes:canReindex:canReindex` to public ([#136](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/136)) 
+-  Change method `AbstractEavAttributes:canReindex` to public ([#136](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/136)) 
 
 ### Added
 - Add support for aliases ([#3](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/3)).
