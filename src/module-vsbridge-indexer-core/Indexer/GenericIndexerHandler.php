@@ -14,11 +14,12 @@ use Divante\VsbridgeIndexerCore\Api\ConvertDataTypesInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 use Divante\VsbridgeIndexerCore\Api\Indexer\TransactionKeyInterface;
+use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
+use Divante\VsbridgeIndexerCore\Model\IndexerRegistry as IndexerRegistry;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Store\Api\Data\StoreInterface;
 use Psr\Log\LoggerInterface;
-use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
 
 /**
  * Class IndexerHandler
@@ -34,6 +35,11 @@ class GenericIndexerHandler
      * @var \Divante\VsbridgeIndexerCore\Index\IndexOperations
      */
     private $indexOperation;
+
+    /**
+     * @var IndexerRegistry
+     */
+    private $indexerRegistry;
 
     /**
      * @var ClientInterface
@@ -71,12 +77,13 @@ class GenericIndexerHandler
     private $logger;
 
     /**
-     * IndexerHandler constructor.
+     * GenericIndexerHandler constructor.
      *
      * @param ClientInterface $client
      * @param LoggerInterface $logger
      * @param IndexOperationInterface $indexOperation
      * @param ConvertDataTypesInterface $convertDataTypes
+     * @param IndexerRegistry $indexerRegistry
      * @param EventManager $eventManager
      * @param Batch $batch
      * @param TransactionKeyInterface $transactionKey
@@ -88,6 +95,7 @@ class GenericIndexerHandler
         LoggerInterface $logger,
         IndexOperationInterface $indexOperation,
         ConvertDataTypesInterface $convertDataTypes,
+        IndexerRegistry $indexerRegistry,
         EventManager $eventManager,
         Batch $batch,
         TransactionKeyInterface $transactionKey,
@@ -101,6 +109,7 @@ class GenericIndexerHandler
         $this->convertDataTypes = $convertDataTypes;
         $this->typeName = $typeName;
         $this->indexIdentifier = $indexIdentifier;
+        $this->indexerRegistry = $indexerRegistry;
         $this->eventManager = $eventManager;
         $this->transactionKey = $transactionKey->load();
     }
@@ -201,7 +210,7 @@ class GenericIndexerHandler
                 $docs = null;
             }
 
-            if ($index->isNew()) {
+            if ($index->isNew() && !$this->indexerRegistry->isFullReIndexationRunning()) {
                 $this->indexOperation->switchIndexer($index->getName(), $index->getIdentifier());
             }
 

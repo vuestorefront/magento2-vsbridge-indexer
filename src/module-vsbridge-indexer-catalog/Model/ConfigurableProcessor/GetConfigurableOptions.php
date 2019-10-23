@@ -64,7 +64,10 @@ class GetConfigurableOptions
 
         foreach ($values as $value) {
             $option = $this->loadOptionById->execute($attributeCode, $value, $storeId);
-            $options[] = $option;
+
+            if (!empty($option)) {
+                $options[] = $option;
+            }
         }
 
         return $this->sortValues->execute($options);

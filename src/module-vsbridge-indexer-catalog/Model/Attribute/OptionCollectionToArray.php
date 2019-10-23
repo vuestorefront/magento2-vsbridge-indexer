@@ -21,10 +21,11 @@ class OptionCollectionToArray
 
     /**
      * @param OptionCollection $collection
+     * @param array $additional
      *
      * @return array
      */
-    public function execute(OptionCollection $collection): array
+    public function execute(OptionCollection $collection, array $additional = []): array
     {
         $res = [];
         $additional['value'] = 'option_id';
