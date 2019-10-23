@@ -17,6 +17,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Indexer\Console\Command\AbstractIndexerCommand;
 use Magento\Store\Api\Data\StoreInterface;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,6 +30,7 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
 {
     const INPUT_STORE = 'store';
     const INPUT_ALL_STORES = 'all';
+    const INPUT_KEY_INDEXERS = 'index';
 
     const INDEX_IDENTIFIER = 'vue_storefront_catalog';
 
@@ -77,7 +79,8 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     protected function configure()
     {
         $this->setName('vsbridge:reindex')
-            ->setDescription('Rebuild indexer in ES.');
+            ->setDescription('Rebuild indexer in ES.')
+            ->setDefinition($this->getInputList());
 
         $this->addOption(
             self::INPUT_STORE,
@@ -108,9 +111,9 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
 
         if ($storeId) {
             $store = $this->getStoreManager()->getStore($storeId);
-            $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+            $output->writeln("<info>Reindexing VS indexes for store " . $store->getName() . "...</info>");
 
-            $returnValue = $this->reindexStore($store, $output);
+            $returnValue = $this->reindexStore($store, $input, $output);
 
             $output->writeln("<info>Reindexing has completed!</info>");
 
@@ -123,7 +126,7 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             /** @var \Magento\Store\Api\Data\StoreInterface $store */
             foreach ($this->getStoreManager()->getStores() as $store) {
                 $output->writeln("<info>Reindexing store " . $store->getName() . "...</info>");
-                $returnValues[] = $this->reindexStore($store, $output);
+                $returnValues[] = $this->reindexStore($store, $input, $output);
             }
 
             $output->writeln("<info>All stores have been reindexed!</info>");
@@ -140,11 +143,12 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
      * Reindex each vsbridge index for the specified store
      *
      * @param \Magento\Store\Api\Data\StoreInterface $store
+     * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
      * @return int
      */
-    private function reindexStore(StoreInterface $store, OutputInterface $output)
+    private function reindexStore(StoreInterface $store, InputInterface $input, OutputInterface $output)
     {
         $this->getIndexerStoreManager()->setLoadedStores([$store]);
         $index = $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store);
@@ -152,7 +156,7 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
 
         $returnValue = Cli::RETURN_FAILURE;
 
-        foreach ($this->getIndexers() as $indexer) {
+        foreach ($this->getIndexers($input) as $indexer) {
             if ($indexer->isWorking()) {
                 $output->writeln($indexer->getTitle() . ' has been skipped. Change indexer status to valid.');
                 continue;
@@ -186,23 +190,62 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     }
 
     /**
+     * Returns the ordered list of specified indexers.
+     *
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     *
      * @return IndexerInterface[]
      */
-    private function getIndexers()
+    private function getIndexers(InputInterface $input)
     {
         /** @var IndexerInterface[] */
-        $indexers = $this->getAllIndexers();
+        $availableIndexers = $this->getAvailableIndexers();
         $vsbridgeIndexers = [];
 
-        foreach ($indexers as $indexer) {
-            $indexId = $indexer->getId();
+        // Handle requested indexers, if any were provided
+        $requestedTypes = [];
+        if ($input->getArgument(self::INPUT_KEY_INDEXERS)) {
+            $requestedTypes = $input->getArgument(self::INPUT_KEY_INDEXERS);
+            $requestedTypes = array_filter(array_map('trim', $requestedTypes), 'strlen');
+        }
 
-            if (substr($indexId, 0, 9) === 'vsbridge_' && !in_array($indexId, $this->excludeIndices)) {
-                $vsbridgeIndexers[] = $indexer;
+        if (empty($requestedTypes)) {
+            // no indexers specific, set all available indexers
+            $vsbridgeIndexers = $availableIndexers;
+        } else {
+            // Make sure requested indexers are valid vsbridge indexers
+            $unsupportedTypes = array_diff($requestedTypes, array_keys($availableIndexers));
+            if ($unsupportedTypes) {
+                throw new \InvalidArgumentException(
+                    "The following requested index types are not supported: '" . join("', '", $unsupportedTypes)
+                    . "'." . PHP_EOL . 'Supported types: ' . join(", ", array_keys($availableIndexers))
+                );
             }
+            $vsbridgeIndexers = array_intersect_key($availableIndexers, array_flip($requestedTypes));
         }
 
         return $vsbridgeIndexers;
+    }
+
+    /**
+     * Get all available indexers. Returns only indexers with 'vsbridge_'
+     *
+     * @return IndexerInterface[]
+     */
+    private function getAvailableIndexers()
+    {
+        /** @var IndexerInterface[] */
+        $indexers = $this->getAllIndexers();
+
+        $availableIndexers = [];
+        foreach ($indexers as $indexerName => $indexer) {
+            $indexId = $indexer->getId();
+
+            if (substr($indexId, 0, 9) === 'vsbridge_' && !in_array($indexId, $this->excludeIndices)) {
+                $availableIndexers[$indexerName] = $indexer;
+            }
+        }
+        return $availableIndexers;
     }
 
     /**
@@ -259,5 +302,21 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     private function initObjectManager()
     {
         $this->getObjectManager();
+    }
+
+    /**
+     * Get list of options and arguments for the command
+     *
+     * @return mixed
+     */
+    public function getInputList()
+    {
+        return [
+            new InputArgument(
+                self::INPUT_KEY_INDEXERS,
+                InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+                'Space-separated list of index types or omit to apply to all vsbridge indexes.'
+            ),
+        ];
     }
 }

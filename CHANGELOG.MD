@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- Add support for indexer input argument. Works the same as Magento's native reindexer where you can pass a space separated list of 1 or more indexer names to specifically reindex. If none are provided all vsbridge indexers are reindexed. [@rain2o](https://github.com/rain2o) ([#100](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/100))
+
 ## [1.5.1]
 
 ### Fixes
