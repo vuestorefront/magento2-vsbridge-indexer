@@ -28,6 +28,7 @@ use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
 class RebuildEsIndexCommand extends AbstractIndexerCommand
 {
     const INPUT_STORE = 'store';
+
     const INPUT_ALL_STORES = 'all';
 
     const INDEX_IDENTIFIER = 'vue_storefront_catalog';
@@ -106,6 +107,51 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         $storeId = $input->getOption(self::INPUT_STORE);
         $allStores = $input->getOption(self::INPUT_ALL_STORES);
 
+        $invalidIndices = $this->getInvalidIndices();
+
+        if (!empty($invalidIndices)) {
+            $message = 'Some indices has invalid status: '. implode(', ', $invalidIndices) . '. ';
+            $message .= 'Please change indices status to VALID manually.';
+            $output->writeln("<info>WARNING: Indexation can't be executed. $message</info>");
+            return;
+        }
+
+        if (!$storeId && !$allStores) {
+            $output->writeln(
+                "<comment>Not enough information provided, nothing has been reindexed. Try using --help for more information.</comment>"
+            );
+        } else {
+            $this->reindex($output, $storeId, $allStores);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function getInvalidIndices()
+    {
+        $invalid = [];
+
+        foreach ($this->getIndexers() as $indexer) {
+            if ($indexer->isWorking()) {
+                $invalid[] = $indexer->getTitle();
+            }
+        }
+
+        return $invalid;
+    }
+
+    /***
+     * @param OutputInterface $output
+     * @param $storeId
+     * @param $allStores
+     *
+     * @return int
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function reindex(OutputInterface $output, $storeId, $allStores)
+    {
+
         if ($storeId) {
             $store = $this->getStoreManager()->getStore($storeId);
             $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
@@ -127,12 +173,9 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             }
 
             $output->writeln("<info>All stores have been reindexed!</info>");
+
             // If failure returned in any store return failure now
             return in_array(Cli::RETURN_FAILURE, $returnValues) ? Cli::RETURN_FAILURE : Cli::RETURN_SUCCESS;
-        } else {
-            $output->writeln(
-                "<comment>Not enough information provided, nothing has been reindexed. Try using --help for more information.</comment>"
-            );
         }
     }
 
@@ -153,11 +196,6 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         $returnValue = Cli::RETURN_FAILURE;
 
         foreach ($this->getIndexers() as $indexer) {
-            if ($indexer->isWorking()) {
-                $output->writeln($indexer->getTitle() . ' has been skipped. Change indexer status to valid.');
-                continue;
-            }
-
             try {
                 $startTime = microtime(true);
                 $indexer->reindexAll();
