@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## [1.5.2]
+
+### Fixes
+ - Run `vsbridge:reindex` command only if all indices has valid status.
+
 ## [1.5.1]
 
 ### Fixes
