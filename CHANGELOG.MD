@@ -2,19 +2,27 @@
 
 ## Unreleased
 
-## [1.5.2]
+### Added
+- Add new command `vsbridge:index` to run indexer for one product, cms block, etc. 
+`bin/magento vsbridge:index vsbridge_product_indexer default 1`
+vsbridge_product_indexer -> indexer code
+default -> store code
+1 -> entity id (in this particular example - product id)
+Useful for testing. 
+
+## [1.5.2] (2019.10.24)
 
 ### Fixes
  - Run `vsbridge:reindex` command only if all indices has valid status.
 
-## [1.5.1]
+## [1.5.1] (2019.10.23)
 
 ### Fixes
 -  Fix Notice: Undefined index: value in ConfigurableData.php on line 254 ([#139](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/139))
 -  Switch indices when all types will be reindex ([#138](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/138))
 -  Change method name `AbstractEavAttributes:canReindex` to '`AbstractEavAttributes:canIndexAttribute`
 
-## [1.5.0]
+## [1.5.0] (2019.10.18)
 
 ### Changed/Improved
 -  Change method `AbstractEavAttributes:canReindex` to public ([#136](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/136)) 
