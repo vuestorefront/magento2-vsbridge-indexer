@@ -63,6 +63,7 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
+                <item name="index_single_entity" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\SingleEntityIndexCommand</item>
                 <item name="rebuild" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand</item>
             </argument>
         </arguments>
