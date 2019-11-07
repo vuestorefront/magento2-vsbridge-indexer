@@ -250,10 +250,16 @@ class ConfigurableData implements DataProviderInterface
 
             foreach ($options as $option) {
                 $values[] = (int)$option['value'];
-                $productAttribute['values'][] = [
+                $optionValue = [
                     'value_index' => $option['value'],
                     'label' => $option['label'],
                 ];
+
+                if (isset($option['swatch'])) {
+                    $optionValue['swatch'] = $option['swatch'];
+                }
+
+                $productAttribute['values'][] = $optionValue;
             }
 
             $productDTO['configurable_options'][] = $productAttribute;

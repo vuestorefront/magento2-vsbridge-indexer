@@ -14,6 +14,7 @@ use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Products Attribute provider
@@ -26,6 +27,11 @@ class AttributeDataProvider extends AbstractEavAttributes
      * @var AttributeCollectionFactory
      */
     private $attributeCollectionFactory;
+
+    /**
+     * @var Json
+     */
+    private $serializer;
 
     /**
      * Product attributes by id
@@ -43,17 +49,20 @@ class AttributeDataProvider extends AbstractEavAttributes
     /**
      * AttributeDataProvider constructor.
      *
+     * @param Json $serializer
      * @param AttributeCollectionFactory $attributeCollectionFactory
      * @param ResourceConnection $resourceConnection
      * @param MetadataPool $metadataPool
      * @param string $entityType
      */
     public function __construct(
+        Json $serializer,
         AttributeCollectionFactory $attributeCollectionFactory,
         ResourceConnection $resourceConnection,
         MetadataPool $metadataPool,
         $entityType = \Magento\Catalog\Api\Data\ProductInterface::class
     ) {
+        $this->serializer = $serializer;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
 
         parent::__construct($resourceConnection, $metadataPool, $entityType);
@@ -112,12 +121,34 @@ class AttributeDataProvider extends AbstractEavAttributes
             $attributeCollection = $this->getAttributeCollection();
 
             foreach ($attributeCollection as $attribute) {
+                $this->prepareAttribute($attribute);
+
                 $this->attributesById[$attribute->getId()] = $attribute;
                 $this->attributeCodeToId[$attribute->getAttributeCode()] = $attribute->getId();
             }
         }
 
         return $this->attributesById;
+    }
+
+    /**
+     * @param Attribute $attribute
+     *
+     * @return Attribute
+     */
+    public function prepareAttribute(Attribute $attribute)
+    {
+        $additionalData = (string)$attribute->getData('additional_data');
+
+        if (!empty($additionalData)) {
+            $additionalData = $this->serializer->unserialize($additionalData);
+
+            if (isset($additionalData['swatch_input_type'])) {
+                $attribute->setData('swatch_input_type', $additionalData['swatch_input_type']);
+            }
+        }
+
+        return $attribute;
     }
 
     /**
