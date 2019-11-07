@@ -4,6 +4,7 @@ namespace Divante\VsbridgeIndexerCatalog\Index\Mapping;
 
 use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
+use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 
 /**
@@ -18,13 +19,22 @@ class Attribute implements MappingInterface
     private $eventManager;
 
     /**
+     * @var GeneralMapping
+     */
+    private $generalMapping;
+
+    /**
      * Attribute constructor.
      *
+     * @param GeneralMapping $generalMapping
      * @param EventManager $eventManager
      */
-    public function __construct(EventManager $eventManager)
-    {
+    public function __construct(
+        GeneralMapping $generalMapping,
+        EventManager $eventManager
+    ) {
         $this->eventManager = $eventManager;
+        $this->generalMapping = $generalMapping;
     }
 
     /**
@@ -73,6 +83,7 @@ class Attribute implements MappingInterface
      */
     private $stringProperties  = [
         'attribute_code',
+        'swatch_input_type',
         'attribute_model',
         'backend_model',
         'backend_table',
@@ -113,7 +124,8 @@ class Attribute implements MappingInterface
             'properties' => [
                 'value' => ['type' => FieldInterface::TYPE_TEXT],
                 'label' => ['type' => FieldInterface::TYPE_TEXT],
-                'sort_order' => ['type' => FieldInterface::TYPE_LONG],
+                'sort_order' => ['type' => FieldInterface::TYPE_INTEGER],
+                'swatch' => $this->generalMapping->getSwatchProperties(),
             ]
         ];
 

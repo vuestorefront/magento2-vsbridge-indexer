@@ -76,6 +76,14 @@ class Settings implements CatalogConfigurationInterface
     }
 
     /**
+     * @return bool
+     */
+    public function addSwatchesToConfigurableOptions()
+    {
+        return (bool) $this->getConfigParam('add_swatches_to_configurable_options');
+    }
+
+    /**
      * @inheritdoc
      */
     public function getAllowedProductTypes($storeId)
