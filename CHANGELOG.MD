@@ -2,19 +2,84 @@
 
 ## Unreleased
 
-## [1.5.2]
+## [1.6.0] (2019.11.07)
+
+### Added
+- Add support for Visual Swatches. ([#15](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/15))
+Attribute options
+```json
+"options": [
+    {
+      "swatch": {
+        "type": 1,
+        "value": "#ffd500"
+      },
+      "value": "60",
+      "label": "Yellow",
+      "sort_order": 12
+    },
+    {
+      "swatch": {
+        "type": 3,
+        "value": null
+      },
+      "value": "105",
+      "label": "purple",
+      "sort_order": 13
+    },
+    {
+      "swatch": {
+        "type": 2,
+        "value": "/4/2/4245592.png"
+      },
+      "value": "106",
+      "label": "File",
+      "sort_order": 14
+    }
+]
+```
+
+Product configurable option values
+```json
+"values": [
+    {
+      "value_index": "50",
+      "label": "blue defaul",
+      "swatch": {
+        "type": 1,
+        "value": "#1857f7"
+      }
+    },
+    {
+      "value_index": "49",
+      "label": "Black",
+      "swatch": {
+        "type": 1,
+        "value": "#000000"
+      }
+    }
+  ]
+``` 
+- Add new command `vsbridge:index` to run indexer for one product, cms block, etc. 
+`bin/magento vsbridge:index vsbridge_product_indexer default 1`
+vsbridge_product_indexer -> indexer code
+default -> store code
+1 -> entity id (in this particular example - product id)
+Useful for testing. 
+
+## [1.5.2] (2019.10.24)
 
 ### Fixes
  - Run `vsbridge:reindex` command only if all indices has valid status.
 
-## [1.5.1]
+## [1.5.1] (2019.10.23)
 
 ### Fixes
 -  Fix Notice: Undefined index: value in ConfigurableData.php on line 254 ([#139](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/139))
 -  Switch indices when all types will be reindex ([#138](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/138))
 -  Change method name `AbstractEavAttributes:canReindex` to '`AbstractEavAttributes:canIndexAttribute`
 
-## [1.5.0]
+## [1.5.0] (2019.10.18)
 
 ### Changed/Improved
 -  Change method `AbstractEavAttributes:canReindex` to public ([#136](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/136)) 

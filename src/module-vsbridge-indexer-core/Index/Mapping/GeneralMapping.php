@@ -43,6 +43,19 @@ class GeneralMapping
     /**
      * @return array
      */
+    public function getSwatchProperties(): array
+    {
+        return [
+            'properties' => [
+                'value' => ['type' => FieldInterface::TYPE_TEXT],
+                'type' => ['type' => FieldInterface::TYPE_SHORT], // to make it compatible with other fields
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getStockMapping()
     {
         return [

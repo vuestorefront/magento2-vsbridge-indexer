@@ -10,12 +10,18 @@ namespace Divante\VsbridgeIndexerCatalog\Model\ConfigurableProcessor;
 
 use Divante\VsbridgeIndexerCatalog\Model\Attribute\LoadOptionById;
 use Divante\VsbridgeIndexerCatalog\Model\Attribute\SortValues;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 
 /**
  * Class GetConfigurableOptions
  */
 class GetConfigurableOptions
 {
+    /**
+     * @var CatalogConfigurationInterface
+     */
+    private $catalogSettings;
+
     /**
      * @var LoadOptionById
      */
@@ -28,13 +34,17 @@ class GetConfigurableOptions
 
     /**
      * GetConfigurableOptions constructor.
-     *
-     * @param LoadOptionById $loadOptions
+     * @param LoadOptionById $loadOptionById
      * @param SortValues $sortValues
+     * @param CatalogConfigurationInterface $catalogSettings
      */
-    public function __construct(LoadOptionById $loadOptions, SortValues $sortValues)
-    {
-        $this->loadOptionById = $loadOptions;
+    public function __construct(
+        LoadOptionById $loadOptionById,
+        SortValues $sortValues,
+        CatalogConfigurationInterface $catalogSettings
+    ) {
+        $this->loadOptionById = $loadOptionById;
+        $this->catalogSettings = $catalogSettings;
         $this->sortValues = $sortValues;
     }
 
@@ -66,6 +76,10 @@ class GetConfigurableOptions
             $option = $this->loadOptionById->execute($attributeCode, $value, $storeId);
 
             if (!empty($option)) {
+                if (!$this->catalogSettings->addSwatchesToConfigurableOptions()) {
+                    unset($option['swatch']);
+                }
+
                 $options[] = $option;
             }
         }
