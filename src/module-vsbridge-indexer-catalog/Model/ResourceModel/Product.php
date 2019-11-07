@@ -228,6 +228,21 @@ class Product
     }
 
     /**
+     * @param array $productIds
+     * @return array
+     */
+    public function getSkusByIds(array $productIds)
+    {
+        $select = $this->getConnection()->select()
+            ->from(['e' => $this->resourceConnection->getTableName('catalog_product_entity')]);
+        $select->where('e.entity_id IN (?)', $productIds);
+        $select->reset(Select::COLUMNS);
+        $select->columns(['sku']);
+
+        return $this->getConnection()->fetchCol($select);
+    }
+
+    /**
      * Get list of attribute ids used to create configurable products
      * @return array
      */

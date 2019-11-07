@@ -71,6 +71,13 @@ interface CatalogConfigurationInterface
     public function syncTierPrices(): bool;
 
     /**
+     * Add Parent SKU
+     *
+     * @return bool
+     */
+    public function addParentSku(): bool;
+
+    /**
      * @return bool
      */
     public function canExportAttributesMetadata(): bool;
