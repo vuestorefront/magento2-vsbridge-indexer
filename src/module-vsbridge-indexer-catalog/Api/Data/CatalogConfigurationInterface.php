@@ -31,6 +31,11 @@ interface CatalogConfigurationInterface
     public function syncTierPrices();
 
     /**
+     * @return bool
+     */
+    public function addSwatchesToConfigurableOptions();
+
+    /**
      * @param int $storeId
      *
      * @return array

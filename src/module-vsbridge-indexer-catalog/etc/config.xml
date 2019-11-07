@@ -14,6 +14,7 @@
                 <use_magento_url_keys>0</use_magento_url_keys>
                 <use_url_key_to_generate_slug>0</use_url_key_to_generate_slug>
                 <sync_tier_prices>0</sync_tier_prices>
+                <add_swatches_to_configurable_options>0</add_swatches_to_configurable_options>
             </catalog_settings>
         </vsbridge_indexer_settings>
     </default>

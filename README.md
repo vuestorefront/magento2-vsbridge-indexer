@@ -185,7 +185,9 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
     
     Sync Tier Prices → by default this option is disabled. Used to sync products tier prices. 
     
-    Types of products to index → by default all product will be exported to ElasticSearch. This option allows for selecting certain product types that should be exported. 
+    Types of products to index → by default all product will be exported to ElasticSearch. This option allows for selecting certain product types that should be exported.
+    
+    Add swatches to `product.configurable_options` → by default No. Use to export information about swatches directly for a product type. 	 
     
     ![](docs/images/config-catalog.png)
 
