@@ -33,6 +33,11 @@ interface CatalogConfigurationInterface
     /**
      * @return bool
      */
+    public function addSwatchesToConfigurableOptions();
+
+    /**
+     * @return bool
+     */  
     public function addParentData();
 
     /**
