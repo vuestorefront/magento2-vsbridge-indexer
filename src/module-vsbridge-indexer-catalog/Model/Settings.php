@@ -78,6 +78,14 @@ class Settings implements CatalogConfigurationInterface
     /**
      * @inheritdoc
      */
+    public function addParentData()
+    {
+        return (bool) $this->getConfigParam('add_parent_data');
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAllowedProductTypes($storeId)
     {
         $types = $this->getConfigParam('allowed_product_types', $storeId);

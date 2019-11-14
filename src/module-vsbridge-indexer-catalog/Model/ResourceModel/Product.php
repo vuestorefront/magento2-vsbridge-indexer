@@ -266,6 +266,21 @@ class Product
     }
 
     /**
+     * @param array $productIds
+     * @return array
+     */
+    public function getSkusByIds(array $productIds)
+    {
+        $select = $this->getConnection()->select()
+            ->from(['e' => $this->resourceConnection->getTableName('catalog_product_entity')]);
+        $select->where('e.entity_id IN (?)', $productIds);
+        $select->reset(Select::COLUMNS);
+        $select->columns(['sku']);
+
+        return $this->getConnection()->fetchCol($select);
+    }
+
+    /**
      * @param \Magento\Framework\DB\Select $select
      * @param int $storeId
      *

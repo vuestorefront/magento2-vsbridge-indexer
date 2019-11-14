@@ -16,6 +16,7 @@ use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Bundle\Model\Product\Type as BundleType;
 use Divante\VsbridgeIndexerCatalog\Model\Product\ParentResolver;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 
 /**
  * Class ParentData
@@ -45,23 +46,32 @@ class ParentData implements DataProviderInterface
     private $parentResolver;
 
     /**
+     * @var CatalogConfigurationInterface
+     */
+    private $configSettings;
+
+    /**
      * ParentData constructor.
      *
      * @param GroupedType $groupedType
      * @param ConfigurableType $configurableType
      * @param BundleType $bundleType
      * @param ParentResolver $parentResolver
+     * @param CatalogConfigurationInterface $configSettings
+     *
      */
     public function __construct(
         GroupedType $groupedType,
         ConfigurableType $configurableType,
         BundleType $bundleType,
-        ParentResolver $parentResolver
+        ParentResolver $parentResolver,
+        CatalogConfigurationInterface $configSettings
     ) {
         $this->groupedType = $groupedType;
         $this->configurableType = $configurableType;
         $this->bundleType = $bundleType;
         $this->parentResolver = $parentResolver;
+        $this->configSettings = $configSettings;
     }
 
     /**
@@ -69,10 +79,13 @@ class ParentData implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
+        if (!$this->addParentData()) {
+            return $indexData;
+        }
+
         $parentIds = [];
 
         foreach ($indexData as $productId => $productData) {
-
             if ($productData['type_id'] == 'simple') {
                 $groupedParentIds = $this->groupedType->getParentIdsByChild($productId);
                 $configurableParentIds = $this->configurableType->getParentIdsByChild($productId);
@@ -89,5 +102,13 @@ class ParentData implements DataProviderInterface
         }
 
         return $indexData;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function addParentData()
+    {
+        return $this->configSettings->addParentData();
     }
 }

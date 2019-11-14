@@ -10,9 +10,7 @@ declare(strict_types=1);
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Product;
 
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Framework\Api\FilterBuilder;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 /**
  * Class ParentResolver
@@ -20,35 +18,19 @@ use Magento\Framework\Api\FilterBuilder;
 class ParentResolver
 {
     /**
-     * @var SearchCriteriaBuilder
+     * @var Product
      */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
-     * @var FilterBuilder
-     */
-    private $filterBuilder;
+    private $productResource;
 
     /**
      * ParentResolver constructor.
      *
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param ProductRepositoryInterface $productRepository
-     * @param FilterBuilder $filterBuilder
+     * @param Product $productResource
      */
     public function __construct(
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductRepositoryInterface $productRepository,
-        FilterBuilder $filterBuilder
+        Product $productResource
     ) {
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->productRepository = $productRepository;
-        $this->filterBuilder = $filterBuilder;
+        $this->productResource = $productResource;
     }
 
     /**
@@ -57,20 +39,6 @@ class ParentResolver
      */
     public function getParentProductsByIds(array $parentIds)
     {
-        $parentSkus = [];
-
-        $this->filterBuilder->setField('entity_id');
-        $this->filterBuilder->setValue($parentIds);
-        $this->filterBuilder->setConditionType('in');
-
-        $this->searchCriteriaBuilder->addFilters([$this->filterBuilder->create()]);
-
-        $searchResult = $this->productRepository->getList($this->searchCriteriaBuilder->create());
-
-        foreach ($searchResult->getItems() as $item) {
-            $parentSkus[] = $item->getSku();
-        }
-
-        return $parentSkus;
+        return $this->productResource->getSkusByIds($parentIds);
     }
 }
