@@ -52,9 +52,10 @@ class Product
 
             /** @var array $product */
             foreach ($products as $product) {
-                $lastProductId = $product['entity_id'];
-                $product['id'] = (int)$product['entity_id'];
+                $lastProductId = (int)$product['entity_id'];
+                $product['id'] = $lastProductId;
 
+                $product['attribute_set_id'] = (int)$product['attribute_set_id'];
                 unset($product['required_options']);
                 unset($product['has_options']);
                 yield $lastProductId => $product;
