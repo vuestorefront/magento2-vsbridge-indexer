@@ -18,7 +18,6 @@ use Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\Collection as Option
  */
 class OptionCollectionToArray
 {
-
     /**
      * @param OptionCollection $collection
      * @param array $additional
@@ -44,6 +43,13 @@ class OptionCollectionToArray
 
                 if ('option_id' === $field) {
                     $value = (string)$value;
+                }
+
+                if ('swatch' === $field) {
+                    $value = [
+                        'type' => (int)$item->getData('swatch_type'),
+                        'value' => $item->getData('swatch_value')
+                    ];
                 }
 
                 $data[$code] = $value;

@@ -2,7 +2,69 @@
 
 ## Unreleased
 
+## [1.7.0] (2019.11.14)
+
+### Changed/Improved
+- Speed up exporting for product/category data. Class `ConvertDataTypes` was removed, converting value to int/float is executed when loading product/category attributes.
+
+## [1.6.0] (2019.11.07)
+
 ### Added
+- Add support for Visual Swatches. ([#15](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/15))
+Attribute options
+```json
+"options": [
+    {
+      "swatch": {
+        "type": 1,
+        "value": "#ffd500"
+      },
+      "value": "60",
+      "label": "Yellow",
+      "sort_order": 12
+    },
+    {
+      "swatch": {
+        "type": 3,
+        "value": null
+      },
+      "value": "105",
+      "label": "purple",
+      "sort_order": 13
+    },
+    {
+      "swatch": {
+        "type": 2,
+        "value": "/4/2/4245592.png"
+      },
+      "value": "106",
+      "label": "File",
+      "sort_order": 14
+    }
+]
+```
+
+Product configurable option values
+```json
+"values": [
+    {
+      "value_index": "50",
+      "label": "blue defaul",
+      "swatch": {
+        "type": 1,
+        "value": "#1857f7"
+      }
+    },
+    {
+      "value_index": "49",
+      "label": "Black",
+      "swatch": {
+        "type": 1,
+        "value": "#000000"
+      }
+    }
+  ]
+``` 
 - Add new command `vsbridge:index` to run indexer for one product, cms block, etc. 
 `bin/magento vsbridge:index vsbridge_product_indexer default 1`
 vsbridge_product_indexer -> indexer code
