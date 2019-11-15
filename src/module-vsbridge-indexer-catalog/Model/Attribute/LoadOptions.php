@@ -90,7 +90,7 @@ class LoadOptions
                 $options = $source->getAllOptions();
             } else {
                 $loadSwatches = $this->isVisualSwatch($attribute);
-                $optionCollection = $this->getOptionCollection($attribute, $loadSwatches);
+                $optionCollection = $this->getOptionCollection($attribute);
                 $additionalFields = [];
 
                 if ($loadSwatches) {
@@ -127,8 +127,9 @@ class LoadOptions
      *
      * @return OptionCollection
      */
-    private function getOptionCollection(Attribute $attribute, $loadSwatches)
+    private function getOptionCollection(Attribute $attribute)
     {
+        $loadSwatches = $this->isVisualSwatch($attribute);
         $attributeId = $attribute->getAttributeId();
         $storeId = $attribute->getStoreId();
 

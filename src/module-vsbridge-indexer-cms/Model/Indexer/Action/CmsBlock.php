@@ -76,8 +76,8 @@ class CmsBlock
             $cmsBlocks = $this->resourceModel->loadBlocks($storeId, $blockIds, $lastBlockId);
 
             foreach ($cmsBlocks as $blockData) {
-                $lastBlockId = $blockData['block_id'];
-                $blockData['id'] = $blockData['block_id'];
+                $lastBlockId = (int)$blockData['block_id'];
+                $blockData['id'] = $lastBlockId;
                 $blockData['content'] = $this->contentProcessor->parse($templateFilter, (string) $blockData['content']);
                 $blockData['active'] = (bool)$blockData['is_active'];
 

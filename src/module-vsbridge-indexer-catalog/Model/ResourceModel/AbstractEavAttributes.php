@@ -8,6 +8,8 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
+use Divante\VsbridgeIndexerCore\Api\ConvertValueInterface;
+use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\EntityManager\EntityMetadataInterface;
@@ -22,6 +24,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
      */
     private $restrictedAttribute = [
         'quantity_and_stock_status',
+        'options_container',
     ];
 
     /**
@@ -50,20 +53,36 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
     private $metadataPool;
 
     /**
-     * EavAttributes constructor.
+     * @var MappingInterface
+     */
+    private $mapping;
+
+    /**
+     * @var ConvertValueInterface
+     */
+    private $convertValue;
+
+    /**
+     * AbstractEavAttributes constructor.
      *
      * @param ResourceConnection $resourceConnection
      * @param MetadataPool $metadataPool
+     * @param ConvertValueInterface $convertValue
+     * @param MappingInterface $mapping
      * @param string $entityType
      */
     public function __construct(
         ResourceConnection $resourceConnection,
         MetadataPool $metadataPool,
+        ConvertValueInterface $convertValue,
+        MappingInterface $mapping,
         $entityType
     ) {
         $this->resourceConnection = $resourceConnection;
         $this->metadataPool = $metadataPool;
         $this->entityType = $entityType;
+        $this->convertValue = $convertValue;
+        $this->mapping = $mapping;
     }
 
     /**
@@ -107,7 +126,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
         if (!empty($selects)) {
             foreach ($selects as $select) {
                 $values = $this->getConnection()->fetchAll($select);
-                $this->prepareValues($values);
+                $this->processValues($values);
             }
         }
 
@@ -144,12 +163,13 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
      * @return array
      * @throws \Exception
      */
-    private function prepareValues(array $values)
+    private function processValues(array $values)
     {
         foreach ($values as $value) {
             $entityIdField = $this->getEntityMetaData()->getIdentifierField();
             $entityId = $value[$entityIdField];
             $attribute = $this->attributesById[$value['attribute_id']];
+            $attributeCode = $attribute->getAttributeCode();
 
             if ($attribute->getFrontendInput() === 'multiselect') {
                 $options = explode(',', $value['value']);
@@ -159,13 +179,29 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
                 }
 
                 $value['value'] = $options;
+            } else {
+                $value['value'] = $this->prepareValue(
+                    $attributeCode,
+                    $value['value']
+                );
             }
 
-            $attributeCode = $attribute->getAttributeCode();
             $this->valuesByEntityId[$entityId][$attributeCode] = $value['value'];
         }
 
         return $this->valuesByEntityId;
+    }
+
+    /**
+     * @param string $attributeCode
+     * @param array|string $value
+     *
+     * @return array|string|int|float
+     * @throws \Exception
+     */
+    private function prepareValue(string $attributeCode, $value)
+    {
+        return $this->convertValue->execute($this->mapping, $attributeCode, $value);
     }
 
     /**
