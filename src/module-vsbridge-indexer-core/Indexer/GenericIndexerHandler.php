@@ -10,7 +10,6 @@ namespace Divante\VsbridgeIndexerCore\Indexer;
 
 use Divante\VsbridgeIndexerCore\Api\BulkResponseInterface;
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
-use Divante\VsbridgeIndexerCore\Api\ConvertDataTypesInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 use Divante\VsbridgeIndexerCore\Api\Indexer\TransactionKeyInterface;
@@ -23,6 +22,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Class IndexerHandler
+ * TODO refactor - coupling between objects
  */
 class GenericIndexerHandler
 {
@@ -62,11 +62,6 @@ class GenericIndexerHandler
     private $eventManager;
 
     /**
-     * @var ConvertDataTypesInterface
-     */
-    private $convertDataTypes;
-
-    /**
      * @var int|string
      */
     private $transactionKey;
@@ -82,7 +77,6 @@ class GenericIndexerHandler
      * @param ClientInterface $client
      * @param LoggerInterface $logger
      * @param IndexOperationInterface $indexOperation
-     * @param ConvertDataTypesInterface $convertDataTypes
      * @param IndexerRegistry $indexerRegistry
      * @param EventManager $eventManager
      * @param Batch $batch
@@ -94,7 +88,6 @@ class GenericIndexerHandler
         ClientInterface $client,
         LoggerInterface $logger,
         IndexOperationInterface $indexOperation,
-        ConvertDataTypesInterface $convertDataTypes,
         IndexerRegistry $indexerRegistry,
         EventManager $eventManager,
         Batch $batch,
@@ -106,7 +99,6 @@ class GenericIndexerHandler
         $this->batch = $batch;
         $this->client = $client;
         $this->indexOperation = $indexOperation;
-        $this->convertDataTypes = $convertDataTypes;
         $this->typeName = $typeName;
         $this->indexIdentifier = $indexIdentifier;
         $this->indexerRegistry = $indexerRegistry;
@@ -148,8 +140,6 @@ class GenericIndexerHandler
                     }
                 }
 
-                $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
-
                 $bulkRequest = $this->indexOperation->createBulk()->updateDocuments(
                     $index->getName(),
                     $this->typeName,
@@ -162,7 +152,7 @@ class GenericIndexerHandler
             }
 
             $this->indexOperation->refreshIndex($index);
-        }  catch (ConnectionDisabledException $exception) {
+        } catch (ConnectionDisabledException $exception) {
             // do nothing, ES indexer disabled in configuration
         }
     }
@@ -189,7 +179,6 @@ class GenericIndexerHandler
                 }
 
                 if (!empty($docs)) {
-                    $docs = $this->convertDataTypes->castFieldsUsingMapping($type, $docs);
                     $bulkRequest = $this->indexOperation->createBulk()->addDocuments(
                         $index->getName(),
                         $this->typeName,
@@ -279,6 +268,8 @@ class GenericIndexerHandler
 
     /**
      * @param BulkResponseInterface $bulkResponse
+     *
+     * @return void
      */
     private function logErrors(BulkResponseInterface $bulkResponse)
     {

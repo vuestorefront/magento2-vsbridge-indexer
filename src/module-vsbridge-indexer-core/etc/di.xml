@@ -18,7 +18,7 @@
 
     <preference for="Divante\VsbridgeIndexerCore\Api\BulkRequestInterface" type="Divante\VsbridgeIndexerCore\Index\BulkRequest"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\BulkResponseInterface" type="Divante\VsbridgeIndexerCore\Index\BulkResponse"/>
-    <preference for="Divante\VsbridgeIndexerCore\Api\ConvertDataTypesInterface" type="Divante\VsbridgeIndexerCore\Index\ConvertDataTypes"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\ConvertValueInterface" type="Divante\VsbridgeIndexerCore\Indexer\ConvertValue"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexInterface" type="Divante\VsbridgeIndexerCore\Index\Index"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexOperationInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperations"/>
 
