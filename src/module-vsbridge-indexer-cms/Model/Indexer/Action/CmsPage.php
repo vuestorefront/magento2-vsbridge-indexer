@@ -76,10 +76,14 @@ class CmsPage
             $cmsPages = $this->resourceModel->loadPages($storeId, $pageIds, $lastPageId);
 
             foreach ($cmsPages as $pageData) {
-                $lastPageId = $pageData['page_id'];
-                $pageData['id'] = $pageData['page_id'];
+                $lastPageId = (int)$pageData['page_id'];
+                $pageData['id'] = $lastPageId;
                 $pageData['content'] = $this->contentProcessor->parse($templateFilter, (string) $pageData['content']);
                 $pageData['active'] = (bool)$pageData['is_active'];
+
+                if (isset($pageData['sort_order'])) {
+                    $pageData['sort_order'] = (int)$pageData['sort_order'];
+                }
 
                 unset($pageData['creation_time'], $pageData['update_time'], $pageData['page_id']);
                 unset($pageData['created_in']);

@@ -32,7 +32,7 @@ class MappingProcessorFactory
     }
 
     /**
-     * @param $instanceName
+     * @param string $instanceName
      *
      * @return mixed
      */

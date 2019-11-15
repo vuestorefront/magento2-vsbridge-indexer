@@ -51,8 +51,12 @@ class Review
                 $review['product_id'] = (int)$review['entity_pk_value'];
                 $review['review_status'] = $review['status_id'];
                 $review['ratings'] = [];
-                unset($review['review_id'], $review['entity_pk_value'], $review['status_id']);
+                unset($review['review_id'], $review['entity_pk_value'], $review['status_id'], $review['store_id']);
                 $lastReviewId = $review['id'];
+
+                if (null !== $review['customer_id']) {
+                    $review['customer_id'] = (int)$review['customer_id'];
+                }
 
                 yield $lastReviewId => $review;
             }
