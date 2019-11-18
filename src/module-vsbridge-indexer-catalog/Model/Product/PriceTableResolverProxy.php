@@ -6,6 +6,8 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
+declare(strict_types = 1);
+
 namespace Divante\VsbridgeIndexerCatalog\Model\Product;
 
 use Magento\Customer\Model\Indexer\CustomerGroupDimensionProvider;
@@ -58,9 +60,9 @@ class PriceTableResolverProxy
      * @param int $websiteId
      * @param int $customerGroupId
      *
-     * @return mixed|string
+     * @return string
      */
-    public function resolve(int $websiteId, int $customerGroupId)
+    public function resolve(int $websiteId, int $customerGroupId): string
     {
         if (class_exists('\Magento\Catalog\Model\Indexer\Product\Price\PriceTableResolver')) {
             $this->createDimensionFactory();
