@@ -97,7 +97,10 @@ class ChildAttributesProcessor
 
             foreach ($priceData as $childId => $priceDataRow) {
                 $allChildren[$childId]['final_price'] = (float)$priceDataRow['final_price'];
-                $allChildren[$childId]['regular_price'] = (float)$priceDataRow['price'];
+
+                if (isset($priceDataRow['price'])) {
+                    $allChildren[$childId]['regular_price'] = (float)$priceDataRow['price'];
+                }
             }
 
             foreach ($allAttributesData as $childId => $attributes) {
