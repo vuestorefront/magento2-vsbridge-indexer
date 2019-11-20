@@ -2,7 +2,12 @@
 
 ## Unreleased
 
-## [1.7.0] (2019.11.14)
+## [1.8.0] (2019.11.20)
+
+### Added
+- Add "final_price" to "configurable_children" ([#151](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/151))
+
+## [1.7.0] (2019.11.15)
 
 ### Changed/Improved
 - Speed up exporting for product/category data. Class `ConvertDataTypes` was removed, converting value to int/float is executed when loading product/category attributes.
