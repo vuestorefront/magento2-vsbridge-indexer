@@ -13,6 +13,7 @@
                 <data_provider name="inventory_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Inventory</data_provider>
                 <data_provider name="configurable_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData</data_provider>
                 <data_provider name="custom_options">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CustomOptions</data_provider>
+                <data_provider name="downloadable_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\DownloadableData</data_provider>
             </data_providers>
         </type>
         <type name="category" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Category">
