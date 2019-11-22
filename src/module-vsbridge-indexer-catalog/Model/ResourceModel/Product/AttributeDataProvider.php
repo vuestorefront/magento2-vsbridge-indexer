@@ -8,13 +8,12 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
+use Divante\VsbridgeIndexerCore\Api\ConvertValueInterface;
+use Divante\VsbridgeIndexerCatalog\Index\Mapping\Product as ProductMapping;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\AbstractEavAttributes;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\EntityManager\MetadataPool;
-use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection;
-use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
-use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Products Attribute provider
@@ -24,48 +23,30 @@ class AttributeDataProvider extends AbstractEavAttributes
 {
 
     /**
-     * @var AttributeCollectionFactory
+     * @var LoadAttributes
      */
-    private $attributeCollectionFactory;
-
-    /**
-     * @var Json
-     */
-    private $serializer;
-
-    /**
-     * Product attributes by id
-     *
-     * @var array
-     */
-    private $attributesById;
-
-    /**
-     * Mapping attribute code to id
-     * @var array
-     */
-    private $attributeCodeToId = [];
+    private $loadAttributes;
 
     /**
      * AttributeDataProvider constructor.
      *
-     * @param Json $serializer
-     * @param AttributeCollectionFactory $attributeCollectionFactory
+     * @param LoadAttributes $loadAttributes
+     * @param ProductMapping $productMapping
      * @param ResourceConnection $resourceConnection
+     * @param ConvertValueInterface $convertValue
      * @param MetadataPool $metadataPool
      * @param string $entityType
      */
     public function __construct(
-        Json $serializer,
-        AttributeCollectionFactory $attributeCollectionFactory,
+        LoadAttributes $loadAttributes,
+        ProductMapping $productMapping,
         ResourceConnection $resourceConnection,
+        ConvertValueInterface $convertValue,
         MetadataPool $metadataPool,
         $entityType = \Magento\Catalog\Api\Data\ProductInterface::class
     ) {
-        $this->serializer = $serializer;
-        $this->attributeCollectionFactory = $attributeCollectionFactory;
-
-        parent::__construct($resourceConnection, $metadataPool, $entityType);
+        $this->loadAttributes = $loadAttributes;
+        parent::__construct($resourceConnection, $metadataPool, $convertValue, $productMapping, $entityType);
     }
 
     /**
@@ -84,13 +65,7 @@ class AttributeDataProvider extends AbstractEavAttributes
      */
     public function getAttributeById($attributeId)
     {
-        $this->initAttributes();
-
-        if (isset($this->attributesById[$attributeId])) {
-            return $this->attributesById[$attributeId];
-        }
-
-        throw new \Magento\Framework\Exception\LocalizedException(__('Attribute not found.'));
+        return $this->loadAttributes->getAttributeById($attributeId);
     }
 
     /**
@@ -101,15 +76,7 @@ class AttributeDataProvider extends AbstractEavAttributes
      */
     public function getAttributeByCode($attributeCode)
     {
-        $this->initAttributes();
-
-        if (isset($this->attributeCodeToId[$attributeCode])) {
-            $attributeId = $this->attributeCodeToId[$attributeCode];
-
-            return $this->attributesById[$attributeId];
-        }
-
-        throw new \Magento\Framework\Exception\LocalizedException(__('Attribute not found.'));
+        return $this->loadAttributes->getAttributeByCode($attributeCode);
     }
 
     /**
@@ -117,45 +84,6 @@ class AttributeDataProvider extends AbstractEavAttributes
      */
     public function initAttributes()
     {
-        if (null === $this->attributesById) {
-            $attributeCollection = $this->getAttributeCollection();
-
-            foreach ($attributeCollection as $attribute) {
-                $this->prepareAttribute($attribute);
-
-                $this->attributesById[$attribute->getId()] = $attribute;
-                $this->attributeCodeToId[$attribute->getAttributeCode()] = $attribute->getId();
-            }
-        }
-
-        return $this->attributesById;
-    }
-
-    /**
-     * @param Attribute $attribute
-     *
-     * @return Attribute
-     */
-    public function prepareAttribute(Attribute $attribute)
-    {
-        $additionalData = (string)$attribute->getData('additional_data');
-
-        if (!empty($additionalData)) {
-            $additionalData = $this->serializer->unserialize($additionalData);
-
-            if (isset($additionalData['swatch_input_type'])) {
-                $attribute->setData('swatch_input_type', $additionalData['swatch_input_type']);
-            }
-        }
-
-        return $attribute;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getAttributeCollection()
-    {
-        return $this->attributeCollectionFactory->create();
+        return $this->loadAttributes->execute();
     }
 }

@@ -96,7 +96,7 @@ class IndexSettings
 
     /**
      * @param StoreInterface $store
-     * 
+     *
      * @return string
      */
     public function getIndexAlias(StoreInterface $store)

@@ -61,7 +61,8 @@ class Prices
     }
 
     /**
-     * @param int   $storeId
+     * Only default customer Group ID (0) is supported now
+     * @param int $storeId
      * @param array $productIds
      *
      * @return array
@@ -72,7 +73,7 @@ class Prices
         $entityIdField = $this->productMetaData->get()->getIdentifierField();
         $websiteId = (int)$this->getStore($storeId)->getWebsiteId();
 
-        // only default customer group Id is supported now
+        // Only default customer Group ID (0) is supported now
         $customerGroupId = 0;
         $priceIndexTableName = $this->getPriceIndexTableName($websiteId, $customerGroupId);
 
@@ -89,7 +90,7 @@ class Prices
             ->where('p.website_id = ?', $websiteId)
             ->where("p.$entityIdField IN (?)", $productIds);
 
-        return $this->getConnection()->fetchAll($select);
+        return $this->getConnection()->fetchAssoc($select);
     }
 
     /**

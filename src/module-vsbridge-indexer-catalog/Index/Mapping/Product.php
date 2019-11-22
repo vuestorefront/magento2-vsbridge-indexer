@@ -6,7 +6,7 @@ use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
 use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\LoadAttributes;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 
 /**
@@ -30,7 +30,7 @@ class Product extends AbstractMapping implements MappingInterface
     private $properties;
 
     /**
-     * @var AttributeDataProvider
+     * @var LoadAttributes
      */
     private $resourceModel;
 
@@ -45,14 +45,14 @@ class Product extends AbstractMapping implements MappingInterface
      * @param EventManager $eventManager
      * @param GeneralMapping $generalMapping
      * @param ConfigurableAttributes $configurableAttributes
-     * @param AttributeDataProvider $resourceModel
+     * @param LoadAttributes $resourceModel
      * @param array $staticFieldMapping
      */
     public function __construct(
         EventManager $eventManager,
         GeneralMapping $generalMapping,
         ConfigurableAttributes $configurableAttributes,
-        AttributeDataProvider $resourceModel,
+        LoadAttributes $resourceModel,
         array $staticFieldMapping
     ) {
         $this->eventManager = $eventManager;
@@ -327,6 +327,6 @@ class Product extends AbstractMapping implements MappingInterface
      */
     public function getAttributes()
     {
-        return $this->resourceModel->getAttributesById();
+        return $this->resourceModel->execute();
     }
 }

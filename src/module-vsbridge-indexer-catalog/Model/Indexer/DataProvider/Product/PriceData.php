@@ -55,12 +55,21 @@ class PriceData implements DataProviderInterface
         $productIds = array_keys($indexData);
         $priceData = $this->resourcePriceModel->loadPriceData($storeId, $productIds);
 
-        foreach ($priceData as $priceDataRow) {
-            $productId = $priceDataRow['entity_id'];
-            $indexData[$productId]['final_price'] = $priceDataRow['final_price'];
-            $indexData[$productId]['regular_price'] = $priceDataRow['price'];
+        foreach ($priceData as $productId => $priceDataRow) {
+            $indexData[$productId]['final_price'] = $this->preparePrice($priceDataRow['final_price']);
+            $indexData[$productId]['regular_price'] = $this->preparePrice($priceDataRow['price']);
         }
 
         return $this->tierPriceProcessor->applyTierGroupPrices($indexData, $storeId);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return float
+     */
+    private function preparePrice($value)
+    {
+        return (float)$value;
     }
 }
