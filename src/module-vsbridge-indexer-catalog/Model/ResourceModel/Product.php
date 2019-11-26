@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -8,14 +8,14 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
-use Divante\VsbridgeIndexerCatalog\Model\ConfigSettings;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Helper as DbHelper;
 use Magento\Framework\DB\Select;
 use Magento\Store\Model\StoreManagerInterface;
-use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 
 /**
  * Class Product
@@ -44,7 +44,7 @@ class Product
     private $attributeDataProvider;
 
     /**
-     * @var ConfigSettings
+     * @var CatalogConfigurationInterface
      */
     private $productSettings;
 
@@ -61,7 +61,7 @@ class Product
     /**
      * Product constructor.
      *
-     * @param ConfigSettings $configSettings
+     * @param CatalogConfigurationInterface $configSettings
      * @param AttributeDataProvider $attributeDataProvider
      * @param ResourceConnection $resourceConnection
      * @param StoreManagerInterface $storeManager
@@ -69,7 +69,7 @@ class Product
      * @param DbHelper $dbHelper
      */
     public function __construct(
-        ConfigSettings $configSettings,
+        CatalogConfigurationInterface $configSettings,
         AttributeDataProvider $attributeDataProvider,
         ResourceConnection $resourceConnection,
         StoreManagerInterface $storeManager,
@@ -97,11 +97,8 @@ class Product
      */
     public function getProducts($storeId = 1, array $productIds = [], $fromId = 0, $limit = 1000)
     {
-        $select = $this->getConnection()->select()
-            ->from(
-                ['entity' => $this->productMetaData->get()->getEntityTable()],
-                $this->getRequiredColumns()
-            );
+        $select = $this->prepareBaseProductSelect($this->getRequiredColumns(), $storeId);
+        $select = $this->addProductTypeFilter($select, $storeId);
 
         if (!empty($productIds)) {
             $select->where('entity.entity_id IN (?)', $productIds);
@@ -110,16 +107,34 @@ class Product
         $select->limit($limit);
         $select->where('entity.entity_id > ?', $fromId);
         $select->order('entity.entity_id ASC');
-        $select = $this->addStatusFilter($select, $storeId);
-        $select = $this->addWebsiteFilter($select, $storeId);
-        $select = $this->addProductTypeFilter($select, $storeId);
 
         return $this->getConnection()->fetchAll($select);
     }
 
     /**
+     * @param array $requiredColumns
+     * @param int $storeId
+     *
+     * @return Select
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function prepareBaseProductSelect(array $requiredColumns, int $storeId)
+    {
+        $select = $this->getConnection()->select()
+            ->from(
+                ['entity' => $this->productMetaData->get()->getEntityTable()],
+                $requiredColumns
+            );
+
+        $select = $this->addStatusFilter($select, $storeId);
+        $select = $this->addWebsiteFilter($select, $storeId);
+
+        return $select;
+    }
+
+    /**
      * @return array
-     * @throws \Exception
      */
     private function getRequiredColumns()
     {
@@ -162,10 +177,7 @@ class Product
             $columns[] = $linkField;
         }
 
-        $select = $this->getConnection()->select()->from(
-            ['entity' => $this->productMetaData->get()->getEntityTable()],
-            $columns
-        );
+        $select = $this->prepareBaseProductSelect($columns, $storeId);
 
         $select->join(
             ['link_table' => $this->resourceConnection->getTableName('catalog_product_super_link')],
@@ -173,13 +185,10 @@ class Product
             []
         );
 
-        $select = $this->addStatusFilter($select, $storeId);
-
         $select->where('link_table.parent_id IN (?)', $parentIds);
         $select->group('entity_id');
 
         $this->dbHelper->addGroupConcatColumn($select, 'parent_ids', 'parent_id');
-        $select = $this->addWebsiteFilter($select, $storeId);
 
         return $this->getConnection()->fetchAll($select);
     }
@@ -252,29 +261,6 @@ class Product
             ->from(['relation' => $relationTable], [])
             ->join(['entity' => $entityTable], $joinCondition, [$metadata->getIdentifierField()])
             ->where('child_id IN(?)', array_map('intval', $childrenIds));
-
-        return $this->getConnection()->fetchCol($select);
-    }
-
-    /**
-     * @param int $storeId
-     * @param array $productIds
-     *
-     * @return array
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function getEnableProductIds($storeId, array $productIds)
-    {
-        $select = $this->getConnection()->select()
-            ->from(['e' => $this->resourceConnection->getTableName('catalog_product_entity')]);
-        $select->where('e.entity_id IN (?)', $productIds);
-        $select->order('e.entity_id ASC');
-        $select = $this->addStatusFilter($select, $storeId);
-        $select = $this->addWebsiteFilter($select, $storeId);
-        $select->reset(Select::COLUMNS);
-        $select->columns(['entity_id']);
 
         return $this->getConnection()->fetchCol($select);
     }

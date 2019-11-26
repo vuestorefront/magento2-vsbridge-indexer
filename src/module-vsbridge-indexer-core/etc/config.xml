@@ -13,15 +13,19 @@
             <es_client>
                 <host>127.0.0.1</host>
                 <port>9200</port>
+                <auth_pwd backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
             </es_client>
             <indices_settings>
                 <batch_indexing_size>1000</batch_indexing_size>
                 <index_name>vue_storefront_magento</index_name>
+                <index_identifier>id</index_identifier>
+                <add_identifier_to_default>1</add_identifier_to_default>
                 <fields_limit>1000</fields_limit>
                 <category_products_update>0</category_products_update>
             </indices_settings>
             <general_settings>
                 <allowed_stores>1</allowed_stores>
+                <enable>0</enable>
             </general_settings>
             <redis_cache_settings>
                 <clear_cache>0</clear_cache>

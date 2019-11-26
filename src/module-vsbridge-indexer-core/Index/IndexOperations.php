@@ -58,7 +58,7 @@ class IndexOperations implements IndexOperationInterface
     /**
      * @var array
      */
-    private $indicesByName;
+    private $indicesByIdentifier;
 
     /**
      * IndexOperations constructor.
@@ -118,7 +118,7 @@ class IndexOperations implements IndexOperationInterface
     {
         $exists = true;
 
-        if (!isset($this->indicesByName[$indexName])) {
+        if (!isset($this->indicesByIdentifier[$indexName])) {
             $exists = $this->client->indexExists($indexName);
         }
 
@@ -130,29 +130,27 @@ class IndexOperations implements IndexOperationInterface
      */
     public function getIndexByName($indexIdentifier, StoreInterface $store)
     {
-        $indexName = $this->getIndexName($store);
+        $indexAlias = $this->indexSettings->getIndexAlias($store);
 
-        if (!isset($this->indicesByName[$indexName])) {
-            if (!$this->indexExists($indexName)) {
+        if (!isset($this->indicesByIdentifier[$indexAlias])) {
+            if (!$this->indexExists($indexAlias)) {
                 throw new \LogicException(
                     "{$indexIdentifier} index does not exist yet."
                 );
             }
 
-            $this->initIndex($indexIdentifier, $store);
+            $this->initIndex($indexIdentifier, $store, true);
         }
 
-        return $this->indicesByName[$indexName];
+        return $this->indicesByIdentifier[$indexAlias];
     }
 
     /**
      * @inheritdoc
      */
-    public function getIndexName(StoreInterface $store)
+    public function getIndexAlias(StoreInterface $store)
     {
-        $name = $this->indexSettings->getIndexNamePrefix();
-
-        return $name . '_' . $store->getId();
+        return $this->indexSettings->getIndexAlias($store);
     }
 
     /**
@@ -160,7 +158,7 @@ class IndexOperations implements IndexOperationInterface
      */
     public function createIndex($indexIdentifier, StoreInterface $store)
     {
-        $index = $this->initIndex($indexIdentifier, $store);
+        $index = $this->initIndex($indexIdentifier, $store, false);
         $this->client->createIndex(
             $index->getName(),
             $this->indexSettings->getEsConfig()
@@ -185,30 +183,55 @@ class IndexOperations implements IndexOperationInterface
     /**
      * @inheritdoc
      */
-    public function deleteIndex($indexIdentifier, StoreInterface $store)
-    {
-        $index = $this->initIndex($indexIdentifier, $store);
-
-        if ($this->client->indexExists($index->getName())) {
-            $this->client->deleteIndex($index->getName());
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function refreshIndex(IndexInterface $index)
     {
         $this->client->refreshIndex($index->getName());
     }
 
     /**
+     * @inheritdoc
+     */
+    public function switchIndexer(string $indexName, string $indexAlias)
+    {
+        $aliasActions   = [
+            [
+                'add' => [
+                    'index' => $indexName,
+                    'alias' => $indexAlias
+                ]
+            ]
+        ];
+
+        $deletedIndices = [];
+        $oldIndices = $this->client->getIndicesNameByAlias($indexAlias);
+
+        foreach ($oldIndices as $oldIndexName) {
+            if ($oldIndexName != $indexName) {
+                $deletedIndices[] = $oldIndexName;
+                $aliasActions[]   = [
+                    'remove' => [
+                        'index' => $oldIndexName,
+                        'alias' => $indexAlias,
+                    ]
+                ];
+            }
+        }
+        
+        $this->client->updateAliases($aliasActions);
+
+        foreach ($deletedIndices as $deletedIndex) {
+            $this->client->deleteIndex($deletedIndex);
+        }
+    }
+
+    /**
      * @param $indexIdentifier
      * @param StoreInterface $store
+     * @param bool $existingIndex
      *
-     * @return mixed
+     * @return Index
      */
-    private function initIndex($indexIdentifier, StoreInterface $store)
+    private function initIndex($indexIdentifier, StoreInterface $store, $existingIndex)
     {
         $this->getIndicesConfiguration();
 
@@ -216,20 +239,29 @@ class IndexOperations implements IndexOperationInterface
             throw new \LogicException('No configuration found');
         }
 
-        $indexName = $this->getIndexName($store);
+        $indexName = $this->indexSettings->createIndexName($store);
+        $indexAlias = $this->indexSettings->getIndexAlias($store);
+
+        if ($existingIndex) {
+            $indexName = $indexAlias;
+        }
+
         $config = $this->indicesConfiguration[$indexIdentifier];
         $types = $config['types'];
 
+        /** @var Index $index */
         $index = $this->indexFactory->create(
             [
                 'name' => $indexName,
+                'newIndex' => !$existingIndex,
+                'identifier' => $indexAlias,
                 'types' => $types,
             ]
         );
 
-        $this->indicesByName[$indexName] = $index;
+        $this->indicesByIdentifier[$indexAlias] = $index;
 
-        return $this->indicesByName[$indexName];
+        return $this->indicesByIdentifier[$indexAlias];
     }
 
     /**

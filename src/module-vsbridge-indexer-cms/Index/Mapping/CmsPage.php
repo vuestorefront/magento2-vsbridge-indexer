@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCms
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -24,11 +24,6 @@ class CmsPage implements MappingInterface
     private $eventManager;
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
      * @var array
      */
     private $textFields = [
@@ -50,22 +45,6 @@ class CmsPage implements MappingInterface
     public function __construct(EventManager $eventManager)
     {
         $this->eventManager = $eventManager;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setType(string $type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 /**
- * @package   magento-2-1.dev
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
+ * @package  Divante\VsbridgeIndexerCatalog
+ * @author Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
+ * @license See LICENSE_DIVANTE.txt for license details.
  */
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
@@ -11,8 +11,8 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
-use Divante\VsbridgeIndexerCatalog\Model\ConfigSettings;
-use Divante\VsbridgeIndexerCatalog\Model\SlugGenerator;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductUrlPathGenerator;
 
 /**
@@ -31,12 +31,12 @@ class AttributeData implements DataProviderInterface
     private $dataFilter;
 
     /**
-     * @var ConfigSettings
+     * @var CatalogConfigurationInterface
      */
     private $settings;
 
     /**
-     * @var SlugGenerator
+     * @var SlugGeneratorInterface
      */
     private $slugGenerator;
 
@@ -48,15 +48,15 @@ class AttributeData implements DataProviderInterface
     /**
      * AttributeData constructor.
      *
-     * @param ConfigSettings $configSettings
-     * @param SlugGenerator\Proxy $slugGenerator
+     * @param CatalogConfigurationInterface $configSettings
+     * @param SlugGeneratorInterface $slugGenerator
      * @param ProductUrlPathGenerator $productUrlPathGenerator
      * @param DataFilter $dataFilter
      * @param AttributeDataProvider $resourceModel
      */
     public function __construct(
-        ConfigSettings $configSettings,
-        SlugGenerator\Proxy $slugGenerator,
+        CatalogConfigurationInterface $configSettings,
+        SlugGeneratorInterface $slugGenerator,
         ProductUrlPathGenerator $productUrlPathGenerator,
         DataFilter $dataFilter,
         AttributeDataProvider $resourceModel
@@ -81,14 +81,7 @@ class AttributeData implements DataProviderInterface
 
         foreach ($attributes as $entityId => $attributesData) {
             $productData = array_merge($indexData[$entityId], $attributesData);
-
-            if ($this->settings->useMagentoUrlKeys()) {
-                $productData['slug'] = $productData['url_key'];
-            } else {
-                $slug = $this->slugGenerator->generate($productData['name'], $entityId);
-                $productData['slug'] = $slug;
-            }
-
+            $productData = $this->applySlug($productData);
             $indexData[$entityId] = $productData;
         }
 
@@ -96,5 +89,31 @@ class AttributeData implements DataProviderInterface
         $indexData = $this->productUrlPathGenerator->addUrlPath($indexData, $storeId);
 
         return $indexData;
+    }
+
+    /**
+     * @param array $productData
+     *
+     * @return array
+     */
+    private function applySlug(array $productData): array
+    {
+        $entityId = $productData['id'];
+
+        if ($this->settings->useMagentoUrlKeys() && isset($productData['url_key'])) {
+            $productData['slug'] = $productData['url_key'];
+        } else {
+            $text = $productData['name'];
+
+            if ($this->settings->useUrlKeyToGenerateSlug() && isset($productData['url_key'])) {
+                $text = $productData['url_key'];
+            }
+
+            $slug = $this->slugGenerator->generate($text, $entityId);
+            $productData['slug'] = $slug;
+            $productData['url_key'] = $slug;
+        }
+
+        return $productData;
     }
 }

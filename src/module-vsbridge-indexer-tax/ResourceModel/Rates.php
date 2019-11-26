@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerTax
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -50,7 +50,7 @@ class Rates
             ->where('tax_calculation_rule_id IN (?)', $ruleIds);
         $select->distinct(true);
 
-        return $this->getConnection()->fetchAssoc($select);
+        return $this->getConnection()->fetchAll($select);
     }
 
     /**

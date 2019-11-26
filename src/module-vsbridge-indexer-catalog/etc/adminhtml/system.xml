@@ -12,10 +12,23 @@
         <section id="vsbridge_indexer_settings">
             <group id="catalog_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Catalog Settings</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
                 <field id="use_magento_url_keys" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Use Short Catalog Urls</label>
-                    <comment>Set base on your setting products.useShortCatalogUrls from vsf. If you change this setting on vsf you have to reindex all product and categories for vsf.</comment>
+                    <label>Use Catalog Url Keys</label>
+                    <comment>Use Magento Url Key attribute for url_key and slug field (for products and categories). Url Keys have to be unique.
+                        IF you select "Yes" slug will be generated base on Magento url_key attribute.
+                    </comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="use_url_key_to_generate_slug" translate="label comment" type="select" sortOrder="45" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Use Magento Url Key and ID to generate slug for VSF</label>
+                    <comment>By default slug (and url_key) is generated base on product/category NAME and ID.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="use_magento_url_keys">0</field>
+                    </depends>
                 </field>
                 <field id="allowed_product_types" translate="label comment" type="multiselect" sortOrder="101" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Types of products to index</label>
@@ -25,8 +38,12 @@
                     </comment>
                     <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ProductType</source_model>
                 </field>
-                <field id="sync_tier_prices" translate="label comment" type="select" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="sync_tier_prices" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Sync Tier Prices</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="add_swatches_to_configurable_options" translate="label comment" type="select" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Add swatches to `product.configurable_options`</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>

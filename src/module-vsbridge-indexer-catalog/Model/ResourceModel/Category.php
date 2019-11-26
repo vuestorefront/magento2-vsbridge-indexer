@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -168,6 +168,28 @@ class Category
         }
 
         return array_unique($parentIds);
+    }
+
+    /**
+     * @param int $categoryId
+     *
+     * @return int[]
+     * @throws \Exception
+     */
+    public function getAllSubCategories(int $categoryId): array
+    {
+        $metaData = $this->categoryMetaData->get();
+        $entityField = $metaData->getIdentifierField();
+        $connection = $this->getConnection();
+        $select = $connection->select()->from(
+            ['entity' => $metaData->getEntityTable()],
+            [$entityField]
+        );
+
+        $catIdExpr = $connection->quote("%/{$categoryId}/%");
+        $select->where("path like {$catIdExpr}");
+
+        return $connection->fetchCol($select);
     }
 
     /**

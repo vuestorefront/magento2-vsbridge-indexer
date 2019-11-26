@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCore
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -28,6 +28,11 @@ class StoreManager
     private $generalSettings;
 
     /**
+     * @var
+     */
+    private $loadedStores = null;
+
+    /**
      * StoreManager constructor.
      *
      * @param GeneralSettings $generalSettings
@@ -47,25 +52,39 @@ class StoreManager
      * @return array|\Magento\Store\Api\Data\StoreInterface[]
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-
     public function getStores($storeId = null)
     {
-        $allowStores = $this->generalSettings->getStoresToIndex();
-        $stores = [];
+        if (null === $this->loadedStores) {
+            $allowStores = $this->generalSettings->getStoresToIndex();
+            $stores = [];
 
-        if (null === $storeId) {
-            $allStores = $this->storeManager->getStores();
+            if (null === $storeId) {
+                $allStores = $this->storeManager->getStores();
 
-            foreach ($allStores as $store) {
+                foreach ($allStores as $store) {
+                    if (in_array($store->getId(), $allowStores)) {
+                        $stores[] = $store;
+                    }
+                }
+            } else {
+                $store = $this->storeManager->getStore($storeId);
+
                 if (in_array($store->getId(), $allowStores)) {
-                    $stores[] = $store;
+                    $stores = [$store];
                 }
             }
-        } elseif (in_array($storeId, $allowStores)) {
-            $store = $this->storeManager->getStore($storeId);
-            $stores = [$store];
+
+            $this->loadedStores = $stores;
         }
 
-        return $stores;
+        return $this->loadedStores;
+    }
+
+    /**
+     * @param array $stores
+     */
+    public function setLoadedStores(array $stores)
+    {
+        $this->loadedStores = $stores;
     }
 }

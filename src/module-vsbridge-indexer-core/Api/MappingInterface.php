@@ -14,18 +14,6 @@ namespace Divante\VsbridgeIndexerCore\Api;
 interface MappingInterface
 {
     /**
-     * @param string $type
-     *
-     * @return $this
-     */
-    public function setType(string $type);
-
-    /**
-     * @return string
-     */
-    public function getType();
-
-    /**
      * @return array
      */
     public function getMappingProperties();

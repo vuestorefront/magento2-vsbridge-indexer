@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -52,9 +52,10 @@ class Product
 
             /** @var array $product */
             foreach ($products as $product) {
-                $lastProductId = $product['entity_id'];
-                $product['id'] = (int)$product['entity_id'];
+                $lastProductId = (int)$product['entity_id'];
+                $product['id'] = $lastProductId;
 
+                $product['attribute_set_id'] = (int)$product['attribute_set_id'];
                 unset($product['required_options']);
                 unset($product['has_options']);
                 yield $lastProductId => $product;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -9,6 +9,8 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Attribute as ResourceModel;
+use Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute as AttributeMapping;
+use Divante\VsbridgeIndexerCore\Api\ConvertValueInterface;
 
 /**
  * Class Attribute
@@ -21,13 +23,30 @@ class Attribute
     private $resourceModel;
 
     /**
+     * @var AttributeMapping
+     */
+    private $attributeMapping;
+
+    /**
+     * @var ConvertValueInterface
+     */
+    private $convertValue;
+
+    /**
      * Attribute constructor.
      *
+     * @param ConvertValueInterface $convertValue
+     * @param AttributeMapping $attributeMapping
      * @param ResourceModel $resourceModel
      */
-    public function __construct(ResourceModel $resourceModel)
-    {
+    public function __construct(
+        ConvertValueInterface $convertValue,
+        AttributeMapping $attributeMapping,
+        ResourceModel $resourceModel
+    ) {
+        $this->convertValue = $convertValue;
         $this->resourceModel = $resourceModel;
+        $this->attributeMapping = $attributeMapping;
     }
 
     /**
@@ -59,8 +78,8 @@ class Attribute
      */
     private function filterData(array $attributeData)
     {
-        if (isset($attributeData['position'])) {
-            $attributeData['position'] = (int)$attributeData['position'];
+        foreach ($attributeData as $key => &$value) {
+            $this->convertValue->execute($this->attributeMapping, $key, $value);
         }
 
         return $attributeData;

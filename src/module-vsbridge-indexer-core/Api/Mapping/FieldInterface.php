@@ -1,6 +1,6 @@
 <?php
 /**
- * @package   magento-2-1.dev
+ * @package   Divante\VsbridgeIndexerCore
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
  * @copyright 2019 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
@@ -17,6 +17,7 @@ interface FieldInterface
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_DOUBLE = 'double';
     const TYPE_INTEGER = 'integer';
+    const TYPE_SHORT = 'short';
     const TYPE_LONG = 'long';
     const TYPE_TEXT = 'text';
     const TYPE_DATE = 'date';

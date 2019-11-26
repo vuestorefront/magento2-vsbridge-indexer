@@ -14,15 +14,26 @@
 
             <group id="general_settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Settings</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable VS Bridge</label>
+                    <comment>Enable to run indexes with Elasticsearch.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="allowed_stores" translate="label comment" type="multiselect" sortOrder="31" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>List of stores to reindex</label>
                     <comment>For every store view separated index is created in Elastic</comment>
                     <source_model>Magento\Config\Model\Config\Source\Store</source_model>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
                 </field>
             </group>
 
             <group id="es_client" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Elasticsearch Client</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
                 <field id="host" translate="label comment" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Elasticsearch host</label>
                 </field>
@@ -45,23 +56,36 @@
                         <field id="enable_http_auth">1</field>
                     </depends>
                 </field>
-                <field id="auth_pwd" translate="label comment" type="text" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="auth_pwd" translate="label comment" type="obscure" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Basic HTTP authentication password</label>
                     <depends>
                         <field id="enable_http_auth">1</field>
                     </depends>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
             </group>
 
             <group id="indices_settings" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Indices Settings</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
                 <field id="batch_indexing_size" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Batch Indexing Size</label>
                     <validate>required-entry validate-digits</validate>
                 </field>
                 <field id="index_name" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Index name prefix</label>
-                    <comment>For each store view, store id will be added to index name, e.g. "vue_storefront_magento_1"</comment>
+                    <label>Index Alias Prefix</label>
+                    <comment>For each store view, store id or code will be added to index alias, e.g. "vue_storefront_magento_1"</comment>
+                </field>
+                <field id="index_identifier" translate="label comment" type="select" sortOrder="250" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Index Identifier</label>
+                    <comment>Choose if the index will append the Store ID or Store Code to the index alias, e.g. "vue_storefront_magento_1" or "vue_storefront_magento_default"</comment>
+                    <source_model>Divante\VsbridgeIndexerCore\Model\Config\Source\IndexIdentifier</source_model>
+                </field>
+                <field id="add_identifier_to_default" translate="label comment" type="select" sortOrder="250" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Add Index Identifier to Default Store View</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="fields_limit" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>The maximum number of fields in an index</label>
@@ -72,6 +96,9 @@
 
             <group id="redis_cache_settings" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="1">
                 <label>Redis Cache Settings</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
                 <field id="clear_cache" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
                     <label>Clear cache</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

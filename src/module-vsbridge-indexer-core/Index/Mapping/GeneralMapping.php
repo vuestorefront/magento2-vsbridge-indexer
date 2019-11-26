@@ -43,6 +43,19 @@ class GeneralMapping
     /**
      * @return array
      */
+    public function getSwatchProperties(): array
+    {
+        return [
+            'properties' => [
+                'value' => ['type' => FieldInterface::TYPE_TEXT],
+                'type' => ['type' => FieldInterface::TYPE_SHORT], // to make it compatible with other fields
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getStockMapping()
     {
         return [
@@ -61,7 +74,6 @@ class GeneralMapping
             'min_qty' => ['type' => FieldInterface::TYPE_DOUBLE],
             'min_sale_qty' => ['type' => FieldInterface::TYPE_DOUBLE],
             'notify_stock_qty' => ['type' => FieldInterface::TYPE_DOUBLE],
-            'product_id' => ['type' => FieldInterface::TYPE_LONG],
             'qty' => ['type' => FieldInterface::TYPE_DOUBLE],
             'qty_increments' => ['type' => FieldInterface::TYPE_DOUBLE],
             'stock_id' => ['type' => FieldInterface::TYPE_LONG],
