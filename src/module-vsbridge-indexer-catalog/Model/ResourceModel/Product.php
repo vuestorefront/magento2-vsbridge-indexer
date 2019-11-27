@@ -144,6 +144,7 @@ class Product
             'attribute_set_id',
             'type_id',
             'sku',
+            'updated_at'
         ];
 
         $linkField = $productMetaData->getLinkField();
