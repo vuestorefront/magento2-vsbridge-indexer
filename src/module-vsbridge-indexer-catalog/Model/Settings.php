@@ -67,6 +67,14 @@ class Settings implements CatalogConfigurationInterface
         return (bool) $this->getConfigParam('use_url_key_to_generate_slug');
     }
 
+    /***
+     * @inheritdoc
+     */
+    public function useCatalogRules()
+    {
+        return (bool) $this->getConfigParam('use_catalog_rules');
+    }
+
     /**
      * @inheritdoc
      */

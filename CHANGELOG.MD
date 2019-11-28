@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## [1.8.1] (2019.11.28)
+
+### Fixes
+- export catalog rule prices for Magento <= 2.2.4
+- export update_at field for products
+
 ## [1.8.0] (2019.11.20)
 
 ### Added

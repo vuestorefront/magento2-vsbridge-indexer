@@ -28,6 +28,11 @@ interface CatalogConfigurationInterface
     /**
      * @return bool
      */
+    public function useCatalogRules();
+
+    /**
+     * @return bool
+     */
     public function syncTierPrices();
 
     /**
@@ -43,7 +48,6 @@ interface CatalogConfigurationInterface
     public function getAllowedProductTypes($storeId);
 
     /**
-     *
      * @return array
      * @throws \Exception
      */
