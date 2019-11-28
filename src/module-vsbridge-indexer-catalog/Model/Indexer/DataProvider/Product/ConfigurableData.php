@@ -248,8 +248,11 @@ class ConfigurableData implements DataProviderInterface
                 $areChildInStock = 1;
             }
 
-            $childPrice[] = $child['price'];
-            $finalPrice[] = $child['final_price'] ?? $child['final_price'] ?? $child['price'];
+            $childHasPrice = $this->hasPrice($child);
+            if ($childHasPrice) {
+                $childPrice[] = $child['price'];
+                $finalPrice[] = $child['final_price'] ?? $child['final_price'] ?? $child['price'];
+            }
         }
 
         if (!$hasPrice && !empty($childPrice)) {
