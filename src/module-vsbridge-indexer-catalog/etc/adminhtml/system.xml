@@ -46,6 +46,11 @@
                     <label>Add swatches to `product.configurable_options`</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="use_catalog_rules" type="select" translate="label comment" sortOrder="350" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Apply catalog price rules in `final_price`</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If you use Catalog Prices Rules and Magento 2.2.4 (or previous version) set option to Yes.</comment>
+                </field>
             </group>
         </section>
     </system>

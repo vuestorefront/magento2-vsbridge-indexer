@@ -248,15 +248,20 @@ class ConfigurableData implements DataProviderInterface
                 $areChildInStock = 1;
             }
 
-            $childPrice[] = $child['price'];
-            $finalPrice[] = $child['final_price'] ?? $child['final_price'] ?? $child['price'];
+            if (isset($child['price'])) {
+                $childPrice[] = $child['price'];
+                $finalPrice[] = $child['final_price'] ?? $child['final_price'] ?? $child['price'];
+            }
         }
 
-        if (!$hasPrice && !empty($childPrice)) {
-            $minPrice = min($childPrice);
-            $productDTO['price'] = $minPrice;
-            $productDTO['final_price'] = min($finalPrice);
-            $productDTO['regular_price'] = $minPrice;
+        if (!empty($childPrice)) {
+            $productDTO['final_price'] = min(min($finalPrice), $productDTO['final_price']);
+
+            if (!$hasPrice) {
+                $minPrice = min($childPrice);
+                $productDTO['price'] = $minPrice;
+                $productDTO['regular_price'] = $minPrice;
+            }
         }
 
         $isInStock = $productDTO['stock']['is_in_stock'];
