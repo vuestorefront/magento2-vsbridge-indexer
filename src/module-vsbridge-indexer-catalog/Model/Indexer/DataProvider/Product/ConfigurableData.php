@@ -181,6 +181,7 @@ class ConfigurableData implements DataProviderInterface
 
     /**
      * Apply attributes to product variants + extra options for products necessary for vsf
+     *
      * @param array $productDTO
      * @param int $storeId
      *
@@ -211,7 +212,7 @@ class ConfigurableData implements DataProviderInterface
             $values = [];
 
             foreach ($options as $option) {
-                $values[] = (int)$option['value'];
+                $values[] = (int) $option['value'];
                 $optionValue = [
                     'value_index' => $option['value'],
                     'label' => $option['label'],
@@ -255,7 +256,9 @@ class ConfigurableData implements DataProviderInterface
         }
 
         if (!empty($childPrice)) {
-            $productDTO['final_price'] = min(min($finalPrice), $productDTO['final_price']);
+            $finalPrice = min($finalPrice);
+            $productDTO['final_price'] =
+                isset($productDTO['final_price']) ? min($finalPrice, $productDTO['final_price']) : $finalPrice;
 
             if (!$hasPrice) {
                 $minPrice = min($childPrice);
@@ -291,7 +294,7 @@ class ConfigurableData implements DataProviderInterface
                 return false;
             }
 
-            if (0 === (int)$product[$field]) {
+            if (0 === (int) $product[$field]) {
                 return false;
             }
         }
