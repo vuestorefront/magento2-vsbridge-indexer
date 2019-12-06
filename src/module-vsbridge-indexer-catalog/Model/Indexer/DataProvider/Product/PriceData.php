@@ -61,6 +61,11 @@ class PriceData implements DataProviderInterface
             if (isset($priceDataRow['price'])) {
                 $indexData[$productId]['regular_price'] = $this->preparePrice($priceDataRow['price']);
             }
+
+            if ($this->preparePrice($indexData[$productId]['regular_price']) >= $this->preparePrice($indexData[$productId]['final_price'])) {
+                $indexData[$productId]['special_price'] = $this->preparePrice($indexData[$productId]['final_price']);
+                $indexData[$productId]['specialPriceInclTax'] = $this->preparePrice($indexData[$productId]['special_price']);
+            }
         }
 
         return $this->tierPriceProcessor->applyTierGroupPrices($indexData, $storeId);

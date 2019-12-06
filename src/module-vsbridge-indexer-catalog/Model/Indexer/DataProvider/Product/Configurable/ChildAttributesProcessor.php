@@ -100,6 +100,10 @@ class ChildAttributesProcessor
 
                 if (isset($priceDataRow['price'])) {
                     $allChildren[$childId]['regular_price'] = (float)$priceDataRow['price'];
+
+                    if ($allChildren[$childId]['regular_price'] >= $allChildren[$childId]['final_price']) {
+                        $allChildren[$childId]['special_price'] = $allChildren[$childId]['final_price'];
+                    }
                 }
             }
 
