@@ -70,8 +70,8 @@ class CmsPage implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         $stores = $this->storeManager->getStores();
 
         foreach ($stores as $store) {
+            $this->indexHandler->createIndex($store);
             $this->indexHandler->saveIndex($this->cmsPageAction->rebuild($store->getId()), $store);
-            $this->indexHandler->cleanUpByTransactionKey($store);
         }
     }
 

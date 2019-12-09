@@ -15,15 +15,17 @@ Sign up for a demo at https://vuestorefront.io/ (Vue Storefront integrated with 
 
 ## Overview
 
-### Version 1.5.0/1.5.1 - support for aliases.
-Command ` php bin/magento vsbridge:reindex --all` will reindex all data to new index.
-It will create new index and update aliases at the end.
+<strong> Which version should I use ? </strong> 
 
-If you used previous versions, you will have to delete index (created with this extension) from ES manually:
-If you won't do that, you will get error when running
-`"error":{"root_cause":[{"type":"invalid_alias_name_exception","reason":"Invalid alias name [vue_storefront_magento_1], an index exists with the same name as the alias"`
+If you want to use elasticsearch 6 or 7 install version 2.*
+
+If you use elasticsearch 5 please install version 1.* 
+
+<strong>Upgrade note from 1.* to 2.* available [here](docs/Upgrade.md) </strong>
+
 
 ## Installation/Getting Started
+
 
 - Install with composer
 ```json
@@ -91,55 +93,26 @@ Configure the module in Magento panel and run full indexation.
    *Example with Store ID*   
     
    VSF config (base on default index prefix name: vue_storefront_magento)
+   *Index Name Prefix* → define prefixes for ElasticSearch indexes. The panel allows adding prefix only to the catalog name e.g.: *vue_storefront_catalog*.
    
-   "vue_storefront_magento_1" - index for store view with id 1
-   ```json
-   "elasticsearch": {
-     "httpAuth": "",
-     "host": "localhost:8080/api/catalog",
-     "index": "vue_storefront_magento_1" 
-   }
-   ```   
+   *Index Identifier* → defines the unique store identifier to append to the ElasticSearch indexes. The default value is ID which will append the Store ID to the index name.
    
-   VSF-API config
-   
-```json
-  "elasticsearch": {
-    "host": "localhost",
-    "port": 9200,
-    "user": "elastic",
-    "password": "changeme",
-    "indices": [
-      "vue_storefront_magento_1" 
-    ],
-```
+   *Add Index Identifier to Default Store View* → defines if we should add Index Identifier to Magento Default Store View. Select "No" - to make it compatible with [mage2vuestorefront](https://github.com/DivanteLtd/mage2vuestorefront/) import. 
 
-   *Example with Store Code*
-    
-   VSF config (base on default index prefix name: vue_storefront_magento)
+   For each store (store view) and type, new index will be created.
+   If you set "Add Index Identifier to Default Store View" to "No" you will have:
+   `vue_storefront_catalog_cms_block`, `vue_storefront_catalog_category`, `vue_storefront_catalog_review`, 
+      `vue_storefront_catalog_taxrule`, `vue_storefront_catalog_cms_page`, `vue_storefront_catalog_attribute`
+      `vue_storefront_catalog_product`
    
-   "vue_storefront_magento_en_us" - index for store view with code "en_us"
-```json
-"elasticsearch": {
-    "httpAuth": "",
-    "host": "localhost:8080/api/catalog",
-    "index": "vue_storefront_magento_en_us" 
-}
-```
+   otherwise:
+       
+   `vue_storefront_catalog_1_taxrule`, `vue_storefront_catalog_1_cms_block`, `vue_storefront_catalog_1_product`, 
+   `vue_storefront_catalog_1_review`, `vue_storefront_catalog_1_cms_page`, `vue_storefront_catalog_1_category`
+   `vue_storefront_catalog_1_attribute`
+   
+   You can check list of aliases with `[ELASTICSEARCH_HOST]/_cat/aliases`
 
-   VSF-API config   
-    
-```json
-  "elasticsearch": {
-    "host": "localhost",
-    "port": 9200,
-    "user": "elastic",
-    "password": "changeme",
-    "indices": [
-      "vue_storefront_magento_en_us"
-    ],
-}
-```
 
 ### Running the full indexation:
 There are two options to run full indexations
@@ -193,13 +166,8 @@ Note: If a docker with ElasticSearch is disabled, Indexer will display error: "N
 -- Vue Storefront >= 1.4.4
 Module was tested on:
  -- Magento Community version 2.2.7. It should perform without any issues on Magento 2.2.* and above versions.
-  
  -- Magento Commerce version 2.3.0. The bridge indexer cannot be installed on lower versions of Magento Enterprise.
- 
- -- You can install module on Magento 2.3.* Commerce, but you still need `ES 5.*` to export data.
-  Module will work with library [elasticsearch/elastichserach](https://github.com/elastic/elasticsearch/) (`5.*`, `6.*`)
    
-
 
 ### TODO
 - add a limitation of the attributes (categories) sent to ElasticSearch

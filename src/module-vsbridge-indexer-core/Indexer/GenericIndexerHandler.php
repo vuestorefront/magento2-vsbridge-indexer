@@ -9,13 +9,11 @@
 namespace Divante\VsbridgeIndexerCore\Indexer;
 
 use Divante\VsbridgeIndexerCore\Api\BulkLoggerInterface;
-use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexInterface;
 use Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface;
 use Divante\VsbridgeIndexerCore\Api\Indexer\TransactionKeyInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
-use Divante\VsbridgeIndexerCore\Model\IndexerRegistry;
 use Exception;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Store\Api\Data\StoreInterface;
@@ -39,16 +37,6 @@ class GenericIndexerHandler
     private $indexOperationProvider;
 
     /**
-     * @var IndexerRegistry
-     */
-    private $indexerRegistry;
-
-    /**
-     * @var string
-     */
-    private $typeName;
-
-    /**
      * @var string
      */
     private $indexIdentifier;
@@ -68,28 +56,22 @@ class GenericIndexerHandler
      *
      * @param BulkLoggerInterface $bulkLogger
      * @param IndexOperationProviderInterface $indexOperationProvider
-     * @param IndexerRegistry $indexerRegistry
      * @param Batch $batch
      * @param TransactionKeyInterface $transactionKey
      * @param string $indexIdentifier
-     * @param string $typeName
      */
     public function __construct(
         BulkLoggerInterface $bulkLogger,
         IndexOperationProviderInterface $indexOperationProvider,
-        IndexerRegistry $indexerRegistry,
         Batch $batch,
         TransactionKeyInterface $transactionKey,
-        string $indexIdentifier,
-        string $typeName
+        string $indexIdentifier
     ) {
         $this->bulkLogger = $bulkLogger;
         $this->batch = $batch;
         $this->indexOperationProvider = $indexOperationProvider;
-        $this->typeName = $typeName;
         $this->indexIdentifier = $indexIdentifier;
-        $this->indexerRegistry = $indexerRegistry;
-        $this->transactionKey = $transactionKey->load();
+        $this->transactionKey = $transactionKey;
     }
 
     /**
@@ -105,10 +87,9 @@ class GenericIndexerHandler
     {
         try {
             $index = $this->getIndex($store);
-            $type = $index->getType($this->typeName);
             $dataProviders = [];
 
-            foreach ($type->getDataProviders() as $name => $dataProvider) {
+            foreach ($index->getDataProviders() as $name => $dataProvider) {
                 if (in_array($name, $requireDataProvides)) {
                     $dataProviders[] = $dataProvider;
                 }
@@ -121,7 +102,7 @@ class GenericIndexerHandler
             $storeId = (int)$store->getId();
 
             foreach ($this->batch->getItems($documents, $this->getBatchSize($storeId)) as $docs) {
-                /** @var DataProviderInterface $datasource */
+                /** @var \Divante\VsbridgeIndexerCore\Api\DataProviderInterface $datasource */
                 foreach ($dataProviders as $datasource) {
                     if (!empty($docs)) {
                         $docs = $datasource->addData($docs, $storeId);
@@ -130,7 +111,7 @@ class GenericIndexerHandler
 
                 $bulkRequest = $this->getIndexOperation($store->getId())->createBulk()->updateDocuments(
                     $index->getName(),
-                    $this->typeName,
+                    $index->getType(),
                     $docs
                 );
 
@@ -157,12 +138,10 @@ class GenericIndexerHandler
     {
         try {
             $index = $this->getIndex($store);
-            $type = $index->getType($this->typeName);
-
             $storeId = (int)$store->getId();
 
             foreach ($this->batch->getItems($documents, $this->getBatchSize($storeId)) as $docs) {
-                foreach ($type->getDataProviders() as $dataProvider) {
+                foreach ($index->getDataProviders() as $dataProvider) {
                     if (!empty($docs)) {
                         $docs = $dataProvider->addData($docs, $storeId);
                     }
@@ -171,7 +150,7 @@ class GenericIndexerHandler
                 if (!empty($docs)) {
                     $bulkRequest = $this->getIndexOperation($store->getId())->createBulk()->addDocuments(
                         $index->getName(),
-                        $this->typeName,
+                        $index->getType(),
                         $docs
                     );
 
@@ -182,7 +161,7 @@ class GenericIndexerHandler
                 $docs = null;
             }
 
-            if ($index->isNew() && !$this->indexerRegistry->isFullReIndexationRunning()) {
+            if ($index->isNew()) {
                 $this->getIndexOperation($store->getId())->switchIndexer($index->getName(), $index->getIdentifier());
             }
 
@@ -207,7 +186,7 @@ class GenericIndexerHandler
 
             if ($this->getIndexOperation($store->getId())->indexExists($indexAlias)) {
                 $index = $this->getIndexOperation($store->getId())->getIndexByName($this->indexIdentifier, $store);
-                $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey]]];
+                $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey->load()]]];
                 $query = ['query' => ['bool' => $transactionKeyQuery]];
 
                 if ($docIds) {
@@ -216,7 +195,7 @@ class GenericIndexerHandler
 
                 $query = [
                     'index' => $index->getName(),
-                    'type' => $this->typeName,
+                    'type' => $index->getType(),
                     'body' => $query,
                 ];
 
@@ -258,6 +237,16 @@ class GenericIndexerHandler
     }
 
     /**
+     * @param StoreInterface $store
+     *
+     * @return IndexInterface
+     */
+    public function createIndex(StoreInterface $store)
+    {
+        return $this->getIndexOperation($store->getId())->createIndex($this->indexIdentifier, $store);
+    }
+
+    /**
      * Get Index operations
      *
      * @param int $storeId
@@ -274,8 +263,8 @@ class GenericIndexerHandler
      *
      * @return string
      */
-    public function getTypeName()
+    public function getIndexIdentifier()
     {
-        return $this->typeName;
+        return $this->indexIdentifier;
     }
 }

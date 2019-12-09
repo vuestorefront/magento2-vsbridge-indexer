@@ -58,23 +58,25 @@ class IndexSettings
     public function getEsConfig()
     {
         return [
-            'index.mapping.total_fields.limit' => $this->settingConfig->getFieldsLimit(),
-            'analysis' => [
-                'analyzer' => [
-                    'autocomplete' => [
-                        'tokenizer' => 'autocomplete',
-                        'filter' => ['lowercase'],
+            'settings' => [
+                'index.mapping.total_fields.limit' => $this->settingConfig->getFieldsLimit(),
+                'analysis' => [
+                    'analyzer' => [
+                        'autocomplete' => [
+                            'tokenizer' => 'autocomplete',
+                            'filter' => ['lowercase']
+                        ],
+                        'autocomplete_search' => [
+                            'tokenizer'=> 'lowercase'
+                        ]
                     ],
-                    'autocomplete_search' => [
-                        'tokenizer'=> 'lowercase'
-                    ]
-                ],
-                'tokenizer' => [
-                    'autocomplete' => [
-                        'type' => 'edge_ngram',
-                        'min_gram' => 2,
-                        'max_gram' => 10,
-                        'token_chars' => ['letter'],
+                    'tokenizer'=> [
+                        'autocomplete' => [
+                            'type'=> 'edge_ngram',
+                            'min_gram'=> 2,
+                            'max_gram'=> 10,
+                            'token_chars'=> ['letter']
+                        ]
                     ]
                 ]
             ]
@@ -83,12 +85,13 @@ class IndexSettings
 
     /**
      * @param StoreInterface $store
+     * @param string $indexIdentifier
      *
      * @return string
      */
-    public function createIndexName(StoreInterface $store)
+    public function createIndexName(StoreInterface $store, string $indexIdentifier)
     {
-        $name = $this->getIndexAlias($store);
+        $name = $this->getIndexAlias($store, $indexIdentifier);
         $currentDate = new \DateTime();
 
         return $name . '_' . $currentDate->getTimestamp();
@@ -96,10 +99,11 @@ class IndexSettings
 
     /**
      * @param StoreInterface $store
+     * @param string $indexIdentifier
      *
      * @return string
      */
-    public function getIndexAlias(StoreInterface $store)
+    public function getIndexAlias(StoreInterface $store, string $indexIdentifier)
     {
         $indexNamePrefix = $this->getIndexNamePrefix();
         $storeIdentifier = $this->getStoreIdentifier($store);
@@ -108,7 +112,7 @@ class IndexSettings
             $indexNamePrefix .= '_' . $storeIdentifier;
         }
 
-        return strtolower($indexNamePrefix);
+        return strtolower($indexNamePrefix . '_' . $indexIdentifier);
     }
 
     /**

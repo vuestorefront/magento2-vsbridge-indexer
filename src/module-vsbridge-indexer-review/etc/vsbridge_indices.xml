@@ -1,10 +1,8 @@
 <indices xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Divante_VsbridgeIndexerCore:etc/vsbridge_indices.xsd">
-    <index identifier="vue_storefront_catalog">
-        <type name="review" mapping="Divante\VsbridgeIndexerReview\Index\Mapping\Review">
-            <data_providers>
-                <data_provider name="ratings">Divante\VsbridgeIndexerReview\Model\Indexer\DataProvider\Ratings</data_provider>
-            </data_providers>
-        </type>
+    <index identifier="review" mapping="Divante\VsbridgeIndexerReview\Index\Mapping\Review">
+        <data_providers>
+            <data_provider name="ratings">Divante\VsbridgeIndexerReview\Model\Indexer\DataProvider\Ratings</data_provider>
+        </data_providers>
     </index>
 </indices>

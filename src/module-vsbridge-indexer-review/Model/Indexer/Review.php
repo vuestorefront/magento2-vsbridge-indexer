@@ -71,8 +71,8 @@ class Review implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fra
         $stores = $this->storeManager->getStores();
 
         foreach ($stores as $store) {
+            $this->indexHandler->createIndex($store);
             $this->indexHandler->saveIndex($this->action->rebuild((int)$store->getId()), $store);
-            $this->indexHandler->cleanUpByTransactionKey($store);
         }
     }
 

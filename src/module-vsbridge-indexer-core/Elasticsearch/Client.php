@@ -16,6 +16,7 @@ use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
  */
 class Client implements ClientInterface
 {
+
     /**
      * @var \Elasticsearch\Client
      */
@@ -105,9 +106,9 @@ class Client implements ClientInterface
     {
         $this->getClient()->indices()->putMapping(
             [
+                'include_type_name' => false,
                 'index' => $indexName,
-                'type'  => $type,
-                'body'  => [$type => $mapping],
+                'body'  => $mapping,
             ]
         );
     }

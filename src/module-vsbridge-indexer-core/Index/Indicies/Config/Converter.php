@@ -9,6 +9,7 @@
 namespace Divante\VsbridgeIndexerCore\Index\Indicies\Config;
 
 use Magento\Framework\Config\ConverterInterface;
+use Magento\Framework\View\Asset\NotationResolver\Variable;
 
 /**
  * Class Converter
@@ -28,7 +29,7 @@ class Converter implements ConverterInterface
     /**
      *
      */
-    const TYPE_NODE_TYPE = 'type';
+    const DATA_PROVIDERS_NODE_TYPE = 'data_providers';
 
     /**
      *
@@ -65,40 +66,22 @@ class Converter implements ConverterInterface
      */
     private function parseIndexConfig(\DOMXPath $xpath, \DOMNode $indexRootNode)
     {
-        $indexConfig = ['types' => []];
-        $typesSearchPath = sprintf('%s', self::TYPE_NODE_TYPE);
-        $xpath->query($typesSearchPath, $indexRootNode);
+        $datasources = $this->parseDataProviders($xpath, $indexRootNode);
+        $mapping = $this->parseMapping($xpath, $indexRootNode);
 
-        foreach ($xpath->query($typesSearchPath, $indexRootNode) as $typeNode) {
-            $typeParams = $this->parseTypeConfig($xpath, $typeNode);
-            $indexConfig['types'][$typeNode->getAttribute('name')] = $typeParams;
-        }
+        $indexConfig = [
+            'data_providers' => $datasources,
+            'mapping' => $mapping,
+        ];
 
         return $indexConfig;
     }
 
-    /**
-     * Parse type node configuration.
-     *
-     * @param \DOMXPath $xpath XPath access to the document parsed.
-     * @param \DOMNode $typeRootNode Type node to be parsed.
-     *
-     * @return array
-     */
-    private function parseTypeConfig(\DOMXPath $xpath, \DOMNode $typeRootNode)
+    private function parseMapping(\DOMXPath $xpath, \DOMNode $typeRootNode)
     {
-        $datasources = $this->parseDataProviders($xpath, $typeRootNode);
-        $mapping = $typeRootNode->getAttribute('mapping');
-        $mappingOptions = [];
+        $mapping = (string)$typeRootNode->getAttribute('mapping');
 
-        if ($mapping) {
-            $mappingOptions[] = $mapping;
-        }
-
-        return [
-            'mapping' => $mappingOptions,
-            'data_providers' => $datasources,
-        ];
+        return $mapping;
     }
 
     /**
@@ -111,12 +94,12 @@ class Converter implements ConverterInterface
      */
     private function parseDataProviders(\DOMXPath $xpath, \DOMNode $typeRootNode)
     {
-        $datasources = [];
+        $dataProviders = [];
 
-        foreach ($xpath->query(self::DATA_PROVIDERS_PATH, $typeRootNode) as $datasourceNode) {
-            $datasources[$datasourceNode->getAttribute('name')] = $datasourceNode->nodeValue;
+        foreach ($xpath->query(self::DATA_PROVIDERS_PATH, $typeRootNode) as $dataProviderNode) {
+            $dataProviders[$dataProviderNode->getAttribute('name')] = $dataProviderNode->nodeValue;
         }
 
-        return $datasources;
+        return $dataProviders;
     }
 }
