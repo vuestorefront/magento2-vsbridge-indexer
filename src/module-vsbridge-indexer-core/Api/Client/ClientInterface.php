@@ -15,6 +15,8 @@ use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
  */
 interface ClientInterface
 {
+    const ES_DUMMY_TYPE_NAME = '_doc';
+
     /**
      * @param array $bulkParams
      *

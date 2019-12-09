@@ -9,7 +9,8 @@
 namespace Divante\VsbridgeIndexerCore\Index;
 
 use Divante\VsbridgeIndexerCore\Api\IndexInterface;
-use Divante\VsbridgeIndexerCore\Api\Index\TypeInterface;
+use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
+use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 
 /**
  * Class Index
@@ -24,12 +25,20 @@ class Index implements IndexInterface
      */
     private $name;
 
+
     /**
-     * Index types.
+     * Type mapping.
      *
-     * @var \Divante\VsbridgeIndexerCore\Api\Index\TypeInterface[]
+     * @var
      */
-    private $types;
+    private $mapping;
+
+    /**
+     * Type dataProviders.
+     *N
+     * @var
+     */
+    private $dataProviders;
 
     /**
      * @var string
@@ -44,21 +53,24 @@ class Index implements IndexInterface
     /**
      * Index constructor.
      *
-     * @param string $name
+     * @param string $name Index name
+     * @param string $newIndex
      * @param string $identifier
-     * @param bool $newIndex
-     * @param array $types
+     * @param DataProviderInterface[] $dataProviders index data providers
+     * @param MappingInterface|null mapping
      */
     public function __construct(
         string $name,
-        string $identifier,
         bool $newIndex,
-        array $types
+        string $identifier,
+        array $dataProviders,
+        MappingInterface $mapping = null
     ) {
-        $this->newIndex = $newIndex;
         $this->name = $name;
+        $this->newIndex = $newIndex;
         $this->identifier = $identifier;
-        $this->types = $this->prepareTypes($types);
+        $this->mapping = $mapping;
+        $this->dataProviders = $dataProviders;
     }
 
     /**
@@ -78,22 +90,6 @@ class Index implements IndexInterface
     }
 
     /**
-     * @param TypeInterface[] $types
-     *
-     * @return TypeInterface[]
-     */
-    private function prepareTypes($types)
-    {
-        $preparedTypes = [];
-
-        foreach ($types as $type) {
-            $preparedTypes[$type->getName()] = $type;
-        }
-
-        return $preparedTypes;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getName()
@@ -102,22 +98,26 @@ class Index implements IndexInterface
     }
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function getTypes()
+    public function getType()
     {
-        return $this->types;
+        return \Divante\VsbridgeIndexerCore\Api\Client\ClientInterface::ES_DUMMY_TYPE_NAME;
     }
 
     /**
      * @inheritdoc
      */
-    public function getType($typeName)
+    public function getMapping()
     {
-        if (!isset($this->types[$typeName])) {
-            throw new \InvalidArgumentException("Type $typeName is not available in index.");
-        }
+        return $this->mapping;
+    }
 
-        return $this->types[$typeName];
+    /**
+     * @inheritdoc
+     */
+    public function getDataProviders()
+    {
+        return $this->dataProviders;
     }
 }

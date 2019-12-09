@@ -70,7 +70,7 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
             $storeId = $store->getId();
             $this->indexHandler->saveIndex($this->productAction->rebuild($storeId, $ids), $store);
             $this->indexHandler->cleanUpByTransactionKey($store, $ids);
-            $this->cacheProcessor->cleanCacheByDocIds($storeId, $this->indexHandler->getTypeName(), $ids);
+            $this->cacheProcessor->cleanCacheByDocIds($storeId, $this->indexHandler->getIndexIdentifier(), $ids);
         }
     }
 
@@ -82,9 +82,9 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         $stores = $this->storeManager->getStores();
 
         foreach ($stores as $store) {
+            $this->indexHandler->createIndex($store);
             $this->indexHandler->saveIndex($this->productAction->rebuild($store->getId()), $store);
-            $this->indexHandler->cleanUpByTransactionKey($store);
-            $this->cacheProcessor->cleanCacheByTags($store->getId(), [$this->indexHandler->getTypeName()]);
+            $this->cacheProcessor->cleanCacheByTags($store->getId(), [$this->indexHandler->getIndexIdentifier()]);
         }
     }
 

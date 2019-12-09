@@ -70,8 +70,8 @@ class CmsBlock implements \Magento\Framework\Indexer\ActionInterface, \Magento\F
         $stores = $this->storeManager->getStores();
 
         foreach ($stores as $store) {
+            $this->indexHandler->createIndex($store);
             $this->indexHandler->saveIndex($this->cmsBlockAction->rebuild($store->getId()), $store);
-            $this->indexHandler->cleanUpByTransactionKey($store);
         }
     }
 

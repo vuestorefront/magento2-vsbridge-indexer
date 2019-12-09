@@ -72,8 +72,8 @@ class Attribute implements \Magento\Framework\Indexer\ActionInterface, \Magento\
         $stores = $this->storeManager->getStores();
 
         foreach ($stores as $store) {
+            $this->indexHandler->createIndex($store);
             $this->indexHandler->saveIndex($this->attributeAction->rebuild(), $store);
-            $this->indexHandler->cleanUpByTransactionKey($store);
         }
     }
 

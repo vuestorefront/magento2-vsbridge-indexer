@@ -1,29 +1,29 @@
 <indices xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Divante_VsbridgeIndexerCore:etc/vsbridge_indices.xsd">
 
-    <index identifier="vue_storefront_catalog">
-        <type name="product" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Product">
-            <data_providers>
-                <data_provider name="attributes">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\AttributeData</data_provider>
-                <data_provider name="bundle_options_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\BundleOptionsData</data_provider>
-                <data_provider name="category_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CategoryData</data_provider>
-                <data_provider name="price_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\PriceData</data_provider>
-                <data_provider name="media_gallery">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\MediaGalleryData</data_provider>
-                <data_provider name="link_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ProductLinksData</data_provider>
-                <data_provider name="inventory_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Inventory</data_provider>
-                <data_provider name="configurable_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData</data_provider>
-                <data_provider name="custom_options">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CustomOptions</data_provider>
-            </data_providers>
-        </type>
-        <type name="category" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Category">
-            <data_providers>
-                <data_provider name="category_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category\AttributeData</data_provider>
-            </data_providers>
-        </type>
-        <type name="attribute" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute">
-            <data_providers>
-                <data_provider name="options">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Attribute\Options</data_provider>
-            </data_providers>
-        </type>
+    <index identifier="product" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Product">
+        <data_providers>
+            <data_provider name="attributes">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\AttributeData</data_provider>
+            <data_provider name="bundle_options_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\BundleOptionsData</data_provider>
+            <data_provider name="category_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CategoryData</data_provider>
+            <data_provider name="price_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\PriceData</data_provider>
+            <data_provider name="media_gallery">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\MediaGalleryData</data_provider>
+            <data_provider name="link_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ProductLinksData</data_provider>
+            <data_provider name="inventory_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Inventory</data_provider>
+            <data_provider name="configurable_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData</data_provider>
+            <data_provider name="custom_options">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CustomOptions</data_provider>
+        </data_providers>
+    </index>
+
+    <index identifier="category" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Category">
+        <data_providers>
+            <data_provider name="category_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category\AttributeData</data_provider>
+        </data_providers>
+    </index>
+
+    <index identifier="attribute" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute">
+        <data_providers>
+            <data_provider name="options">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Attribute\Options</data_provider>
+        </data_providers>
     </index>
 </indices>

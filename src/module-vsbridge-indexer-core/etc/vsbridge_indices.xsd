@@ -10,16 +10,9 @@
 
     <xs:complexType name="indexDefinition">
         <xs:sequence>
-            <xs:element name="type" type="typeDefinition" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element name="data_providers" type="dataProvidersDefinition" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute type="xs:string" name="identifier" use="required"/>
-    </xs:complexType>
-
-    <xs:complexType name="typeDefinition">
-        <xs:all>
-            <xs:element name="data_providers" type="dataProvidersDefinition" minOccurs="0"/>
-        </xs:all>
-        <xs:attribute type="xs:string" name="name" use="required"/>
         <xs:attribute type="xs:string" name="mapping" use="optional"/>
     </xs:complexType>
 

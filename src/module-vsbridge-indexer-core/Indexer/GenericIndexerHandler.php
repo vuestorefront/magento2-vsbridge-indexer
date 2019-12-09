@@ -14,7 +14,6 @@ use Divante\VsbridgeIndexerCore\Api\IndexInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 use Divante\VsbridgeIndexerCore\Api\Indexer\TransactionKeyInterface;
 use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
-use Divante\VsbridgeIndexerCore\Model\IndexerRegistry as IndexerRegistry;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Store\Api\Data\StoreInterface;
@@ -32,24 +31,14 @@ class GenericIndexerHandler
     private $batch;
 
     /**
-     * @var \Divante\VsbridgeIndexerCore\Index\IndexOperations
+     * @var IndexOperationInterface
      */
     private $indexOperation;
-
-    /**
-     * @var IndexerRegistry
-     */
-    private $indexerRegistry;
 
     /**
      * @var ClientInterface
      */
     private $client;
-
-    /**
-     * @var string
-     */
-    private $typeName;
 
     /**
      * @var string
@@ -77,33 +66,27 @@ class GenericIndexerHandler
      * @param ClientInterface $client
      * @param LoggerInterface $logger
      * @param IndexOperationInterface $indexOperation
-     * @param IndexerRegistry $indexerRegistry
      * @param EventManager $eventManager
      * @param Batch $batch
      * @param TransactionKeyInterface $transactionKey
      * @param string $indexIdentifier
-     * @param string $typeName
      */
     public function __construct(
         ClientInterface $client,
         LoggerInterface $logger,
         IndexOperationInterface $indexOperation,
-        IndexerRegistry $indexerRegistry,
         EventManager $eventManager,
         Batch $batch,
         TransactionKeyInterface $transactionKey,
-        string $indexIdentifier,
-        string $typeName
+        string $indexIdentifier
     ) {
         $this->logger = $logger;
         $this->batch = $batch;
         $this->client = $client;
         $this->indexOperation = $indexOperation;
-        $this->typeName = $typeName;
         $this->indexIdentifier = $indexIdentifier;
-        $this->indexerRegistry = $indexerRegistry;
         $this->eventManager = $eventManager;
-        $this->transactionKey = $transactionKey->load();
+        $this->transactionKey = $transactionKey;
     }
 
     /**
@@ -117,10 +100,9 @@ class GenericIndexerHandler
     {
         try {
             $index = $this->getIndex($store);
-            $type = $index->getType($this->typeName);
             $dataProviders = [];
 
-            foreach ($type->getDataProviders() as $name => $dataProvider) {
+            foreach ($index->getDataProviders() as $name => $dataProvider) {
                 if (in_array($name, $requireDataProvides)) {
                     $dataProviders[] = $dataProvider;
                 }
@@ -142,7 +124,7 @@ class GenericIndexerHandler
 
                 $bulkRequest = $this->indexOperation->createBulk()->updateDocuments(
                     $index->getName(),
-                    $this->typeName,
+                    $index->getType(),
                     $docs
                 );
 
@@ -167,12 +149,10 @@ class GenericIndexerHandler
     {
         try {
             $index = $this->getIndex($store);
-            $type = $index->getType($this->typeName);
-
             $storeId = (int)$store->getId();
 
             foreach ($this->batch->getItems($documents, $this->getBatchSize()) as $docs) {
-                foreach ($type->getDataProviders() as $dataProvider) {
+                foreach ($index->getDataProviders() as $dataProvider) {
                     if (!empty($docs)) {
                         $docs = $dataProvider->addData($docs, $storeId);
                     }
@@ -181,7 +161,7 @@ class GenericIndexerHandler
                 if (!empty($docs)) {
                     $bulkRequest = $this->indexOperation->createBulk()->addDocuments(
                         $index->getName(),
-                        $this->typeName,
+                        $index->getType(),
                         $docs
                     );
 
@@ -190,7 +170,7 @@ class GenericIndexerHandler
                     $this->eventManager->dispatch(
                         'search_engine_save_documents_after',
                         [
-                            'data_type' => $this->typeName,
+                            'data_type' => $this->indexIdentifier,
                             'bulk_response' => $response,
                         ]
                     );
@@ -199,7 +179,7 @@ class GenericIndexerHandler
                 $docs = null;
             }
 
-            if ($index->isNew() && !$this->indexerRegistry->isFullReIndexationRunning()) {
+            if ($index->isNew()) {
                 $this->indexOperation->switchIndexer($index->getName(), $index->getIdentifier());
             }
 
@@ -222,7 +202,7 @@ class GenericIndexerHandler
 
             if ($this->indexOperation->indexExists($indexAlias)) {
                 $index = $this->indexOperation->getIndexByName($this->indexIdentifier, $store);
-                $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey]]];
+                $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey->load()]]];
                 $query = ['query' => ['bool' => $transactionKeyQuery]];
 
                 if ($docIds) {
@@ -231,7 +211,7 @@ class GenericIndexerHandler
 
                 $query = [
                     'index' => $index->getName(),
-                    'type' => $this->typeName,
+                    'type' => $index->getType(),
                     'body' => $query,
                 ];
 
@@ -264,6 +244,16 @@ class GenericIndexerHandler
         }
 
         return $index;
+    }
+
+    /**
+     * @param StoreInterface $store
+     *
+     * @return IndexInterface
+     */
+    public function createIndex(StoreInterface $store)
+    {
+        return $this->indexOperation->createIndex($this->indexIdentifier, $store);
     }
 
     /**
@@ -306,8 +296,8 @@ class GenericIndexerHandler
     /**
      * @return string
      */
-    public function getTypeName()
+    public function getIndexIdentifier()
     {
-        return $this->typeName;
+        return $this->indexIdentifier;
     }
 }

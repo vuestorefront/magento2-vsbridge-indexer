@@ -130,7 +130,7 @@ class IndexOperations implements IndexOperationInterface
      */
     public function getIndexByName($indexIdentifier, StoreInterface $store)
     {
-        $indexAlias = $this->indexSettings->getIndexAlias($store);
+        $indexAlias = $this->getIndexAlias($indexIdentifier, $store);
 
         if (!isset($this->indicesByIdentifier[$indexAlias])) {
             if (!$this->indexExists($indexAlias)) {
@@ -148,9 +148,9 @@ class IndexOperations implements IndexOperationInterface
     /**
      * @inheritdoc
      */
-    public function getIndexAlias(StoreInterface $store)
+    public function getIndexAlias($indexIdentifier, StoreInterface $store)
     {
-        return $this->indexSettings->getIndexAlias($store);
+        return $this->indexSettings->getIndexAlias($store, $indexIdentifier);
     }
 
     /**
@@ -164,17 +164,14 @@ class IndexOperations implements IndexOperationInterface
             $this->indexSettings->getEsConfig()
         );
 
-        /** @var TypeInterface $type */
-        foreach ($index->getTypes() as $type) {
-            $mapping = $type->getMapping();
+        $mapping = $index->getMapping();
 
-            if ($mapping instanceof MappingInterface) {
-                $this->client->putMapping(
-                    $index->getName(),
-                    $type->getName(),
-                    $mapping->getMappingProperties()
-                );
-            }
+        if ($mapping instanceof MappingInterface) {
+            $this->client->putMapping(
+                $index->getName(),
+                $index->getType(),
+                $mapping->getMappingProperties()
+            );
         }
 
         return $index;
@@ -239,23 +236,22 @@ class IndexOperations implements IndexOperationInterface
             throw new \LogicException('No configuration found');
         }
 
-        $indexName = $this->indexSettings->createIndexName($store);
-        $indexAlias = $this->indexSettings->getIndexAlias($store);
+        $indexName = $this->indexSettings->createIndexName($store, $indexIdentifier);
+        $indexAlias = $this->indexSettings->getIndexAlias($store, $indexIdentifier);
 
         if ($existingIndex) {
             $indexName = $indexAlias;
         }
 
         $config = $this->indicesConfiguration[$indexIdentifier];
-        $types = $config['types'];
 
-        /** @var Index $index */
         $index = $this->indexFactory->create(
             [
                 'name' => $indexName,
                 'newIndex' => !$existingIndex,
                 'identifier' => $indexAlias,
-                'types' => $types,
+                'dataProviders' => $config['dataProviders'],
+                'mapping' => $config['mapping'],
             ]
         );
 

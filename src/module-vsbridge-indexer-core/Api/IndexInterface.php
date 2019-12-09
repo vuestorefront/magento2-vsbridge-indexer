@@ -29,15 +29,17 @@ interface IndexInterface
     public function isNew();
 
     /**
-     * @return \Divante\VsbridgeIndexerCore\Api\Index\TypeInterface[]
+     * @return string
      */
-    public function getTypes();
+    public function getType();
 
     /**
-     * @param $typeName
-     *
-     * @return \Divante\VsbridgeIndexerCore\Api\Index\TypeInterface
-     * @throws \InvalidArgumentException When the type does not exists.
+     * @return \Divante\VsbridgeIndexerCore\Api\DataProviderInterface[]
      */
-    public function getType($typeName);
+    public function getDataProviders();
+
+    /**
+     * @return \Divante\VsbridgeIndexerCore\Api\MappingInterface|null
+     */
+    public function getMapping();
 }
