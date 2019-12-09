@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Divante\VsbridgeIndexerCore\Cache\Processor">
+        <arguments>
+            <argument name="cacheTags" xsi:type="array">
+                <item name="category" xsi:type="string">C</item>
+                <item name="product" xsi:type="string">P</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

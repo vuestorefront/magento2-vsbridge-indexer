@@ -8,7 +8,6 @@
 
 namespace Divante\VsbridgeIndexerCore\Index\Indicies;
 
-use Divante\VsbridgeIndexerCore\Api\Index\TypeInterfaceFactory as TypeFactoryInterface;
 use Divante\VsbridgeIndexerCore\Indexer\DataProviderProcessorFactory;
 use Divante\VsbridgeIndexerCore\Indexer\MappingProcessorFactory;
 
@@ -17,13 +16,6 @@ use Divante\VsbridgeIndexerCore\Indexer\MappingProcessorFactory;
  */
 class Config
 {
-    /**
-     * Factory used to build mapping types.
-     *
-     * @var TypeFactoryInterface
-     */
-    private $typeFactory;
-
     /**
      * @var DataProviderProcessorFactory
      */
@@ -49,14 +41,12 @@ class Config
      *
      * @param Config\Data $configData
      * @param \Divante\VsbridgeIndexerCore\Indexer\DataProvider\TransactionKey $transactionKey
-     * @param TypeFactoryInterface $typeInterfaceFactory
      * @param MappingProcessorFactory $mappingProcessorFactory
      * @param DataProviderProcessorFactory $dataProviderFactoryProcessor
      */
     public function __construct(
         Config\Data $configData,
         \Divante\VsbridgeIndexerCore\Indexer\DataProvider\TransactionKey $transactionKey,
-        TypeFactoryInterface $typeInterfaceFactory,
         MappingProcessorFactory $mappingProcessorFactory,
         DataProviderProcessorFactory $dataProviderFactoryProcessor
     ) {
@@ -64,13 +54,12 @@ class Config
         $this->transactionKey = $transactionKey;
         $this->mappingProviderProcessorFactory = $mappingProcessorFactory;
         $this->dataProviderFactoryProcessor = $dataProviderFactoryProcessor;
-        $this->typeFactory = $typeInterfaceFactory;
     }
 
     /**
      * @return array
      */
-    public function get()
+    public function get(): array
     {
         $configData = $this->configData->get();
         $indicesConfig = [];
@@ -87,34 +76,25 @@ class Config
      *
      * @return array
      */
-    private function initIndexConfig(array $indexConfigData)
+    private function initIndexConfig(array $indexConfigData): array
     {
-        $types = [];
+        $dataProviders['transaction_key'] = $this->transactionKey;
+        $mapping = null;
 
-        foreach ($indexConfigData['types'] as $typeName => $typeConfigData) {
-            $dataProviders = [];
-
-            foreach ($typeConfigData['data_providers'] as $dataProviderName => $dataProviderClass) {
-                $dataProviders[$dataProviderName] =
-                    $this->dataProviderFactoryProcessor->get($dataProviderClass);
-            }
-
-            $mapping = null;
-
-            if (isset($typeConfigData['mapping'][0])) {
-                $mapping = $this->mappingProviderProcessorFactory->get($typeConfigData['mapping'][0]);
-            }
-
-            $dataProviders['transaction_key'] = $this->transactionKey;
-            $types[$typeName] = $this->typeFactory->create(
-                [
-                    'name' => $typeName,
-                    'dataProviders' => $dataProviders,
-                    'mapping' => $mapping,
-                ]
-            );
+        foreach ($indexConfigData['data_providers'] as $dataProviderName => $dataProviderClass) {
+            $dataProviders[$dataProviderName] =
+                $this->dataProviderFactoryProcessor->get($dataProviderClass);
         }
 
-        return ['types' => $types];
+        if (isset($indexConfigData['mapping'])) {
+            $mapping = $this->mappingProviderProcessorFactory->get($indexConfigData['mapping']);
+        }
+
+       $config = [
+           'dataProviders' => $dataProviders,
+           'mapping' => $mapping,
+       ];
+
+        return $config;
     }
 }

@@ -9,7 +9,6 @@
 namespace Divante\VsbridgeIndexerCore\Cache;
 
 use Magento\Framework\HTTP\Adapter\CurlFactory;
-use Magento\Framework\Event\ManagerInterface as EventManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -17,15 +16,6 @@ use Psr\Log\LoggerInterface;
  */
 class Processor
 {
-    /**
-     * Mapping elastic type to cache tag used by vsf
-     * @var array
-     */
-    private $defaultCacheTags = [
-        'category' => 'C',
-        'product' => 'P',
-    ];
-
     /**
      * @var ConfigInterface
      */
@@ -47,28 +37,24 @@ class Processor
     private $curlFactory;
 
     /**
-     * @var EventManager
-     */
-    private $eventManager;
-
-    /**
      * Processor constructor.
      *
      * @param CurlFactory $curlFactory
      * @param ConfigInterface $config
      * @param EventManager $manager
      * @param LoggerInterface $logger
+     * @param $cacheTags
      */
     public function __construct(
         CurlFactory $curlFactory,
         ConfigInterface $config,
-        EventManager $manager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        array $cacheTags = []
     ) {
-        $this->eventManager = $manager;
         $this->curlFactory = $curlFactory;
         $this->logger = $logger;
         $this->config = $config;
+        $this->cacheTags = $cacheTags;
     }
 
     /**
@@ -193,6 +179,7 @@ class Processor
     }
 
     /**
+     * @param int $storeId
      * @return string
      */
     private function getInvalidateCacheUrl($storeId)
@@ -235,16 +222,6 @@ class Processor
      */
     public function getCacheTags()
     {
-        if (null === $this->cacheTags) {
-            $tagsDataObject = new \Magento\Framework\DataObject();
-            $tagsDataObject->setData('items', $this->defaultCacheTags);
-            $this->eventManager->dispatch(
-                'vsf_prepare_cache_tags',
-                ['cache_tags' => $tagsDataObject]
-            );
-            $this->cacheTags = $tagsDataObject->getData('items');
-        }
-
         return $this->cacheTags;
     }
 }

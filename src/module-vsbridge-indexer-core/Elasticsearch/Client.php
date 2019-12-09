@@ -19,6 +19,7 @@ use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
  */
 class Client implements ClientInterface
 {
+
     /**
      * @var \Divante\VsbridgeIndexerCore\Config\GeneralSettings
      */
@@ -130,9 +131,9 @@ class Client implements ClientInterface
     {
         $this->getClient()->indices()->putMapping(
             [
+                'include_type_name' => false,
                 'index' => $indexName,
-                'type'  => $type,
-                'body'  => [$type => $mapping],
+                'body'  => $mapping,
             ]
         );
     }
