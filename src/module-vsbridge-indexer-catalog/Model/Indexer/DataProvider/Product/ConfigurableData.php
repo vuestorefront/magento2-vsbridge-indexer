@@ -264,8 +264,7 @@ class ConfigurableData implements DataProviderInterface
                 $productDTO['regular_price'] = $minPrice;
                 $productDTO['final_price'] = $finalPrice;
             } else {
-                $productDTO['final_price'] =
-                    isset($productDTO['final_price']) ? min($finalPrice, $productDTO['final_price']) : $finalPrice;
+                $productDTO['final_price'] = min($finalPrice, $productDTO['final_price']);
             }
         }
 
