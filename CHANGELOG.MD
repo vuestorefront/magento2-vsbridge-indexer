@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+
+## [1.8.3] (2019.12.19)
+
+### Fixes
+- support table prefix with review_entity
+- fix exporting final_price and price for configurable products when `final_price` equals `0`
+
+## [1.8.2] (2019.11.29)
+
+### Fixes
+- fix notice undefined final_price
+
 ## [1.8.1] (2019.11.28)
 
 ### Fixes
