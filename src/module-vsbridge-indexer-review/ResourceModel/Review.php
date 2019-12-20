@@ -110,7 +110,7 @@ class Review
         if (null === $this->entityId) {
             $connection = $this->getConnection();
             $select = $connection->select()
-                ->from('review_entity', ['entity_id'])
+                ->from($this->resource->getTableName('review_entity'), ['entity_id'])
                 ->where('entity_code = :entity_code');
 
             $entityId = $connection->fetchOne(
