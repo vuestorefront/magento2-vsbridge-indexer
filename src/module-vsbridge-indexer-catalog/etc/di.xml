@@ -56,6 +56,10 @@
         </arguments>
     </virtualType>
 
+    <type name="Magento\Framework\Mview\ViewInterface">
+        <plugin name="updateMviewSubscriptions" type="Divante\VsbridgeIndexerCatalog\Plugin\Mview\ViewPlugin"/>
+    </type>
+
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Product">
         <arguments>
             <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual</argument>
