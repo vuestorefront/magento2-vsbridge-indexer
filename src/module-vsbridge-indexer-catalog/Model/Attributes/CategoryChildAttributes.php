@@ -21,6 +21,7 @@ class CategoryChildAttributes
         'is_active',
         'url_path',
         'url_key',
+        'image',
     ];
 
     /**
