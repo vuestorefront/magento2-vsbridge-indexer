@@ -258,8 +258,24 @@ class ConfigurableData implements DataProviderInterface
      *
      * @return array
      */
-    private function filterData(array $productData): array
+    public function filterData(array $productData): array
     {
         return $this->dataFilter->execute($productData, $this->childBlackListConfig);
+    }
+
+    public function getConfigurableResource(){
+        return $this->configurableResource;
+    }
+
+    public function getLoadInventory(){
+        return $this->loadInventory;
+    }
+
+    public function getChildrenAttributeProcessor(){
+        return $this->childrenAttributeProcessor;
+    }
+
+    public function getInventoryProcessor(){
+        return $this->inventoryProcessor;
     }
 }
