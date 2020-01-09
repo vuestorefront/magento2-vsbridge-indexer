@@ -8,7 +8,8 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer;
 
-use Magento\Framework\Indexer\{Config\DependencyInfoProviderInterface, IndexerRegistry};
+use Magento\Framework\Indexer\Config\DependencyInfoProviderInterface;
+use Magento\Framework\Indexer\IndexerRegistry;
 
 /**
  * Class ProductProcessor

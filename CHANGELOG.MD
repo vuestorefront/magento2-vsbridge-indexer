@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+- Emulate store when rebuilding cms block and pages.
+
 
 ## [1.8.3] (2019.12.19)
 
