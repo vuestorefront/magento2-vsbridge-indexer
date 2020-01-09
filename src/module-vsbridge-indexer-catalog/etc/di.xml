@@ -141,6 +141,9 @@
     <type name="Magento\CatalogInventory\Observer\ReindexQuoteInventoryObserver">
         <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\CatalogInventory\ReindexQuoteInventoryObserverPlugin"/>
     </type>
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\Action\Attribute\Save">
+        <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Controller\Catalog\Adminhtml\Product\Action\AttributeSavePlugin"/>
+    </type>
     <type name="Divante\VsbridgeIndexerCatalog\Index\Mapping\AbstractMapping">
         <arguments>
             <argument name="staticFieldMapping" xsi:type="array">
