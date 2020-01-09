@@ -8,12 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCms\Model\Indexer\Action;
 
-use Divante\VsbridgeIndexerCms\Api\ContentProcessorInterface;
 use Divante\VsbridgeIndexerCms\Model\ResourceModel\CmsPage as CmsPageResource;
-
-use Magento\Cms\Model\Template\FilterProvider;
-use Magento\Framework\App\Area;
-use Magento\Framework\App\AreaList;
 
 /**
  * Class CmsPage
@@ -26,38 +21,13 @@ class CmsPage
     private $resourceModel;
 
     /**
-     * @var \Magento\Cms\Model\Template\FilterProvider
-     */
-    private $filterProvider;
-
-    /**
-     * @var AreaList
-     */
-    private $areaList;
-
-    /**
-     * @var ContentProcessorInterface
-     */
-    private $contentProcessor;
-
-    /**
      * CmsBlock constructor.
      *
-     * @param AreaList $areaList
-     * @param ContentProcessorInterface $contentProcessor
      * @param CmsPageResource $cmsBlockResource
-     * @param FilterProvider $filterProvider
      */
-    public function __construct(
-        AreaList $areaList,
-        ContentProcessorInterface $contentProcessor,
-        CmsPageResource $cmsBlockResource,
-        FilterProvider $filterProvider
-    ) {
-        $this->areaList = $areaList;
+    public function __construct(CmsPageResource $cmsBlockResource)
+    {
         $this->resourceModel = $cmsBlockResource;
-        $this->filterProvider = $filterProvider;
-        $this->contentProcessor = $contentProcessor;
     }
 
     /**
@@ -68,8 +38,6 @@ class CmsPage
      */
     public function rebuild($storeId = 1, array $pageIds = [])
     {
-        $this->areaList->getArea(Area::AREA_FRONTEND)->load(Area::PART_DESIGN);
-        $templateFilter = $this->filterProvider->getPageFilter()->setStoreId($storeId);
         $lastPageId = 0;
 
         do {
@@ -78,7 +46,7 @@ class CmsPage
             foreach ($cmsPages as $pageData) {
                 $lastPageId = (int)$pageData['page_id'];
                 $pageData['id'] = $lastPageId;
-                $pageData['content'] = $this->contentProcessor->parse($templateFilter, (string) $pageData['content']);
+                $pageData['content'] = $pageData['content'];
                 $pageData['active'] = (bool)$pageData['is_active'];
 
                 if (isset($pageData['sort_order'])) {

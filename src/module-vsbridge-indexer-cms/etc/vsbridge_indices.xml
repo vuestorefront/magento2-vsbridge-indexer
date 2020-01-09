@@ -2,7 +2,15 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Divante_VsbridgeIndexerCore:etc/vsbridge_indices.xsd">
 
     <index identifier="vue_storefront_catalog">
-        <type name="cms_block" mapping="Divante\VsbridgeIndexerCms\Index\Mapping\CmsBlock" />
-        <type name="cms_page" mapping="Divante\VsbridgeIndexerCms\Index\Mapping\CmsPage" />
+        <type name="cms_block" mapping="Divante\VsbridgeIndexerCms\Index\Mapping\CmsBlock">
+            <data_providers>
+                <data_provider name="content">Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\Block\ContentData</data_provider>
+            </data_providers>
+        </type>
+        <type name="cms_page" mapping="Divante\VsbridgeIndexerCms\Index\Mapping\CmsPage">
+            <data_providers>
+                <data_provider name="content">Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\Page\ContentData</data_provider>
+            </data_providers>
+        </type>
     </index>
 </indices>
