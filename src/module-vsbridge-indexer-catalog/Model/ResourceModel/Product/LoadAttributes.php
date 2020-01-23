@@ -72,10 +72,7 @@ class LoadAttributes
             $attributeCollection = $this->getAttributeCollection();
 
             foreach ($attributeCollection as $attribute) {
-                $this->prepareAttribute($attribute);
-
-                $this->attributesById[$attribute->getId()] = $attribute;
-                $this->attributeCodeToId[$attribute->getAttributeCode()] = $attribute->getId();
+                $this->addAttribute($attribute);
             }
         }
 
@@ -88,7 +85,7 @@ class LoadAttributes
      * @return Attribute
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getAttributeById($attributeId)
+    public function getAttributeById(int $attributeId)
     {
         $this->initAttributes();
 
@@ -105,9 +102,10 @@ class LoadAttributes
      * @return Attribute
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getAttributeByCode($attributeCode)
+    public function getAttributeByCode(string $attributeCode)
     {
         $this->initAttributes();
+        $this->loadAttributeByCode($attributeCode);
 
         if (isset($this->attributeCodeToId[$attributeCode])) {
             $attributeId = $this->attributeCodeToId[$attributeCode];
@@ -116,6 +114,34 @@ class LoadAttributes
         }
 
         throw new \Magento\Framework\Exception\LocalizedException(__('Attribute not found.'));
+    }
+
+    /**
+     * @param string $attributeCode
+     */
+    private function loadAttributeByCode(string $attributeCode)
+    {
+        if (!isset($this->attributeCodeToId[$attributeCode])) {
+            $attributeCollection = $this->getAttributeCollection();
+            $attributeCollection->addFieldToFilter('attribute_code', $attributeCode);
+            $attributeCollection->setPageSize(1)->setCurPage(1);
+
+            $attribute = $attributeCollection->getFirstItem();
+
+            if ($attribute->getId()) {
+                $this->addAttribute($attribute);
+            }
+        }
+    }
+
+    /**
+     * @param Attribute $attribute
+     */
+    private function addAttribute(Attribute $attribute)
+    {
+        $this->prepareAttribute($attribute);
+        $this->attributesById[$attribute->getId()] = $attribute;
+        $this->attributeCodeToId[$attribute->getAttributeCode()] = $attribute->getId();
     }
 
     /**
