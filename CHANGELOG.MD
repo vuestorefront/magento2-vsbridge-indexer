@@ -2,9 +2,18 @@
 
 ## Unreleased
 
-### Fixed
-- Emulate store when rebuilding cms block and pages.
 
+## [1.9.0] (2020.01.28)
+
+### Fixed
+- Emulate store when rebuilding cms block and pages. ([#179](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/179))
+- Fix modules sequence declaration
+- Fixes for clean magento install with sample data modules.
+- Collecting attributes values when there is no default value ([#160](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/160))
+
+### Added
+- Product indexer - add dependencies, add dynamic catalogrule_product_price dependencies for Magento <= 2.2.4 ([#176](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/176))
+- Reindexing products which have beed modified by mass action on product grid when indexers are 'On Save ([#157](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/157))
 
 ## [1.8.3] (2019.12.19)
 
