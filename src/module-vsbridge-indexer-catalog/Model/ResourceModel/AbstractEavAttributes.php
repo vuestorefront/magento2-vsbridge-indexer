@@ -125,7 +125,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
 
         if (!empty($selects)) {
             foreach ($selects as $select) {
-                $values = $this->getConnection()->fetchAll($select);
+                $values = $this->getConnection()->fetchAll($select, [], \PDO::FETCH_GROUP);
                 $this->processValues($values);
             }
         }
@@ -158,35 +158,39 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
     }
 
     /**
-     * @param array $values
+     * @param array $entities
      *
      * @return array
      * @throws \Exception
      */
-    private function processValues(array $values)
+    private function processValues(array $entities)
     {
-        foreach ($values as $value) {
-            $entityIdField = $this->getEntityMetaData()->getIdentifierField();
-            $entityId = $value[$entityIdField];
-            $attribute = $this->attributesById[$value['attribute_id']];
-            $attributeCode = $attribute->getAttributeCode();
+        foreach ($entities as $entityId => $values) {
+            foreach ($values as $value) {
+                $attribute = $this->attributesById[$value['attribute_id']];
+                $attributeCode = $attribute->getAttributeCode();
 
-            if ($attribute->getFrontendInput() === 'multiselect') {
-                $options = explode(',', $value['value']);
-
-                if (!empty($options)) {
-                    $options = array_map([$this, 'parseValue'], $options);
+                if (isset($this->valuesByEntityId[$entityId][$attributeCode])) {
+                    continue;
                 }
 
-                $value['value'] = $options;
-            } else {
-                $value['value'] = $this->prepareValue(
-                    $attributeCode,
-                    $value['value']
-                );
-            }
+                if ($attribute->getFrontendInput() === 'multiselect') {
+                    $options = explode(',', $value['value']);
 
-            $this->valuesByEntityId[$entityId][$attributeCode] = $value['value'];
+                    if (!empty($options)) {
+                        $options = array_map([$this, 'parseValue',], $options);
+                    }
+
+                    $value['value'] = $options;
+                } else {
+                    $value['value'] = $this->prepareValue(
+                        $attributeCode,
+                        $value['value']
+                    );
+                }
+
+                $this->valuesByEntityId[$entityId][$attributeCode] = $value['value'];
+            }
         }
 
         return $this->valuesByEntityId;
@@ -235,32 +239,23 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
         $linkField = $this->getEntityMetaData()->getLinkField();
         $entityIdField = $this->getEntityMetaData()->getIdentifierField();
 
-        $joinStoreCondition = [
-            "t_default.$linkField=t_store.$linkField",
-            't_default.attribute_id=t_store.attribute_id',
-            't_store.store_id=?',
-        ];
-
-        $joinCondition = $this->getConnection()->quoteInto(
-            implode(' AND ', $joinStoreCondition),
-            $storeId
-        );
-
         $select = $this->getConnection()->select()
             ->from(['entity' => $this->getEntityMetaData()->getEntityTable()], [$entityIdField])
             ->joinInner(
-                ['t_default' => $table],
-                new \Zend_Db_Expr("entity.{$linkField} = t_default.{$linkField}"),
-                ['attribute_id']
+                ['eav_values' => $table],
+                new \Zend_Db_Expr("entity.{$linkField} = eav_values.{$linkField}"),
+                ['store_id', 'attribute_id', 'value']
             )
-            ->joinLeft(
-                ['t_store' => $table],
-                $joinCondition,
-                ['value' => new \Zend_Db_Expr('COALESCE(t_store.value, t_default.value)')]
+            ->where(
+                'eav_values.store_id IN (?)',
+                [
+                    $storeId,
+                    \Magento\Store\Model\Store::DEFAULT_STORE_ID,
+                ]
             )
-            ->where('t_default.store_id = ?', \Magento\Store\Model\Store::DEFAULT_STORE_ID)
             ->where("entity.$entityIdField IN (?)", $entityIds)
-            ->where('t_default.attribute_id IN (?)', $attributeIds);
+            ->where('eav_values.attribute_id IN (?)', $attributeIds)
+            ->order('eav_values.store_id DESC');
 
         return $select;
     }

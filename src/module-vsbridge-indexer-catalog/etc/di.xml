@@ -56,6 +56,10 @@
         </arguments>
     </virtualType>
 
+    <type name="Magento\Framework\Mview\ViewInterface">
+        <plugin name="updateMviewSubscriptions" type="Divante\VsbridgeIndexerCatalog\Plugin\Mview\ViewPlugin"/>
+    </type>
+
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Product">
         <arguments>
             <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual</argument>
@@ -136,6 +140,9 @@
     </type>
     <type name="Magento\CatalogInventory\Observer\ReindexQuoteInventoryObserver">
         <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\CatalogInventory\ReindexQuoteInventoryObserverPlugin"/>
+    </type>
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\Action\Attribute\Save">
+        <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Controller\Catalog\Adminhtml\Product\Action\AttributeSavePlugin"/>
     </type>
     <type name="Divante\VsbridgeIndexerCatalog\Index\Mapping\AbstractMapping">
         <arguments>

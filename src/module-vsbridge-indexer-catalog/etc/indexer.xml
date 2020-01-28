@@ -4,6 +4,10 @@
              class="Divante\VsbridgeIndexerCatalog\Model\Indexer\Product">
         <title translate="true">Vsbridge Product Indexer</title>
         <description translate="true">Update Products data in Elastic</description>
+        <dependencies>
+            <indexer id="catalog_product_price" />
+            <indexer id="cataloginventory_stock" />
+        </dependencies>
     </indexer>
     <indexer id="vsbridge_category_indexer" view_id="vsbridge_category_indexer"
              class="Divante\VsbridgeIndexerCatalog\Model\Indexer\Category">

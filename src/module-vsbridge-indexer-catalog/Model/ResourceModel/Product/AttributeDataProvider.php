@@ -65,7 +65,7 @@ class AttributeDataProvider extends AbstractEavAttributes
      */
     public function getAttributeById($attributeId)
     {
-        return $this->loadAttributes->getAttributeById($attributeId);
+        return $this->loadAttributes->getAttributeById((int) $attributeId);
     }
 
     /**
