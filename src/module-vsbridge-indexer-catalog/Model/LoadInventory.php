@@ -26,7 +26,7 @@ class LoadInventory implements LoadInventoryInterface
     /**
      * LoadChildrenInventory constructor.
      *
-     * @param InvetoryResource $resource
+     * @param InventoryResource $resource
      */
     public function __construct(InventoryResource $resource)
     {

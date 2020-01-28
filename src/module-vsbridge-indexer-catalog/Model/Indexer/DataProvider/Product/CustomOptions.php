@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
-use Divante\VsbridgeIndexerCatalog\Model\ProductOptionProcessor;
+use Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\CustomOptionConverterInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CustomOptions as Resource;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CustomOptionValues as OptionValuesResource;
@@ -37,7 +37,7 @@ class CustomOptions implements DataProviderInterface
     private $productMetaData;
 
     /**
-     * @var ProductOptionProcessor
+     * @var CustomOptionConverterInterface
      */
     private $productOptionProcessor;
 
@@ -46,13 +46,13 @@ class CustomOptions implements DataProviderInterface
      *
      * @param Resource $resource
      * @param OptionValuesResource $customOptionValues
-     * @param ProductOptionProcessor $processor
+     * @param CustomOptionConverterInterface $processor
      * @param ProductMetaData $productMetaData
      */
     public function __construct(
         Resource $resource,
         OptionValuesResource $customOptionValues,
-        ProductOptionProcessor $processor,
+        CustomOptionConverterInterface $processor,
         ProductMetaData $productMetaData
     ) {
         $this->optionsResourceModel = $resource;
@@ -71,10 +71,15 @@ class CustomOptions implements DataProviderInterface
         $linkFieldIds = array_column($indexData, $linkField);
 
         $options = $this->optionsResourceModel->loadProductOptions($linkFieldIds, $storeId);
+
+        if (empty($options)) {
+            return $indexData;
+        }
+
         $optionIds = array_column($options, 'option_id');
         $values = $this->optionValuesResourceModel->loadOptionValues($optionIds, $storeId);
 
-        $optionsByProduct = $this->productOptionProcessor->prepareOptions($options, $values);
+        $optionsByProduct = $this->productOptionProcessor->process($options, $values);
 
         foreach ($indexData as $productId => $productData) {
             $linkFieldValue = $productData[$linkField];

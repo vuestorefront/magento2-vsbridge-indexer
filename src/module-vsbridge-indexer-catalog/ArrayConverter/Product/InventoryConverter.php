@@ -6,16 +6,17 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Model;
+namespace Divante\VsbridgeIndexerCatalog\ArrayConverter\Product;
 
 use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
 use Magento\CatalogInventory\Api\StockConfigurationInterface;
 use Magento\CatalogInventory\Api\Data\StockItemInterface;
+use Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\InventoryConverterInterface;
 
 /**
- * Class InventoryProcessor
+ * Class InventoryConverter
  */
-class InventoryProcessor
+class InventoryConverter implements InventoryConverterInterface
 {
 
     /**
@@ -29,7 +30,7 @@ class InventoryProcessor
     private $generalMapping;
 
     /**
-     * InventoryProcessor constructor.
+     * InventoryConverter constructor.
      *
      * @param GeneralMapping $generalMapping
      * @param StockConfigurationInterface $stockConfiguration
@@ -48,36 +49,36 @@ class InventoryProcessor
      *
      * @return array
      */
-    public function prepareInventoryData($storeId, array $inventory)
+    public function prepareInventoryData(int $storeId, array $inventory): array
     {
         if (!empty($inventory[StockItemInterface::USE_CONFIG_MIN_QTY])) {
-            $inventory['min_qty'] = $this->stockConfiguration->getMinQty($storeId);
+            $inventory[StockItemInterface::MIN_QTY] = $this->stockConfiguration->getMinQty($storeId);
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_MIN_SALE_QTY])) {
-            $inventory['min_sale_qty'] = $this->stockConfiguration->getMinSaleQty($storeId);
+            $inventory[StockItemInterface::MIN_SALE_QTY] = $this->stockConfiguration->getMinSaleQty($storeId);
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_MAX_SALE_QTY])) {
-            $inventory['max_sale_qty'] = $this->stockConfiguration->getMaxSaleQty($storeId);
+            $inventory[StockItemInterface::MAX_SALE_QTY] = $this->stockConfiguration->getMaxSaleQty($storeId);
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_NOTIFY_STOCK_QTY])) {
-            $inventory['notify_stock_qty'] = $this->stockConfiguration->getNotifyStockQty($storeId);
+            $inventory[StockItemInterface::NOTIFY_STOCK_QTY] = $this->stockConfiguration->getNotifyStockQty($storeId);
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_QTY_INCREMENTS])) {
-            $inventory['qty_increments'] = $this->stockConfiguration->getQtyIncrements($storeId);
+            $inventory[StockItemInterface::QTY_INCREMENTS] = $this->stockConfiguration->getQtyIncrements($storeId);
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_ENABLE_QTY_INC])) {
-            $inventory['enable_qty_increments'] = $this->stockConfiguration->getEnableQtyIncrements($storeId);
+            $inventory[StockItemInterface::ENABLE_QTY_INCREMENTS] = $this->stockConfiguration->getEnableQtyIncrements($storeId);
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_BACKORDERS])) {
-            $inventory['backorders'] = $this->stockConfiguration->getBackorders($storeId);
+            $inventory[StockItemInterface::BACKORDERS] = $this->stockConfiguration->getBackorders($storeId);
         }
-        
+
         return $this->generalMapping->prepareStockData($inventory);
     }
 }

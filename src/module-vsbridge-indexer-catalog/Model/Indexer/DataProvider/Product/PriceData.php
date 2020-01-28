@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -8,9 +8,9 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
-use Divante\VsbridgeIndexerCatalog\Model\TierPriceProcessor;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Prices as Resource;
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
+use Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Prices as Resource;
 
 /**
  * Class PriceData
@@ -23,22 +23,22 @@ class PriceData implements DataProviderInterface
     private $resourcePriceModel;
 
     /**
-     * @var TierPriceProcessor
+     * @var LoadTierPricesInterface
      */
-    private $tierPriceProcessor;
+    private $tierPriceLoader;
 
     /**
      * PriceData constructor.
      *
      * @param Resource $resource
-     * @param TierPriceProcessor $tierPriceProcessor
+     * @param LoadTierPricesInterface $loadTierPrices
      */
     public function __construct(
         Resource $resource,
-        TierPriceProcessor $tierPriceProcessor
+        LoadTierPricesInterface $loadTierPrices
     ) {
         $this->resourcePriceModel = $resource;
-        $this->tierPriceProcessor = $tierPriceProcessor;
+        $this->tierPriceLoader = $loadTierPrices;
     }
 
     /**
@@ -63,7 +63,7 @@ class PriceData implements DataProviderInterface
             }
         }
 
-        return $this->tierPriceProcessor->applyTierGroupPrices($indexData, $storeId);
+        return $this->tierPriceLoader->execute($indexData, $storeId);
     }
 
     /**
@@ -71,7 +71,7 @@ class PriceData implements DataProviderInterface
      *
      * @return float
      */
-    private function preparePrice($value)
+    private function preparePrice($value): float
     {
         return (float)$value;
     }

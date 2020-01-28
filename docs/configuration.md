@@ -113,6 +113,19 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
     **Apply catalog price rules in `final_price`**  → by default No. Set option to Yes if you use Catalog Price Rules and have Magento version 2.2.4 (or any previous version).
     
     ![](./images/config-catalog.png)
+    
+    **Product attributes to export***  → choose product attributes for export.
+    By default only part of attributes will be exported, like: description, image, small_image, thumbnail, 
+    media_gallery, media_title, meta_description, special_price, special_from_date, special_to_date, tax_class_id.
+    
+    **Configurable children attributes to export***  → choose product attributes for export.
+    For configurable_children attributes used to create configurable products are also always exported 
+    plus attributes set in configuration (by default: image, small_image, thumbnail, media_gallery, special_price, special_from_date, special_to_date)
+    
+    ![](./images/config-attributes.png)
+
+ * Some attributes are always exported: price, sku, name, visibility, status, url_path, url_key
+
 
 After updating the configuration, you can run the indexation.
 It is also worth query ElasticSearch using CURL, to be sure that the communication works.

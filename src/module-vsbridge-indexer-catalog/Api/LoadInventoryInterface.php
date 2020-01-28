@@ -11,7 +11,7 @@ interface LoadInventoryInterface
 {
     /**
      * @param array $indexData
-     * @param iny $storeId
+     * @param int $storeId
      *
      * @return array
      */

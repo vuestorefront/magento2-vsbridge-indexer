@@ -9,7 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface;
-use Divante\VsbridgeIndexerCatalog\Model\InventoryProcessor;
+use Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\InventoryConverterInterface;
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 
 /**
@@ -24,7 +24,7 @@ class Inventory implements DataProviderInterface
     private $getInventory;
 
     /**
-     * @var InventoryProcessor
+     * @var InventoryConverterInterface
      */
     private $inventoryProcessor;
 
@@ -32,11 +32,11 @@ class Inventory implements DataProviderInterface
      * Inventory constructor.
      *
      * @param LoadInventoryInterface $getInventory
-     * @param InventoryProcessor $inventoryProcessor
+     * @param InventoryConverterInterface $inventoryProcessor
      */
     public function __construct(
         LoadInventoryInterface $getInventory,
-        InventoryProcessor $inventoryProcessor
+        InventoryConverterInterface $inventoryProcessor
     ) {
         $this->getInventory = $getInventory;
         $this->inventoryProcessor = $inventoryProcessor;

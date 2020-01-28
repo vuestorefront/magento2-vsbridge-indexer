@@ -54,6 +54,11 @@ class Product
     private $statusAttributeId;
 
     /**
+     * @var array
+     */
+    private $configurableAttributeIds;
+
+    /**
      * @var ProductMetaData
      */
     private $productMetaData;
@@ -264,6 +269,27 @@ class Product
             ->where('child_id IN(?)', array_map('intval', $childrenIds));
 
         return $this->getConnection()->fetchCol($select);
+    }
+
+    /**
+     * Get list of attribute ids used to create configurable products
+     * @return array
+     */
+    public function getConfigurableAttributeIds()
+    {
+        if (null === $this->configurableAttributeIds) {
+            $select = $this->getConnection()->select();
+            $select->from(
+                $this->resourceConnection->getTableName('catalog_product_super_attribute'),
+                ['attribute_id']
+            );
+
+            $select->distinct();
+
+            $this->configurableAttributeIds = $this->getConnection()->fetchCol($select);
+        }
+
+        return $this->configurableAttributeIds;
     }
 
     /**

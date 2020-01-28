@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /**
  * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -6,13 +7,19 @@
  * @license   See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Model;
+namespace Divante\VsbridgeIndexerCatalog\Model\Product;
+
+use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Gallery as Resource;
 
 /**
- * Class GalleryProcessor
+ * Class LoadMediaGallery
  */
-class GalleryProcessor
+class LoadMediaGallery implements LoadMediaGalleryInterface
 {
+    const VIDEO_TYPE = 'external-video';
+
     /**
      * Youtube regex
      * @var string
@@ -30,14 +37,40 @@ class GalleryProcessor
     ];
 
     /**
-     * @param array $gallerySet
-     * @param array $videoSet
-     *
-     * @return array
+     * @var \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Gallery
      */
-    public function prepareMediaGallery(array $gallerySet, array $videoSet = [])
+    private $resourceModel;
+
+    /**
+     * @var ProductMetaData
+     */
+    private $productMetaData;
+
+    /**
+     * MediaGalleryData constructor.
+     *
+     * @param Resource $resource
+     * @param ProductMetaData $productMetaData
+     */
+    public function __construct(
+        Resource $resource,
+        ProductMetaData $productMetaData
+    ) {
+        $this->resourceModel = $resource;
+        $this->productMetaData = $productMetaData;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function execute(array $indexData, int $storeId): array
     {
-        $galleryPerProduct = [];
+        $linkField = $this->productMetaData->get()->getLinkField();
+        $linkFieldIds = array_column($indexData, $linkField);
+
+        $gallerySet = $this->resourceModel->loadGallerySet($linkFieldIds, $storeId);
+        $valueIds = $this->getValueIds($gallerySet);
+        $videoSet = $this->resourceModel->loadVideos($valueIds, $storeId);
 
         foreach ($gallerySet as $mediaImage) {
             $linkFieldId  = $mediaImage['row_id'];
@@ -55,10 +88,28 @@ class GalleryProcessor
                 $image['vid'] = $this->prepareVideoData($videoSet[$valueId]);
             }
 
-            $galleryPerProduct[$linkFieldId][] = $image;
+            $indexData[$linkFieldId]['media_gallery'][] = $image;
         }
 
-        return $galleryPerProduct;
+        return $indexData;
+    }
+
+    /**
+     * @param array $mediaGallery
+     *
+     * @return array
+     */
+    private function getValueIds(array $mediaGallery)
+    {
+        $valueIds = [];
+
+        foreach ($mediaGallery as $mediaItem) {
+            if (self::VIDEO_TYPE === $mediaItem['media_type']) {
+                $valueIds[] = $mediaItem['value_id'];
+            }
+        }
+
+        return $valueIds;
     }
 
     /**

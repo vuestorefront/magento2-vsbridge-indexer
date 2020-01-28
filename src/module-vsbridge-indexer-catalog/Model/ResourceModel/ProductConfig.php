@@ -12,9 +12,9 @@ use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Magento\Framework\App\ResourceConnection;
 
 /**
- * Class Config
+ * Class ProductConfig
  */
-class Config
+class ProductConfig
 {
 
     /**

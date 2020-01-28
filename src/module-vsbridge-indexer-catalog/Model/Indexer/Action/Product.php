@@ -56,6 +56,8 @@ class Product
                 $product['id'] = $lastProductId;
 
                 $product['attribute_set_id'] = (int)$product['attribute_set_id'];
+                $product['media_gallery'] = [];
+
                 unset($product['required_options']);
                 unset($product['has_options']);
                 yield $lastProductId => $product;
