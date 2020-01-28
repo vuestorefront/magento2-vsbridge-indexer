@@ -9,47 +9,41 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Gallery as Resource;
-use Divante\VsbridgeIndexerCatalog\Model\GalleryProcessor;
-use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
+use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 
 /**
  * Class MediaGalleryData
  */
 class MediaGalleryData implements DataProviderInterface
 {
-    const VIDEO_TYPE = 'external-video';
 
     /**
-     * @var \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Gallery
+     * @var CatalogConfigurationInterface
      */
-    private $resourceModel;
+    private $catalogConfig;
 
     /**
-     * @var GalleryProcessor
+     * @var LoadMediaGalleryInterface
      */
-    private $galleryProcessor;
+    private $galleryConverter;
 
     /**
-     * @var ProductMetaData
+     * @var boolean
      */
-    private $productMetaData;
+    private $canIndexMediaGallery;
 
     /**
      * MediaGalleryData constructor.
      *
-     * @param Resource $resource
-     * @param ProductMetaData $productMetaData
-     * @param GalleryProcessor $galleryProcessor
+     * @param LoadMediaGalleryInterface $galleryProcessor
      */
     public function __construct(
-        Resource $resource,
-        ProductMetaData $productMetaData,
-        GalleryProcessor $galleryProcessor
+        CatalogConfigurationInterface $catalogConfig,
+        LoadMediaGalleryInterface $galleryProcessor
     ) {
-        $this->resourceModel = $resource;
-        $this->productMetaData = $productMetaData;
-        $this->galleryProcessor = $galleryProcessor;
+        $this->catalogConfig = $catalogConfig;
+        $this->galleryConverter = $galleryProcessor;
     }
 
     /**
@@ -57,43 +51,23 @@ class MediaGalleryData implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
-        $linkField = $this->productMetaData->get()->getLinkField();
-        $linkFieldIds = array_column($indexData, $linkField);
-
-        $gallerySet = $this->resourceModel->loadGallerySet($linkFieldIds, $storeId);
-        $valueIds = $this->getValueIds($gallerySet);
-
-        $galleryVideos = $this->resourceModel->loadVideos($valueIds, $storeId);
-        $galleryPerProduct = $this->galleryProcessor->prepareMediaGallery($gallerySet, $galleryVideos);
-
-        foreach ($indexData as $productId => $productData) {
-            $linkFieldValue = $productData[$linkField];
-
-            if (isset($galleryPerProduct[$linkFieldValue])) {
-                $indexData[$productId]['media_gallery'] = $galleryPerProduct[$linkFieldValue];
-            } else {
-                $indexData[$productId]['media_gallery'] = [];
-            }
+        if ($this->canIndexMediaGallery()) {
+            return $this->galleryConverter->execute($indexData, $storeId);
         }
 
         return $indexData;
     }
 
     /**
-     * @param array $mediaGallery
-     *
-     * @return array
+     * @return bool
      */
-    private function getValueIds(array $mediaGallery)
+    private function canIndexMediaGallery()
     {
-        $valueIds = [];
-
-        foreach ($mediaGallery as $mediaItem) {
-            if (self::VIDEO_TYPE === $mediaItem['media_type']) {
-                $valueIds[] = $mediaItem['value_id'];
-            }
+        if (null === $this->canIndexMediaGallery) {
+            $attributes = $this->catalogConfig->getAllowedAttributesToIndex();
+            $this->canIndexMediaGallery = in_array('media_gallery', $attributes);
         }
 
-        return $valueIds;
+        return $this->canIndexMediaGallery;
     }
 }

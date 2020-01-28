@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * @package  Divante\VsbridgeIndexerCatalog
  * @author Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -6,18 +6,21 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Model;
+namespace Divante\VsbridgeIndexerCatalog\Model\Product;
 
+use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface;
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\TierPrices as TierPricesResource;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
+
 use Magento\Customer\Model\Group;
 use Magento\Store\Model\StoreManagerInterface;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 
 /**
- * Class TierPriceProcessor
+ * Class LoadTierPrices
  */
-class TierPriceProcessor
+class LoadTierPrices implements LoadTierPricesInterface
 {
     /**
      * @var \Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\TierPrices
@@ -68,14 +71,6 @@ class TierPriceProcessor
     }
 
     /**
-     * @return bool
-     */
-    public function syncTierPrices()
-    {
-        return $this->configSettings->syncTierPrices();
-    }
-
-    /**
      * @param array $indexData
      * @param int $storeId
      *
@@ -83,7 +78,7 @@ class TierPriceProcessor
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function applyTierGroupPrices(array $indexData, $storeId)
+    public function execute(array $indexData, int $storeId): array
     {
         if ($this->syncTierPrices()) {
             $linkField = $this->productMetaData->get()->getLinkField();
@@ -121,6 +116,14 @@ class TierPriceProcessor
         }
 
         return $indexData;
+    }
+
+    /**
+     * @return bool
+     */
+    private function syncTierPrices(): bool
+    {
+        return $this->configSettings->syncTierPrices();
     }
 
     /**
