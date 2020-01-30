@@ -116,7 +116,6 @@ class Bundle
             /* entity_id or row_id*/
             $parentId = $bundleOption['parent_id'];
             $parentEntityId = $this->products[$parentId]['entity_id'];
-
             $optionId = $bundleOption['option_id'];
 
             $this->bundleOptionsByProduct[$parentEntityId][$optionId] = [
@@ -145,13 +144,14 @@ class Bundle
             $optionId = $selection['option_id'];
             /*row_id or entity_id*/
             $parentId = $selection['parent_product_id'];
+            $entityId = $this->products[$parentId]['entity_id'];
             $productId = $selection['product_id'];
             $bundlePriceType = $this->products[$parentId]['price_type'];
 
             $selectionPriceType = $bundlePriceType ? $selection['selection_price_type'] : null;
             $selectionPrice = $bundlePriceType ? $selection['selection_price_value'] : null;
 
-            $this->bundleOptionsByProduct[$parentId][$optionId]['product_links'][] = [
+            $this->bundleOptionsByProduct[$entityId][$optionId]['product_links'][] = [
                 'id' => (int)$selection['selection_id'],
                 'is_default' => (bool)$selection['is_default'],
                 'qty' => (float)$selection['selection_qty'],
