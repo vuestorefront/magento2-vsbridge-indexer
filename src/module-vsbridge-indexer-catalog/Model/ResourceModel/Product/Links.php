@@ -9,6 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Divante\VsbridgeIndexerCatalog\Model\Product\LinkTypeMapper;
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
 
@@ -44,17 +45,25 @@ class Links
     private $positionAttribute;
 
     /**
+     * @var ProductMetaData
+     */
+    private $productMetaData;
+
+    /**
      * Links constructor.
      *
+     * @param ProductMetaData $productMetaData
      * @param LinkTypeMapper $linkTypeMapper
      * @param ResourceConnection $resourceConnection
      */
     public function __construct(
+        ProductMetaData $productMetaData,
         LinkTypeMapper $linkTypeMapper,
         ResourceConnection $resourceConnection
     ) {
         $this->linkTypeMapper = $linkTypeMapper;
         $this->resource = $resourceConnection;
+        $this->productMetaData = $productMetaData;
     }
 
     /**
@@ -255,8 +264,9 @@ class Links
     private function getProductsIds()
     {
         $products = $this->getProducts();
+        $linkField = $this->productMetaData->get()->getLinkField();
 
-        return array_keys($products);
+        return array_column($products, $linkField);
     }
 
     /**
