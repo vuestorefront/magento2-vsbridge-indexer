@@ -55,7 +55,7 @@ class InventoryProcessor
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_MIN_SALE_QTY])) {
-            $inventory['max_sale_qty'] = $this->stockConfiguration->getMinSaleQty($storeId);
+            $inventory['min_sale_qty'] = $this->stockConfiguration->getMinSaleQty($storeId);
         }
 
         if (!empty($inventory[StockItemInterface::USE_CONFIG_MAX_SALE_QTY])) {

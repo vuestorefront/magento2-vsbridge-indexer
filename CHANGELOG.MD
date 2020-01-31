@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### Fixed
+- Fixed `max_sale_qty` getting wrong value when set per-product. [@rain2o](https://github.com/rain2o) ([#201](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/201))
 
 ## [1.9.0] (2020.01.28)
 
