@@ -16,6 +16,31 @@ interface CatalogConfigurationInterface
     const CATALOG_SETTINGS_XML_PREFIX = 'vsbridge_indexer_settings/catalog_settings';
 
     /**
+     * Slug/url key config
+     */
+    const USE_MAGENTO_URL_KEYS = 'use_magento_url_keys';
+    const USE_URL_KEY_TO_GENERATE_SLUG = 'use_url_key_to_generate_slug';
+
+    /**
+     * Prices
+     */
+    const USE_CATALOG_RULES = 'use_catalog_rules';
+    const SYNC_TIER_PRICES = 'sync_tier_prices';
+
+    const ADD_SWATCHES_OPTIONS = 'add_swatches_to_configurable_options';
+
+    /**
+     * Allow product types to reindex
+     */
+    const ALLOWED_PRODUCT_TYPES = '';
+
+    /**
+     * Product attributes to reindex
+     */
+    const PRODUCT_ATTRIBUTES = 'product_attributes';
+    const CHILD_ATTRIBUTES = 'child_attributes';
+
+    /**
      * @return bool
      */
     public function useMagentoUrlKeys();
@@ -48,6 +73,17 @@ interface CatalogConfigurationInterface
     public function getAllowedProductTypes($storeId);
 
     /**
+     * @return array
+     */
+    public function getAllowedAttributesToIndex();
+
+    /**
+     * @return array
+     */
+    public function getAllowedChildAttributesToIndex();
+
+    /**
+     *
      * @return array
      * @throws \Exception
      */

@@ -14,6 +14,7 @@ use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductUrlPathGenerator;
+use Divante\VsbridgeIndexerCatalog\Model\Attributes\ProductAttributes;
 
 /**
  * Class AttributeData
@@ -41,6 +42,11 @@ class AttributeData implements DataProviderInterface
     private $slugGenerator;
 
     /**
+     * @var ProductAttributes
+     */
+    private $productAttributes;
+
+    /**
      * @var AttributeDataProvider
      */
     private $productUrlPathGenerator;
@@ -55,6 +61,7 @@ class AttributeData implements DataProviderInterface
      * @param AttributeDataProvider $resourceModel
      */
     public function __construct(
+        ProductAttributes $productAttributes,
         CatalogConfigurationInterface $configSettings,
         SlugGeneratorInterface $slugGenerator,
         ProductUrlPathGenerator $productUrlPathGenerator,
@@ -65,6 +72,7 @@ class AttributeData implements DataProviderInterface
         $this->settings = $configSettings;
         $this->resourceModel = $resourceModel;
         $this->dataFilter = $dataFilter;
+        $this->productAttributes = $productAttributes;
         $this->productUrlPathGenerator = $productUrlPathGenerator;
     }
 
@@ -77,7 +85,8 @@ class AttributeData implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
-        $attributes = $this->resourceModel->loadAttributesData($storeId, array_keys($indexData));
+        $requiredAttributes = $this->productAttributes->getAttributes();
+        $attributes = $this->resourceModel->loadAttributesData($storeId, array_keys($indexData), $requiredAttributes);
 
         foreach ($attributes as $entityId => $attributesData) {
             $productData = array_merge($indexData[$entityId], $attributesData);

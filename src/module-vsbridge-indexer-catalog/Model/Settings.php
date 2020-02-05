@@ -9,11 +9,12 @@
 namespace Divante\VsbridgeIndexerCatalog\Model;
 
 use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Config as ConfigResource;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\ProductConfig as ConfigResource;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
+use Divante\VsbridgeIndexerCatalog\Model\Product\GetAttributeCodesByIds;
 
 /**
- * Class ConfigSettings
+ * Class Settings
  */
 class Settings implements CatalogConfigurationInterface
 {
@@ -33,21 +34,29 @@ class Settings implements CatalogConfigurationInterface
     private $scopeConfig;
 
     /**
+     * @var GetAttributeCodesByIds
+     */
+    private $getAttributeCodesByIds;
+
+    /**
      * @var ConfigResource
      */
     private $catalogConfigResource;
 
     /**
-     * ClientConfiguration constructor.
+     * Settings constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
+     * @param GetAttributeCodesByIds $getAttributeCodesByIds
      * @param ConfigResource $configResource
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
+        GetAttributeCodesByIds $getAttributeCodesByIds,
         ConfigResource $configResource
     ) {
         $this->scopeConfig = $scopeConfig;
+        $this->getAttributeCodesByIds = $getAttributeCodesByIds;
         $this->catalogConfigResource = $configResource;
     }
 
@@ -56,7 +65,7 @@ class Settings implements CatalogConfigurationInterface
      */
     public function useMagentoUrlKeys()
     {
-        return (bool) $this->getConfigParam('use_magento_url_keys');
+        return (bool) $this->getConfigParam(CatalogConfigurationInterface::USE_MAGENTO_URL_KEYS);
     }
 
     /**
@@ -64,7 +73,7 @@ class Settings implements CatalogConfigurationInterface
      */
     public function useUrlKeyToGenerateSlug()
     {
-        return (bool) $this->getConfigParam('use_url_key_to_generate_slug');
+        return (bool) $this->getConfigParam(CatalogConfigurationInterface::USE_URL_KEY_TO_GENERATE_SLUG);
     }
 
     /***
@@ -72,7 +81,7 @@ class Settings implements CatalogConfigurationInterface
      */
     public function useCatalogRules()
     {
-        return (bool) $this->getConfigParam('use_catalog_rules');
+        return (bool) $this->getConfigParam(CatalogConfigurationInterface::USE_CATALOG_RULES);
     }
 
     /**
@@ -80,7 +89,7 @@ class Settings implements CatalogConfigurationInterface
      */
     public function syncTierPrices()
     {
-        return (bool) $this->getConfigParam('sync_tier_prices');
+        return (bool) $this->getConfigParam(CatalogConfigurationInterface::SYNC_TIER_PRICES);
     }
 
     /**
@@ -88,7 +97,7 @@ class Settings implements CatalogConfigurationInterface
      */
     public function addSwatchesToConfigurableOptions()
     {
-        return (bool) $this->getConfigParam('add_swatches_to_configurable_options');
+        return (bool) $this->getConfigParam(CatalogConfigurationInterface::ADD_SWATCHES_OPTIONS);
     }
 
     /**
@@ -96,7 +105,7 @@ class Settings implements CatalogConfigurationInterface
      */
     public function getAllowedProductTypes($storeId)
     {
-        $types = $this->getConfigParam('allowed_product_types', $storeId);
+        $types = $this->getConfigParam(CatalogConfigurationInterface::ALLOWED_PRODUCT_TYPES, $storeId);
 
         if (null === $types || '' === $types) {
             $types = [];
@@ -105,6 +114,26 @@ class Settings implements CatalogConfigurationInterface
         }
 
         return $types;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAllowedAttributesToIndex()
+    {
+        $attributes = (string)$this->getConfigParam(CatalogConfigurationInterface::PRODUCT_ATTRIBUTES);
+
+        return $this->getAttributeCodesByIds->execute($attributes);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAllowedChildAttributesToIndex()
+    {
+        $attributes = (string)$this->getConfigParam(CatalogConfigurationInterface::CHILD_ATTRIBUTES);
+
+        return $this->getAttributeCodesByIds->execute($attributes);
     }
 
     /**
