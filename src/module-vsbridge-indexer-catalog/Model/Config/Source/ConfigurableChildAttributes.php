@@ -32,12 +32,13 @@ class ConfigurableChildAttributes extends AbstractProductAttributeSource
      * ProductAttributes constructor.
      *
      * @param CollectionFactory $collectionFactory
+     * @param Resource $productResource
      */
     public function __construct(CollectionFactory $collectionFactory, Resource $productResource)
     {
         $this->productResource = $productResource;
 
-        parent::__construct($collectionFactory, $productResource);
+        parent::__construct($collectionFactory);
     }
 
     /**
