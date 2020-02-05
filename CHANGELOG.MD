@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## [1.10.0] (2020.02.05)
+
 ### Fixed
 - Fixed `max_sale_qty` getting wrong value when set per-product. [@rain2o](https://github.com/rain2o) ([#201](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/201))
+- Fixed exporting products for Magento Commerce: Bundle products and Linked products([#202](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/202))
 
 ## [1.9.0] (2020.01.28)
 
