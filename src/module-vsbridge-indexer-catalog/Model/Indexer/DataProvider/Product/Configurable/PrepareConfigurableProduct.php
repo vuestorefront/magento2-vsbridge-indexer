@@ -49,7 +49,7 @@ class PrepareConfigurableProduct
             }
         }
 
-        if (!empty($productDTO['stock']['is_in_stock']) || !$areChildInStock) {
+        if (empty($productDTO['stock']['is_in_stock']) || !$areChildInStock) {
             $productDTO['stock']['is_in_stock'] = false;
             $productDTO['stock']['stock_status'] = 0;
         }
