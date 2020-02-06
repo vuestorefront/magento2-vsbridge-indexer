@@ -59,6 +59,7 @@ class IndexSettings
     {
         return [
             'settings' => [
+                'index.blocks.read_only_allow_delete' => false,
                 'index.mapping.total_fields.limit' => $this->settingConfig->getFieldsLimit(),
                 'analysis' => [
                     'analyzer' => [
