@@ -103,6 +103,11 @@
                     <label>Clear cache</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="entity_invalidate_batch_size" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Invalidate entity batch size</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                    <comment>Set "0" to avoid batch processing</comment>
+                </field>
                 <field id="vsf_base_url" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="1">
                     <label>Vsf base Url</label>
                     <comment>with "/" in the end</comment>
