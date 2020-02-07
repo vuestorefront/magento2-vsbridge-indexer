@@ -78,8 +78,9 @@ class Attribute
      */
     private function filterData(array $attributeData)
     {
-        foreach ($attributeData as $key => &$value) {
-            $this->convertValue->execute($this->attributeMapping, $key, $value);
+        foreach ($attributeData as $key => $value) {
+            $value = $this->convertValue->execute($this->attributeMapping, $key, $value);
+            $attributeData[$key] = $value;
         }
 
         return $attributeData;
