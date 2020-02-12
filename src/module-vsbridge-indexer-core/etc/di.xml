@@ -8,20 +8,22 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Divante\VsbridgeIndexerCore\Api\BulkLoggerInterface" type="Divante\VsbridgeIndexerCore\Index\BulkLogger"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\Client\ClientInterface" type="Divante\VsbridgeIndexerCore\Elasticsearch\Client"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\Client\ConfigurationInterface" type="Divante\VsbridgeIndexerCore\Elasticsearch\ClientConfiguration"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\Client\BuilderInterface" type="Divante\VsbridgeIndexerCore\Elasticsearch\ClientBuilder"/>
-
     <preference for="Divante\VsbridgeIndexerCore\Api\Index\TypeInterface" type="Divante\VsbridgeIndexerCore\Index\Type"/>
-
     <preference for="Divante\VsbridgeIndexerCore\Api\Indexer\TransactionKeyInterface" type="Divante\VsbridgeIndexerCore\Indexer\TransactionKey"/>
-
     <preference for="Divante\VsbridgeIndexerCore\Api\BulkRequestInterface" type="Divante\VsbridgeIndexerCore\Index\BulkRequest"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\BulkResponseInterface" type="Divante\VsbridgeIndexerCore\Index\BulkResponse"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\ConvertValueInterface" type="Divante\VsbridgeIndexerCore\Indexer\ConvertValue"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexInterface" type="Divante\VsbridgeIndexerCore\Index\Index"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexOperationInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperations"/>
+    <preference for="Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperationProvider"/>
 
+    <preference for="Divante\VsbridgeIndexerCore\Client\ClientProviderInterface" type="Divante\VsbridgeIndexerCore\Client\ClientProvider"/>
+    <preference for="Divante\VsbridgeIndexerCore\System\GeneralConfigInterface" type="Divante\VsbridgeIndexerCore\System\GeneralConfig"/>
     <preference for="Divante\VsbridgeIndexerCore\Cache\ConfigInterface" type="Divante\VsbridgeIndexerCore\Cache\Config"/>
 
     <type name="Divante\VsbridgeIndexerCore\Logger\IndexerLogger">
@@ -32,7 +34,7 @@
             </argument>
         </arguments>
     </type>
-    <type name="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+    <type name="Divante\VsbridgeIndexerCore\Index\BulkLogger">
         <arguments>
             <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\IndexerLogger</argument>
         </arguments>
