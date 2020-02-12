@@ -32,7 +32,7 @@ interface CatalogConfigurationInterface
     /**
      * Allow product types to reindex
      */
-    const ALLOWED_PRODUCT_TYPES = '';
+    const ALLOWED_PRODUCT_TYPES = 'allowed_product_types';
 
     /**
      * Product attributes to reindex
