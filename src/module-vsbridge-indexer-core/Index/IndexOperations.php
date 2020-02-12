@@ -95,12 +95,9 @@ class IndexOperations implements IndexOperationInterface
         $bulkParams = ['body' => $bulk->getOperations()];
         $rawBulkResponse = $this->client->bulk($bulkParams);
 
-        /** @var BulkResponseInterface $bulkResponse */
-        $bulkResponse = $this->bulkResponseFactory->create(
+        return $this->bulkResponseFactory->create(
             ['rawResponse' => $rawBulkResponse]
         );
-
-        return $bulkResponse;
     }
 
     /**
@@ -190,11 +187,11 @@ class IndexOperations implements IndexOperationInterface
      */
     public function switchIndexer(string $indexName, string $indexAlias)
     {
-        $aliasActions   = [
+        $aliasActions = [
             [
                 'add' => [
                     'index' => $indexName,
-                    'alias' => $indexAlias
+                    'alias' => $indexAlias,
                 ]
             ]
         ];
@@ -213,7 +210,7 @@ class IndexOperations implements IndexOperationInterface
                 ];
             }
         }
-        
+
         $this->client->updateAliases($aliasActions);
 
         foreach ($deletedIndices as $deletedIndex) {

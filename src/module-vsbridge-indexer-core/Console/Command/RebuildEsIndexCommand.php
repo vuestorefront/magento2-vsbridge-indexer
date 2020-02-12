@@ -9,7 +9,6 @@
 namespace Divante\VsbridgeIndexerCore\Console\Command;
 
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
-use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
@@ -17,7 +16,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Indexer\Console\Command\AbstractIndexerCommand;
 use Magento\Store\Api\Data\StoreInterface;
-use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,11 +30,6 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     const INPUT_STORE = 'store';
 
     const INPUT_ALL_STORES = 'all';
-
-    /**
-     * @var IndexOperationInterface
-     */
-    private $indexOperations;
 
     /**
      * @var StoreManager
@@ -246,18 +240,6 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         }
 
         return $this->indexerStoreManager;
-    }
-
-    /**
-     * @return IndexOperationInterface
-     */
-    private function getIndexOperations()
-    {
-        if (null === $this->indexOperations) {
-            $this->indexOperations = $this->getObjectManager()->get(IndexOperationInterface::class);
-        }
-
-        return $this->indexOperations;
     }
 
     /**

@@ -14,7 +14,7 @@ use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Indexer\Console\Command\AbstractIndexerCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
@@ -39,21 +39,12 @@ class SingleEntityIndexCommand extends AbstractIndexerCommand
     private $storeManager;
 
     /**
-     * @var array
-     */
-    private $excludeIndices = [];
-
-    /**
      * RebuildEsIndexCommand constructor.
      *
      * @param ObjectManagerFactory $objectManagerFactory
-     * @param array $excludeIndices
      */
-    public function __construct(
-        ObjectManagerFactory $objectManagerFactory,
-        array $excludeIndices = []
-    ) {
-        $this->excludeIndices = $excludeIndices;
+    public function __construct(ObjectManagerFactory $objectManagerFactory)
+    {
         parent::__construct($objectManagerFactory);
     }
 
@@ -82,17 +73,17 @@ class SingleEntityIndexCommand extends AbstractIndexerCommand
         return [
             new InputArgument(
                 self::INPUT_INDEXER_CODE,
-                InputArgument::REQUIRED ,
+                InputArgument::REQUIRED,
                 'Indexer code'
             ),
             new InputArgument(
                 self::INPUT_STORE,
-                InputArgument::REQUIRED ,
+                InputArgument::REQUIRED,
                 'Store ID or Store Code'
             ),
             new InputArgument(
                 self::INPUT_ENTITY_ID,
-                InputArgument::REQUIRED ,
+                InputArgument::REQUIRED,
                 'Entity id'
             ),
         ];

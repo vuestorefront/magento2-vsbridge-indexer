@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Divante\VsbridgeIndexerCore\Cache;
 
-use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * @inheritdoc
