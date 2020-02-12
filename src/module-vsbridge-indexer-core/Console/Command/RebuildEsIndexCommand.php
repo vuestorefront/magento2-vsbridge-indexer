@@ -10,7 +10,8 @@ namespace Divante\VsbridgeIndexerCore\Console\Command;
 
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
-use Divante\VsbridgeIndexerCore\Model\IndexerRegistry as IndexerRegistry;
+use Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface;
+use Divante\VsbridgeIndexerCore\Model\IndexerRegistry;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\LocalizedException;
@@ -20,7 +21,7 @@ use Magento\Store\Api\Data\StoreInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class IndexerReindexCommand
@@ -189,8 +190,10 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
      */
     private function reindexStore(StoreInterface $store, OutputInterface $output)
     {
+        $indexOperations = $this->getIndexOperationProvider()->getOperationByStore($store->getId());
+
         $this->getIndexerStoreManager()->setLoadedStores([$store]);
-        $index = $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store);
+        $index = $indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
         $this->getIndexerRegistry()->setFullReIndexationIsInProgress();
 
         $returnValue = Cli::RETURN_FAILURE;
@@ -213,12 +216,11 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             }
         }
 
-        $this->indexOperations->switchIndexer($index->getName(), $index->getIdentifier());
+        $indexOperations->switchIndexer($index->getName(), $index->getIdentifier());
 
         $output->writeln(
             sprintf('<info>Index name: %s, index alias: %s</info>', $index->getName(), $index->getIdentifier())
         );
-        $this->getIndexOperations()->switchIndexer($index->getName(), $index->getIdentifier());
 
         return $returnValue;
     }
@@ -280,12 +282,12 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     }
 
     /**
-     * @return IndexOperationInterface
+     * @return IndexOperationProviderInterface
      */
-    private function getIndexOperations()
+    private function getIndexOperationProvider()
     {
         if (null === $this->indexOperations) {
-            $this->indexOperations = $this->getObjectManager()->get(IndexOperationInterface::class);
+            $this->indexOperations = $this->getObjectManager()->get(IndexOperationProviderInterface::class);
         }
 
         return $this->indexOperations;
