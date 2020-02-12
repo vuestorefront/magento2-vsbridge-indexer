@@ -6,7 +6,7 @@
             <label>Vuestorefront</label>
         </tab>
 
-        <section id="vsbridge_indexer_settings" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+        <section id="vsbridge_indexer_settings" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
             <label>Indexer</label>
             <tab>vuestorefront_config</tab>
