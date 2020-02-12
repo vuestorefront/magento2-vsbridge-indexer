@@ -4,6 +4,7 @@
 
 
 ### Added
+- Add option to export data for store views to different ES instances
 - Manage exported attributes for products. Customize indexed attributes for product and product.configurable_children.
 
 ~~Some attributes are always exported:

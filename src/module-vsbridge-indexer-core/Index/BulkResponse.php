@@ -85,16 +85,7 @@ class BulkResponse implements BulkResponseInterface
             $errorKey = $operationType . $errorData['type'] . $errorData['reason'] . $index . $documentType;
 
             if (!isset($errorByReason[$errorKey])) {
-                $errorByReason[$errorKey] = [
-                    'index' => $itemData['_index'],
-                    'document_type' => $itemData['_type'],
-                    'operation' => $operationType,
-                    'error' => [
-                        'type' => $errorData['type'],
-                        'reason' => $errorData['reason'],
-                    ],
-                    'count' => 0,
-                ];
+                $errorByReason[$errorKey] = $this->prepareErrorByReason($item);
             }
 
             $errorByReason[$errorKey]['count'] += 1;
@@ -102,5 +93,28 @@ class BulkResponse implements BulkResponseInterface
         }
 
         return array_values($errorByReason);
+    }
+
+    /**
+     * @param array $item
+     *
+     * @return array
+     */
+    private function prepareErrorByReason(array $item)
+    {
+        $operationType = current(array_keys($item));
+        $itemData = $item[$operationType];
+        $errorData = $itemData['error'];
+
+        return [
+            'index' => $itemData['_index'],
+            'document_type' => $itemData['_type'],
+            'operation' => $operationType,
+            'error' => [
+                'type' => $errorData['type'],
+                'reason' => $errorData['reason'],
+            ],
+            'count' => 0,
+        ];
     }
 }
