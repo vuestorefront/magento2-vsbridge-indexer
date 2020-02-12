@@ -29,7 +29,7 @@
                 </field>
             </group>
 
-            <group id="es_client" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="1">
+            <group id="es_client" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Elasticsearch Client</label>
                 <depends>
                     <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
