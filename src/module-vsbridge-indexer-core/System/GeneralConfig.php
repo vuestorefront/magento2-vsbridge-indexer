@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /**
  * @package  Divante\VsbridgeIndexerCore
  * @author Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -6,17 +7,15 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCore\Config;
+namespace Divante\VsbridgeIndexerCore\System;
 
-use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
- * Class GeneralSettings
+ * @inheritdoc
  */
-class GeneralSettings
+class GeneralConfig implements GeneralConfigInterface
 {
-    const GENERAL_SETTINGS_CONFIG_XML_PREFIX = 'vsbridge_indexer_settings/general_settings';
-
     /**
      * @var ScopeConfigInterface
      */
@@ -33,11 +32,9 @@ class GeneralSettings
     }
 
     /**
-     * @param $storeId
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function canReindexStore($storeId)
+    public function canReindexStore($storeId): bool
     {
         $allowedStores = $this->getStoresToIndex();
 
@@ -49,11 +46,11 @@ class GeneralSettings
     }
 
     /**
-     * @return array|int|null|string
+     * @inheritdoc
      */
-    public function getStoresToIndex()
+    public function getStoresToIndex(): array
     {
-        $stores = $this->getConfigParam('allowed_stores');
+        $stores = $this->scopeConfig->getValue(self::XML_PATH_ALLOWED_STORES_TO_REINDEX);
 
         if (null === $stores || '' === $stores) {
             $stores = [];
@@ -65,24 +62,10 @@ class GeneralSettings
     }
 
     /**
-     * Check if ES indexing enabled
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
-        return (bool)$this->getConfigParam('enable');
-    }
-
-    /**
-     * @param string $configField
-     *
-     * @return string|null
-     */
-    private function getConfigParam(string $configField)
-    {
-        $path = self::GENERAL_SETTINGS_CONFIG_XML_PREFIX . '/' . $configField;
-
-        return $this->scopeConfig->getValue($path);
+        return (bool)$this->scopeConfig->isSetFlag(self::XML_PATH_GENERAL_INDEXER_ENABLED);
     }
 }

@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCore\Config;
 
-use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Class SettingsConfig
