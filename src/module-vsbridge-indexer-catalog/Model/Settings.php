@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -10,8 +10,9 @@ namespace Divante\VsbridgeIndexerCatalog\Model;
 
 use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\ProductConfig as ConfigResource;
-use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
 use Divante\VsbridgeIndexerCatalog\Model\Product\GetAttributeCodesByIds;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class Settings
@@ -119,9 +120,12 @@ class Settings implements CatalogConfigurationInterface
     /**
      * @inheritdoc
      */
-    public function getAllowedAttributesToIndex()
+    public function getAllowedAttributesToIndex(int $storeId): array
     {
-        $attributes = (string)$this->getConfigParam(CatalogConfigurationInterface::PRODUCT_ATTRIBUTES);
+        $attributes = (string)$this->getConfigParam(
+            CatalogConfigurationInterface::PRODUCT_ATTRIBUTES,
+            $storeId
+        );
 
         return $this->getAttributeCodesByIds->execute($attributes);
     }
@@ -129,9 +133,12 @@ class Settings implements CatalogConfigurationInterface
     /**
      * @inheritdoc
      */
-    public function getAllowedChildAttributesToIndex()
+    public function getAllowedChildAttributesToIndex(int $storeId): array
     {
-        $attributes = (string)$this->getConfigParam(CatalogConfigurationInterface::CHILD_ATTRIBUTES);
+        $attributes = (string)$this->getConfigParam(
+            CatalogConfigurationInterface::CHILD_ATTRIBUTES,
+            $storeId
+        );
 
         return $this->getAttributeCodesByIds->execute($attributes);
     }
@@ -148,12 +155,9 @@ class Settings implements CatalogConfigurationInterface
 
         if (!isset($this->settings[$key])) {
             $path = CatalogConfigurationInterface::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
+            $scopeType = ($storeId) ? ScopeInterface::SCOPE_STORES : ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
 
-            if ($storeId) {
-                $configValue = $this->scopeConfig->getValue($path, 'stores', $storeId);
-            }
-
-            $configValue = $this->scopeConfig->getValue($path);
+            $configValue = $this->scopeConfig->getValue($path, $scopeType, $storeId);
             $this->settings[$key] = $configValue;
         }
 

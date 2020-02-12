@@ -85,7 +85,7 @@ class AttributeData implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
-        $requiredAttributes = $this->productAttributes->getAttributes();
+        $requiredAttributes = $this->productAttributes->getAttributes($storeId);
         $attributes = $this->resourceModel->loadAttributesData($storeId, array_keys($indexData), $requiredAttributes);
 
         foreach ($attributes as $entityId => $attributesData) {

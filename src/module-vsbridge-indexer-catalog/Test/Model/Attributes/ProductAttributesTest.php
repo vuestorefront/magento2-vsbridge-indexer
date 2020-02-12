@@ -40,18 +40,20 @@ class ProductAttributesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param int $storeId
      * @param array $selectedAttributes
      *
      * @dataProvider provideAllowedAttributes
      */
-    public function testGetAttributes(array $selectedAttributes)
+    public function testGetAttributes(int $storeId, array $selectedAttributes)
     {
         $attributes = ProductAttributes::REQUIRED_ATTRIBUTES;
         $this->catalogConfigMock->expects($this->once())
             ->method('getAllowedAttributesToIndex')
+            ->with($storeId)
             ->willReturn($selectedAttributes);
 
-        $productAttributes = $this->productAttributes->getAttributes();
+        $productAttributes = $this->productAttributes->getAttributes($storeId);
 
         foreach ($attributes as $attributeCode) {
             $this->assertContains($attributeCode, $productAttributes);
@@ -63,11 +65,14 @@ class ProductAttributesTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetAllAttributes()
     {
+        $storeId = 2;
+
         $this->catalogConfigMock->expects($this->once())
             ->method('getAllowedAttributesToIndex')
+            ->with($storeId)
             ->willReturn([]);
 
-        $productAttributes = $this->productAttributes->getAttributes();
+        $productAttributes = $this->productAttributes->getAttributes($storeId);
         $this->assertEmpty($productAttributes);
     }
 
@@ -78,7 +83,8 @@ class ProductAttributesTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                [
+                'storeId' => 1,
+                'attributes' => [
                     'sku',
                     'url_path',
                     'url_key',
