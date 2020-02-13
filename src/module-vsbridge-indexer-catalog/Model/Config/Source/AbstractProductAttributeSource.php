@@ -8,8 +8,10 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Catalog\Api\Data\ProductAttributeInterface;
+use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory;
+use Magento\Framework\Option\ArrayInterface;
 
 /**
  * Class AbstractProductAttributeSource
@@ -47,15 +49,16 @@ abstract class AbstractProductAttributeSource implements ArrayInterface
                 'value' => '',
                 'label' => __('-- All Attributes --'),
             ];
-            /** @var \Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection $collection */
+            /** @var Collection $collection */
             $collection = $this->collectionFactory->create();
             $collection->addVisibleFilter();
             $attributes = $collection->getItems();
 
+            /** @var ProductAttributeInterface $attribute */
             foreach ($attributes as $attribute) {
                 if ($this->canAddAttribute($attribute)) {
                     $this->options[] = [
-                        'label' => $attribute->getName(),
+                        'label' => $attribute->getAttributeCode(),
                         'value' => $attribute->getAttributeId(),
                     ];
                 }
@@ -66,9 +69,9 @@ abstract class AbstractProductAttributeSource implements ArrayInterface
     }
 
     /**
-     * @param \Magento\Catalog\Api\Data\ProductAttributeInterface $attribute
+     * @param ProductAttributeInterface $attribute
      *
      * @return bool
      */
-    abstract public function canAddAttribute(\Magento\Catalog\Api\Data\ProductAttributeInterface $attribute): bool;
+    abstract public function canAddAttribute(ProductAttributeInterface $attribute): bool;
 }
