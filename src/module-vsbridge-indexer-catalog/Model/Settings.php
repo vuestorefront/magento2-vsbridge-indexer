@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\ProductConfig as ConfigResource;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
 use Divante\VsbridgeIndexerCatalog\Model\Product\GetAttributeCodesByIds;

@@ -10,7 +10,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Conf
 
 use Divante\VsbridgeIndexerCatalog\Model\Attribute\LoadOptionById;
 use Divante\VsbridgeIndexerCatalog\Model\Attribute\SortValues;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
  * Class LoadConfigurableOptions

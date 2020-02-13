@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Setup\UpgradeData;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Magento\Eav\Model\Config as EavConfig;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;

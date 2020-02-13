@@ -3,7 +3,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Test\Model\Attributes;
 
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\ProductAttributes;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
 /**

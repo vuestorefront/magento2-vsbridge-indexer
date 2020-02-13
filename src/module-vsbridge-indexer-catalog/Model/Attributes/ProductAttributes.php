@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Attributes;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
  * Class ProductAttributes
