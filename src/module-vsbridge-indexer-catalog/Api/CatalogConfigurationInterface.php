@@ -6,7 +6,7 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Api\Data;
+namespace Divante\VsbridgeIndexerCatalog\Api;
 
 /**
  * Interface CatalogConfigurationInterface
@@ -73,14 +73,18 @@ interface CatalogConfigurationInterface
     public function getAllowedProductTypes($storeId);
 
     /**
+     * @param int $storeId
+     *
      * @return array
      */
-    public function getAllowedAttributesToIndex();
+    public function getAllowedAttributesToIndex(int $storeId): array;
 
     /**
+     * @param int $storeId
+     *
      * @return array
      */
-    public function getAllowedChildAttributesToIndex();
+    public function getAllowedChildAttributesToIndex(int $storeId): array;
 
     /**
      *

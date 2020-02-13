@@ -3,7 +3,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Test\Model\Attributes;
 
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
 /**
@@ -40,19 +40,21 @@ class ConfigurableAttributesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param int $storeId
      * @param array $selectedAttributes
      *
      * @dataProvider provideAllowedAttributes
      */
-    public function testGetChildrenRequiredAttributes(array $selectedAttributes)
+    public function testGetChildrenRequiredAttributes(int $storeId, array $selectedAttributes)
     {
         $attributes = ConfigurableAttributes::MINIMAL_ATTRIBUTE_SET;
 
         $this->catalogConfigMock->expects($this->once())
             ->method('getAllowedChildAttributesToIndex')
+            ->with($storeId)
             ->willReturn($selectedAttributes);
 
-        $productAttributes = $this->configurableAttributes->getChildrenRequiredAttributes();
+        $productAttributes = $this->configurableAttributes->getChildrenRequiredAttributes($storeId);
 
         foreach ($attributes as $attributeCode) {
             $this->assertContains($attributeCode, $productAttributes);
@@ -64,11 +66,13 @@ class ConfigurableAttributesTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetAllAttributes()
     {
+        $storeId = 1;
+
         $this->catalogConfigMock->expects($this->once())
             ->method('getAllowedChildAttributesToIndex')
             ->willReturn([]);
 
-        $productAttributes = $this->configurableAttributes->getChildrenRequiredAttributes();
+        $productAttributes = $this->configurableAttributes->getChildrenRequiredAttributes($storeId);
         $this->assertEmpty($productAttributes);
     }
 
@@ -79,7 +83,8 @@ class ConfigurableAttributesTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                [
+                'storeId' => 1,
+                'attributes' => [
                     'sku',
                     'status',
                     'visibility',
@@ -88,7 +93,8 @@ class ConfigurableAttributesTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             [
-                [
+                'storeId' => 1,
+                'attributes' => [
                     'tax_class_id',
                 ]
             ]
