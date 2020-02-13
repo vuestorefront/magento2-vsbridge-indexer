@@ -13,7 +13,7 @@ use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Prices as PriceResourceModel;
 use Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
 
 /**

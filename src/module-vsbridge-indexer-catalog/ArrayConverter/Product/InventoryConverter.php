@@ -8,10 +8,11 @@
 
 namespace Divante\VsbridgeIndexerCatalog\ArrayConverter\Product;
 
-use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
 use Magento\CatalogInventory\Api\StockConfigurationInterface;
 use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\InventoryConverterInterface;
+use Divante\VsbridgeIndexerCatalog\Index\Mapping\StockMapping;
+use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
 
 /**
  * Class InventoryConverter
@@ -25,21 +26,21 @@ class InventoryConverter implements InventoryConverterInterface
     private $stockConfiguration;
 
     /**
-     * @var GeneralMapping
+     * @var StockMapping
      */
-    private $generalMapping;
+    private $stockMapping;
 
     /**
      * InventoryConverter constructor.
      *
-     * @param GeneralMapping $generalMapping
+     * @param StockMapping $generalMapping
      * @param StockConfigurationInterface $stockConfiguration
      */
     public function __construct(
-        GeneralMapping $generalMapping,
+        StockMapping $generalMapping,
         StockConfigurationInterface $stockConfiguration
     ) {
-        $this->generalMapping = $generalMapping;
+        $this->stockMapping = $generalMapping;
         $this->stockConfiguration = $stockConfiguration;
     }
 
@@ -79,6 +80,36 @@ class InventoryConverter implements InventoryConverterInterface
             $inventory[StockItemInterface::BACKORDERS] = $this->stockConfiguration->getBackorders($storeId);
         }
 
-        return $this->generalMapping->prepareStockData($inventory);
+        return $this->prepareStockData($inventory);
+    }
+
+    /**
+     * @param array $stockData
+     *
+     * @return array
+     */
+    public function prepareStockData(array $stockData)
+    {
+        $stockMapping = $this->stockMapping->get();
+
+        foreach (array_keys($stockData) as $key) {
+            if (isset($stockMapping[$key]['type'])) {
+                $type = $stockMapping[$key]['type'];
+
+                if ($type === FieldInterface::TYPE_BOOLEAN) {
+                    settype($stockData[$key], 'bool');
+                }
+
+                if ($type === FieldInterface::TYPE_LONG) {
+                    settype($stockData[$key], 'int');
+                }
+
+                if ($type === FieldInterface::TYPE_DOUBLE) {
+                    settype($stockData[$key], 'float');
+                }
+            }
+        }
+
+        return $stockData;
     }
 }

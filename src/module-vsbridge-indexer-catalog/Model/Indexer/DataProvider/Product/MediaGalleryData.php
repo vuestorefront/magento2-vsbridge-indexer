@@ -10,7 +10,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
  * Class MediaGalleryData

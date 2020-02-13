@@ -6,7 +6,7 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Api\Data;
+namespace Divante\VsbridgeIndexerCatalog\Api;
 
 /**
  * Interface CatalogConfigurationInterface

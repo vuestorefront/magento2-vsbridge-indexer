@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
