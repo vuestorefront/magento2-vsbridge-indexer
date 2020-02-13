@@ -3,7 +3,7 @@
     <preference for="Magento\Indexer\Console\Command\IndexerReindexCommand"
                 type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerReindexCommand"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface" type="Divante\VsbridgeIndexerCatalog\Model\SlugGenerator"/>
-    <preference for="Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface" type="Divante\VsbridgeIndexerCatalog\Model\LoadInventory"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\InventoryConverterInterface"
@@ -184,6 +184,19 @@
                 <item name="special_price" xsi:type="string">special_price</item>
                 <item name="special_from_date" xsi:type="string">special_from_date</item>
                 <item name="special_to_date" xsi:type="string">special_to_date</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Index\Mapping\Product">
+        <arguments>
+            <argument name="additionalMapping" xsi:type="array">
+                <item name="bundle_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\BundleOptionsMapping</item>
+                <item name="product_links" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\ProductLinksMapping</item>
+                <item name="configurable_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\ConfigurableOptionsMapping</item>
+                <item name="category" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\CategoryMapping</item>
+                <item name="custom_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\CustomOptionsMapping</item>
+                <item name="tier_prices" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\TierPricesMapping</item>
             </argument>
         </arguments>
     </type>
