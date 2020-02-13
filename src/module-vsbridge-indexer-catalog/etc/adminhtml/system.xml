@@ -40,13 +40,14 @@
                 <field id="product_attributes" translate="label comment" type="multiselect" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Product attributes to export</label>
                     <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ProductAttributes</source_model>
+                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\ProductAttributes</backend_model>
                     <can_be_empty>1</can_be_empty>
                     <comment>Select which product attributes should be exported. Some attributes will be always exported: name, sku, price, status, url_path, url_key, visibility.</comment>
                 </field>
-
                 <field id="child_attributes" translate="label comment" type="multiselect" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Configurable children attributes to export</label>
                     <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ConfigurableChildAttributes</source_model>
+                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\ProductAttributes</backend_model>
                     <can_be_empty>1</can_be_empty>
                     <comment>Select which product attributes should be exported for 'configurable_children'. Some attributes will be always exported: name, sku, price, status, url_key, visibility.</comment>
                 </field>
