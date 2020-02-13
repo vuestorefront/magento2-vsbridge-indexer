@@ -13,7 +13,7 @@ use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Prices as PriceResourceModel;
 use Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
 
 /**
@@ -96,7 +96,7 @@ class LoadChildrenRawAttributes
      */
     public function execute($storeId, array $allChildren, array $configurableAttributeCodes)
     {
-        $requiredAttributes = $this->getRequiredChildrenAttributes();
+        $requiredAttributes = $this->getRequiredChildrenAttributes($storeId);
 
         if (!empty($requiredAttributes)) {
             $requiredAttributes = array_merge(
@@ -133,7 +133,7 @@ class LoadChildrenRawAttributes
 
                 if (
                     $this->settings->syncTierPrices() ||
-                    $this->configurableAttributes->canIndexMediaGallery()
+                    $this->configurableAttributes->canIndexMediaGallery($storeId)
                 ) {
                     /*we need some extra attributes to apply tier prices*/
                     $batch[$productId] = $newProductData;
@@ -149,7 +149,7 @@ class LoadChildrenRawAttributes
                 $replace = true;
             }
 
-            if ($this->configurableAttributes->canIndexMediaGallery()) {
+            if ($this->configurableAttributes->canIndexMediaGallery($storeId)) {
                 $batch = $this->mediaGalleryLoader->execute($batch, $storeId);
                 $replace = true;
             }
@@ -163,11 +163,13 @@ class LoadChildrenRawAttributes
     }
 
     /**
+     * @param int $storeId
+     *
      * @return array
      */
-    private function getRequiredChildrenAttributes(): array
+    private function getRequiredChildrenAttributes($storeId): array
     {
-        return $this->configurableAttributes->getChildrenRequiredAttributes();
+        return $this->configurableAttributes->getChildrenRequiredAttributes($storeId);
     }
 
     /**

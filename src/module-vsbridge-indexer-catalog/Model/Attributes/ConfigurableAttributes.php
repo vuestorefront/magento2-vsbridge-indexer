@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Attributes;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
  * Class ConfigurableAttributes
@@ -54,12 +54,14 @@ class ConfigurableAttributes
     }
 
     /**
+     * @param int $storeId
+     *
      * @return array
      */
-    public function getChildrenRequiredAttributes(): array
+    public function getChildrenRequiredAttributes(int $storeId): array
     {
         if (null === $this->requiredAttributes) {
-            $attributes = $this->catalogConfig->getAllowedChildAttributesToIndex();
+            $attributes = $this->catalogConfig->getAllowedChildAttributesToIndex($storeId);
 
             if (empty($attributes)) {
                 $this->requiredAttributes = [];
@@ -72,12 +74,14 @@ class ConfigurableAttributes
     }
 
     /**
+     * @param int $storeId
+     *
      * @return bool
      */
-    public function canIndexMediaGallery(): bool
+    public function canIndexMediaGallery($storeId): bool
     {
         if (null === $this->canIndexMediaGallery) {
-            $attributes = $this->getChildrenRequiredAttributes();
+            $attributes = $this->getChildrenRequiredAttributes($storeId);
             $this->canIndexMediaGallery = in_array('media_gallery', $attributes) || empty($attributes);
         }
 

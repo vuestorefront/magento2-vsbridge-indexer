@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Attributes;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
  * Class ProductAttributes
@@ -45,11 +45,13 @@ class ProductAttributes
     }
 
     /**
+     * @param int $storeId
+     *
      * @return array
      */
-    public function getAttributes(): array
+    public function getAttributes(int $storeId): array
     {
-        $attributes = $this->catalogConfig->getAllowedAttributesToIndex();
+        $attributes = $this->catalogConfig->getAllowedAttributesToIndex($storeId);
 
         if (empty($attributes)) {
             return [];

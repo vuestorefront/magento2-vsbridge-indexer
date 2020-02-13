@@ -11,7 +11,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductUrlPathGenerator;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\ProductAttributes;
@@ -85,7 +85,7 @@ class AttributeData implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
-        $requiredAttributes = $this->productAttributes->getAttributes();
+        $requiredAttributes = $this->productAttributes->getAttributes($storeId);
         $attributes = $this->resourceModel->loadAttributesData($storeId, array_keys($indexData), $requiredAttributes);
 
         foreach ($attributes as $entityId => $attributesData) {

@@ -10,7 +10,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="vsbridge_indexer_settings">
-            <group id="catalog_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+            <group id="catalog_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Catalog Settings</label>
                 <depends>
                     <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
@@ -37,14 +37,14 @@
                         If you changed configuration after running full reindex it might be required to re-create index.
                     </comment>
                 </field>
-                <field id="product_attributes" translate="label comment" type="multiselect" sortOrder="102" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="product_attributes" translate="label comment" type="multiselect" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Product attributes to export</label>
                     <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ProductAttributes</source_model>
                     <can_be_empty>1</can_be_empty>
                     <comment>Select which product attributes should be exported. Some attributes will be always exported: name, sku, price, status, url_path, url_key, visibility.</comment>
                 </field>
 
-                <field id="child_attributes" translate="label comment" type="multiselect" sortOrder="103" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="child_attributes" translate="label comment" type="multiselect" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Configurable children attributes to export</label>
                     <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ConfigurableChildAttributes</source_model>
                     <can_be_empty>1</can_be_empty>

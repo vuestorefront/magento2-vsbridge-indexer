@@ -10,7 +10,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
  * Class MediaGalleryData
@@ -36,6 +36,7 @@ class MediaGalleryData implements DataProviderInterface
     /**
      * MediaGalleryData constructor.
      *
+     * @param CatalogConfigurationInterface $catalogConfig
      * @param LoadMediaGalleryInterface $galleryProcessor
      */
     public function __construct(
@@ -51,7 +52,7 @@ class MediaGalleryData implements DataProviderInterface
      */
     public function addData(array $indexData, $storeId)
     {
-        if ($this->canIndexMediaGallery()) {
+        if ($this->canIndexMediaGallery($storeId)) {
             return $this->galleryConverter->execute($indexData, $storeId);
         }
 
@@ -59,12 +60,14 @@ class MediaGalleryData implements DataProviderInterface
     }
 
     /**
+     * @param int $storeId
+     *
      * @return bool
      */
-    private function canIndexMediaGallery()
+    private function canIndexMediaGallery(int $storeId)
     {
         if (null === $this->canIndexMediaGallery) {
-            $attributes = $this->catalogConfig->getAllowedAttributesToIndex();
+            $attributes = $this->catalogConfig->getAllowedAttributesToIndex($storeId);
             $this->canIndexMediaGallery = in_array('media_gallery', $attributes);
         }
 
