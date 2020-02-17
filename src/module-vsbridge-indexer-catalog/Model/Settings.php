@@ -102,6 +102,14 @@ class Settings implements CatalogConfigurationInterface
     }
 
     /**
+     * @return bool
+     */
+    public function canExportAttributesMetadata(): bool
+    {
+        return (bool) $this->getConfigParam(CatalogConfigurationInterface::EXPORT_ATTRIBUTES_METADATA);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getAllowedProductTypes($storeId)

@@ -2,7 +2,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Index\Mapping;
 
-use Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute\SwatchMapping;
+use Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute\OptionMapping;
 use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
 
@@ -12,18 +12,18 @@ use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
 class Attribute implements MappingInterface
 {
     /**
-     * @var SwatchMapping
+     * @var OptionMapping
      */
-    private $swatchMapping;
+    private $optionMapping;
 
     /**
      * Attribute constructor.
      *
-     * @param SwatchMapping $generalMapping
+     * @param OptionMapping $optionMapping
      */
-    public function __construct(SwatchMapping $generalMapping)
+    public function __construct(OptionMapping $optionMapping)
     {
-        $this->swatchMapping = $generalMapping;
+        $this->optionMapping = $optionMapping;
     }
 
     /**
@@ -109,14 +109,7 @@ class Attribute implements MappingInterface
             $properties[$property] = ['type' => FieldInterface::TYPE_TEXT];
         }
 
-        $properties['options'] = [
-            'properties' => [
-                'value' => ['type' => FieldInterface::TYPE_TEXT],
-                'label' => ['type' => FieldInterface::TYPE_TEXT],
-                'sort_order' => ['type' => FieldInterface::TYPE_INTEGER],
-                'swatch' => $this->swatchMapping->get(),
-            ]
-        ];
+        $properties['options'] = $this->optionMapping->get();
 
         return ['properties' => $properties];
     }

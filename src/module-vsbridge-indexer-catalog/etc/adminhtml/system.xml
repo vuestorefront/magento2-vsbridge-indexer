@@ -49,7 +49,12 @@
                     <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ConfigurableChildAttributes</source_model>
                     <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\ProductAttributes</backend_model>
                     <can_be_empty>1</can_be_empty>
-                    <comment>Select which product attributes should be exported for 'configurable_children'. Some attributes will be always exported: name, sku, price, status, url_key, visibility.</comment>
+                    <comment>Select which product attributes should be exported for 'configurable_children'. Some attributes will be always exported: name, sku, price, status, url_key, visibility and attributes used for creating configurable children (like color, size, etc)</comment>
+                </field>
+                <field id="export_attributes_metadata" translate="label comment" type="select" sortOrder="110" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Export attributes_metadata for product</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Only visible attributes will be exported in "product.attributes_metadata"</comment>
                 </field>
                 <field id="sync_tier_prices" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Sync Tier Prices</label>

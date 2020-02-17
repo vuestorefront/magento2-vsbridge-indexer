@@ -18,9 +18,10 @@ use Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\CollectionFactory;
 use Magento\Eav\Model\Entity\Attribute;
 use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 use Magento\Eav\Model\Entity\Attribute\Source\Table as SourceTable;
+use Magento\Swatches\Model\Swatch;
 
 /**
- * Class LoadOptionLabelById
+ * Class LoadOptions
  */
 class LoadOptions
 {
@@ -160,7 +161,7 @@ class LoadOptions
      */
     private function isVisualSwatch(Attribute $attribute)
     {
-        return \Magento\Swatches\Model\Swatch::SWATCH_INPUT_TYPE_VISUAL === $attribute->getData('swatch_input_type');
+        return $attribute->getData('swatch_input_type') === Swatch::SWATCH_INPUT_TYPE_VISUAL;
     }
 
     /**
