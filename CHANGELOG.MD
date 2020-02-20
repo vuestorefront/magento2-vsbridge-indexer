@@ -4,6 +4,10 @@
 
 
 ### Added
+- Add option to export "attributes_metadata" for products. Only visible attributes are exported by default.
+Sample: `docs/sample/attributes-metadata.json`
+Options values are collected from exported attributes - so make sure attribute is exported to ES (check option `Product attributes to export`).
+
 - Manage exported attributes for products. Customize indexed attributes for product and product.configurable_children.
 
 ~~Some attributes are always exported:
