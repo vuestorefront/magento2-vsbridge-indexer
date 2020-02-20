@@ -47,6 +47,11 @@ class LoadMediaGallery implements LoadMediaGalleryInterface
     private $productMetaData;
 
     /**
+     * @var array
+     */
+    private $rowIdToEntityId = [];
+
+    /**
      * MediaGalleryData constructor.
      *
      * @param Resource $resource
@@ -65,6 +70,7 @@ class LoadMediaGallery implements LoadMediaGalleryInterface
      */
     public function execute(array $indexData, int $storeId): array
     {
+        $this->mapRowIdToEntityId($indexData);
         $linkField = $this->productMetaData->get()->getLinkField();
         $linkFieldIds = array_column($indexData, $linkField);
 
@@ -74,6 +80,8 @@ class LoadMediaGallery implements LoadMediaGalleryInterface
 
         foreach ($gallerySet as $mediaImage) {
             $linkFieldId  = $mediaImage['row_id'];
+            $entityId = $this->rowIdToEntityId[$linkFieldId] ?? $linkFieldId;
+
             $image['typ'] = 'image';
             $image        = [
                 'typ' => 'image',
@@ -88,10 +96,31 @@ class LoadMediaGallery implements LoadMediaGalleryInterface
                 $image['vid'] = $this->prepareVideoData($videoSet[$valueId]);
             }
 
-            $indexData[$linkFieldId]['media_gallery'][] = $image;
+            $indexData[$entityId]['media_gallery'][] = $image;
         }
 
+        $this->rowIdToEntityId = [];
+
         return $indexData;
+    }
+
+    /**
+     * Map Row Id to Entity Id
+     *
+     * @param array $products
+     *
+     * @return void
+     */
+    private function mapRowIdToEntityId(array $products)
+    {
+        $linkField = $this->productMetaData->get()->getLinkField();
+        $identifierField = $this->productMetaData->get()->getIdentifierField();
+
+        if ($identifierField !== $linkField) {
+            foreach ($products as $entityId => $product) {
+                $this->rowIdToEntityId[$product[$linkField]] = $entityId;
+            }
+        }
     }
 
     /**

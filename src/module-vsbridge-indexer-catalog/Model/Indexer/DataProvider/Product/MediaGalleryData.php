@@ -26,7 +26,7 @@ class MediaGalleryData implements DataProviderInterface
     /**
      * @var LoadMediaGalleryInterface
      */
-    private $galleryConverter;
+    private $loadMediaGallery;
 
     /**
      * @var boolean
@@ -44,7 +44,7 @@ class MediaGalleryData implements DataProviderInterface
         LoadMediaGalleryInterface $galleryProcessor
     ) {
         $this->catalogConfig = $catalogConfig;
-        $this->galleryConverter = $galleryProcessor;
+        $this->loadMediaGallery = $galleryProcessor;
     }
 
     /**
@@ -53,7 +53,7 @@ class MediaGalleryData implements DataProviderInterface
     public function addData(array $indexData, $storeId)
     {
         if ($this->canIndexMediaGallery($storeId)) {
-            return $this->galleryConverter->execute($indexData, $storeId);
+            return $this->loadMediaGallery->execute($indexData, $storeId);
         }
 
         return $indexData;
@@ -68,7 +68,7 @@ class MediaGalleryData implements DataProviderInterface
     {
         if (null === $this->canIndexMediaGallery) {
             $attributes = $this->catalogConfig->getAllowedAttributesToIndex($storeId);
-            $this->canIndexMediaGallery = in_array('media_gallery', $attributes);
+            $this->canIndexMediaGallery = in_array('media_gallery', $attributes) || empty($attributes);
         }
 
         return $this->canIndexMediaGallery;
