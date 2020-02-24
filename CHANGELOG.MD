@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## [1.11.0] (2020.02.24)
 
 ### Added
 - Add option to export "attributes_metadata" for products. Only visible attributes are exported by default.
