@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 /**
  * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -6,19 +7,19 @@
  * @license   See LICENSE_DIVANTE.txt for license details.
  */
 
-declare(strict_types = 1);
-
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Configurable;
 
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\ConfigurableAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Prices as PriceResourceModel;
-use Divante\VsbridgeIndexerCatalog\Model\TierPriceProcessor;
+use Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
 
 /**
- * Class ChildAttributesProcessor
+ * Class LoadChildrenRawAttributes
  */
-class ChildAttributesProcessor
+class LoadChildrenRawAttributes
 {
     /**
      * @var int
@@ -26,9 +27,9 @@ class ChildAttributesProcessor
     private $batchSize;
 
     /**
-     * @var TierPriceProcessor
+     * @var LoadTierPricesInterface
      */
-    private $tierPriceProcessor;
+    private $loadTierPrices;
 
     /**
      * @var PriceResourceModel
@@ -46,23 +47,39 @@ class ChildAttributesProcessor
     private $configurableAttributes;
 
     /**
-     * ChildAttributesProcessor constructor.
+     * @var LoadMediaGalleryInterface
+     */
+    private $mediaGalleryLoader;
+
+    /**
+     * @var CatalogConfigurationInterface
+     */
+    private $settings;
+
+    /**
+     * LoadChildrenRawAttributes constructor.
      *
+     * @param CatalogConfigurationInterface $catalogConfiguration
      * @param AttributeDataProvider $attributeDataProvider
      * @param ConfigurableAttributes $configurableAttributes
-     * @param TierPriceProcessor $tierPriceProcessor
+     * @param LoadTierPricesInterface $loadTierPrices
+     * @param LoadMediaGalleryInterface $loadMediaGallery
      * @param PriceResourceModel $priceResourceModel
      * @param int $batchSize
      */
     public function __construct(
+        CatalogConfigurationInterface $catalogConfiguration,
         AttributeDataProvider $attributeDataProvider,
         ConfigurableAttributes $configurableAttributes,
-        TierPriceProcessor $tierPriceProcessor,
+        LoadTierPricesInterface $loadTierPrices,
+        LoadMediaGalleryInterface $loadMediaGallery,
         PriceResourceModel $priceResourceModel,
         $batchSize = 500
     ) {
         $this->batchSize = $batchSize;
-        $this->tierPriceProcessor = $tierPriceProcessor;
+        $this->settings = $catalogConfiguration;
+        $this->loadTierPrices = $loadTierPrices;
+        $this->mediaGalleryLoader = $loadMediaGallery;
         $this->priceResourceModel = $priceResourceModel;
         $this->resourceAttributeModel = $attributeDataProvider;
         $this->configurableAttributes = $configurableAttributes;
@@ -77,18 +94,23 @@ class ChildAttributesProcessor
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function loadChildrenRawAttributesInBatches($storeId, array $allChildren, array $configurableAttributeCodes)
+    public function execute($storeId, array $allChildren, array $configurableAttributeCodes)
     {
-        $requiredAttributes = array_merge(
-            $this->getRequiredChildrenAttributes(),
-            $configurableAttributeCodes
-        );
+        $requiredAttributes = $this->getRequiredChildrenAttributes($storeId);
+
+        if (!empty($requiredAttributes)) {
+            $requiredAttributes = array_merge(
+                $requiredAttributes,
+                $configurableAttributeCodes
+            );
+        }
 
         $requiredAttribute = array_unique($requiredAttributes);
 
         foreach ($this->getChildrenInBatches($allChildren, $this->batchSize) as $batch) {
             $childIds = array_keys($batch);
             $priceData = $this->priceResourceModel->loadPriceData($storeId, $childIds);
+
             $allAttributesData = $this->resourceAttributeModel->loadAttributesData(
                 $storeId,
                 $childIds,
@@ -103,38 +125,51 @@ class ChildAttributesProcessor
                 }
             }
 
-            foreach ($allAttributesData as $childId => $attributes) {
-                if ($this->tierPriceProcessor->syncTierPrices()) {
+            foreach ($allAttributesData as $productId => $attributes) {
+                $newProductData = array_merge(
+                    $allChildren[$productId],
+                    $attributes
+                );
+
+                if (
+                    $this->settings->syncTierPrices() ||
+                    $this->configurableAttributes->canIndexMediaGallery($storeId)
+                ) {
                     /*we need some extra attributes to apply tier prices*/
-                    $batch[$childId] = array_merge(
-                        $allChildren[$childId],
-                        $attributes
-                    );
+                    $batch[$productId] = $newProductData;
                 } else {
-                    $allChildren[$childId] = array_merge(
-                        $allChildren[$childId],
-                        $attributes
-                    );
+                    $allChildren[$productId] = $newProductData;
                 }
             }
 
-            if ($this->tierPriceProcessor->syncTierPrices()) {
-                $batch = $this->tierPriceProcessor->applyTierGroupPrices($batch, $storeId);
-                $allChildren = array_replace_recursive($allChildren, $batch);
+            $replace = false;
+
+            if ($this->settings->syncTierPrices()) {
+                $batch = $this->loadTierPrices->execute($batch, $storeId);
+                $replace = true;
             }
 
-            $batch = null;
+            if ($this->configurableAttributes->canIndexMediaGallery($storeId)) {
+                $batch = $this->mediaGalleryLoader->execute($batch, $storeId);
+                $replace = true;
+            }
+
+            if ($replace) {
+                $allChildren = array_replace_recursive($allChildren, $batch);
+            }
         }
 
         return $allChildren;
     }
 
     /**
+     * @param int $storeId
+     *
      * @return array
      */
-    private function getRequiredChildrenAttributes(): array
+    private function getRequiredChildrenAttributes($storeId): array
     {
-        return $this->configurableAttributes->getChildrenRequiredAttributes();
+        return $this->configurableAttributes->getChildrenRequiredAttributes($storeId);
     }
 
     /**

@@ -6,7 +6,7 @@
             <label>Vuestorefront</label>
         </tab>
 
-        <section id="vsbridge_indexer_settings" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+        <section id="vsbridge_indexer_settings" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
             <label>Indexer</label>
             <tab>vuestorefront_config</tab>
@@ -102,6 +102,11 @@
                 <field id="clear_cache" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="1">
                     <label>Clear cache</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="entity_invalidate_batch_size" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Invalidate entity batch size</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                    <comment>Set "0" to avoid batch processing</comment>
                 </field>
                 <field id="vsf_base_url" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="1">
                     <label>Vsf base Url</label>

@@ -2,6 +2,94 @@
 
 ## Unreleased
 
+## [1.11.0] (2020.02.24)
+
+### Added
+- Add option to export "attributes_metadata" for products. Only visible attributes are exported by default.
+Sample: `docs/sample/attributes-metadata.json`
+Options values are collected from exported attributes - so make sure attribute is exported to ES (check option `Product attributes to export`).
+
+- Manage exported attributes for products. Customize indexed attributes for product and product.configurable_children.
+
+~~Some attributes are always exported:
+- price
+- sku
+- name
+- visibility
+- status
+- url_path
+- url_key~~
+
+
+** By default only part of attributes will be exported, like: description, image, small_image, thumbnail, 
+media_gallery, media_title, meta_description, special_price, special_from_date, special_to_date, tax_class_id.
+
+```json
+    "type_id": "simple",
+    "sku": "24-MB04",
+    "id": 2,
+    "media_gallery": [
+      {
+        "typ": "image",
+        "image": "/m/b/mb04-black-0.jpg",
+        "lab": "Image",
+        "pos": 1
+      },
+      {
+        "typ": "image",
+        "image": "/m/b/mb04-black-0_alt1.jpg",
+        "lab": "Image",
+        "pos": 2
+      }
+    ],
+    "description": "<p>Convenience is next to nothing when your day is crammed with action. So whether you're heading to class, gym, or the unbeaten path, make sure you've got your Strive Shoulder Pack stuffed with all your essentials, and extras as well.</p>\n<ul>\n<li>Zippered main compartment.</li>\n<li>Front zippered pocket.</li>\n<li>Side mesh pocket.</li>\n<li>Cell phone pocket on strap.</li>\n<li>Adjustable shoulder strap and top carry handle.</li>\n</ul>",
+    "name": "Strive Shoulder Pack",
+    "image": "/m/b/mb04-black-0.jpg",
+    "small_image": "/m/b/mb04-black-0.jpg",
+    "thumbnail": "/m/b/mb04-black-0.jpg",
+    "url_key": "strive-shoulder-pack-2",
+    "price": 32,
+    "special_price": 32,
+    "status": 1,
+    "visibility": 4,
+    "tax_class_id": 2,
+    "special_from_date": "2019-11-27 13:25:55",
+    "slug": "strive-shoulder-pack-2",
+    "url_path": "strive-shoulder-pack",
+```
+
+
+** For configurable_children attributes used to create configurable products are also always exported 
+plus attributes set in configuration (by default: image, small_image, thumbnail, media_gallery, special_price, special_from_date, special_to_date)
+
+** You can customize attributes exported for product and product.configurable_children.
+
+```json
+    "configurable_children": [
+      {
+        "sku": "MH01-XS-Black",
+        "final_price": 52,
+        "regular_price": 52,
+        "color": 49,
+        "status": 1,
+        "visibility": 1,
+        "size": 167,
+        "name": "Chaz Kangeroo Hoodie-XS-Black",
+        "image": "/m/h/mh01-black_main.jpg",
+        "small_image": "/m/h/mh01-black_main.jpg",
+        "thumbnail": "/m/h/mh01-black_main.jpg",
+        "price": 52,
+        "media_gallery": [
+          {
+            "typ": "image",
+            "image": "/m/h/mh01-black_main.jpg",
+            "lab": "",
+            "pos": 1
+          }
+        ],
+      },
+```
+
 ## [1.10.0] (2020.02.05)
 
 ### Fixed

@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types = 1);
+
 /**
  * @package  Divante\VsbridgeIndexerCatalog
  * @author Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -6,16 +7,15 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-declare(strict_types = 1);
-
-namespace Divante\VsbridgeIndexerCatalog\Model;
+namespace Divante\VsbridgeIndexerCatalog\ArrayConverter\Product;
 
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
+use Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\CustomOptionConverterInterface;
 
 /**
- * Class ProductOptionProcessor
+ * Class CustomOptionConverter
  */
-class ProductOptionProcessor
+class CustomOptionConverter implements CustomOptionConverterInterface
 {
     /**
      * @var array
@@ -36,7 +36,7 @@ class ProductOptionProcessor
     private $dataFilter;
 
     /**
-     * ProductOptionProcessor constructor.
+     * CustomOptionConverter constructor.
      *
      * @param DataFilter $dataFilter
      */
@@ -51,7 +51,7 @@ class ProductOptionProcessor
      *
      * @return array
      */
-    public function prepareOptions(array $options, array $optionValues): array
+    public function process(array $options, array $optionValues): array
     {
         $groupOption = [];
 

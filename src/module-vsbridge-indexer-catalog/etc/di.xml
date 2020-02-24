@@ -3,9 +3,17 @@
     <preference for="Magento\Indexer\Console\Command\IndexerReindexCommand"
                 type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerReindexCommand"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface" type="Divante\VsbridgeIndexerCatalog\Model\SlugGenerator"/>
-    <preference for="Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface" type="Divante\VsbridgeIndexerCatalog\Model\LoadInventory"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\InventoryConverterInterface"
+                type="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\InventoryConverter" />
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\CustomOptionConverterInterface"
+                type="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\CustomOptionConverter"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface"
+                type="Divante\VsbridgeIndexerCatalog\Model\Product\LoadMediaGallery"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface"
+                type="Divante\VsbridgeIndexerCatalog\Model\Product\LoadTierPrices" />
 
     <type name="Divante\VsbridgeIndexerCatalog\Logger\CatalogIndexerLogger">
         <arguments>
@@ -20,7 +28,11 @@
             <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCatalog\Logger\CatalogIndexerLogger</argument>
         </arguments>
     </type>
-
+    <type name="Divante\VsbridgeIndexerCatalog\Model\Product\GetAttributeCodesByIds">
+        <arguments>
+            <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCatalog\Logger\CatalogIndexerLogger</argument>
+        </arguments>
+    </type>
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData">
         <arguments>
             <argument name="loadInventory" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\LoadChildrenInventory</argument>
@@ -58,6 +70,10 @@
 
     <type name="Magento\Framework\Mview\ViewInterface">
         <plugin name="updateMviewSubscriptions" type="Divante\VsbridgeIndexerCatalog\Plugin\Mview\ViewPlugin"/>
+    </type>
+    <type name="Magento\Indexer\Ui\DataProvider\Indexer\DataCollection">
+        <plugin name="hideVsbridgeProductCategoryIndexer"
+                type="Divante\VsbridgeIndexerCatalog\Plugin\Ui\DataProvider\Indexer\DataCollectionPlugin" />
     </type>
 
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Product">
@@ -112,7 +128,7 @@
             </argument>
         </arguments>
     </virtualType>
-    <type name="Divante\VsbridgeIndexerCatalog\Model\ProductOptionProcessor">
+    <type name="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\CustomOptionConverter">
         <arguments>
             <argument name="dataFilter" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\CustomOptionsDataFilterVirtual</argument>
         </arguments>
@@ -144,6 +160,48 @@
     <type name="Magento\Catalog\Controller\Adminhtml\Product\Action\Attribute\Save">
         <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Controller\Catalog\Adminhtml\Product\Action\AttributeSavePlugin"/>
     </type>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Setup\UpgradeData\SetDefaultAttributes">
+        <arguments>
+            <argument name="productAttributes" xsi:type="array">
+                <item name="description" xsi:type="string">description</item>
+                <item name="image" xsi:type="string">image</item>
+                <item name="small_image" xsi:type="string">small_image</item>
+                <item name="thumbnail" xsi:type="string">thumbnail</item>
+                <item name="media_gallery" xsi:type="string">media_gallery</item>
+                <item name="meta_title" xsi:type="string">meta_title</item>
+                <item name="meta_description" xsi:type="string">meta_description</item>
+                <item name="special_price" xsi:type="string">special_price</item>
+                <item name="special_from_date" xsi:type="string">special_from_date</item>
+                <item name="special_to_date" xsi:type="string">special_to_date</item>
+                <item name="tax_class_id" xsi:type="string">tax_class_id</item>
+            </argument>
+            <argument name="childAttributes" xsi:type="array">
+                <item name="image" xsi:type="string">image</item>
+                <item name="small_image" xsi:type="string">small_image</item>
+                <item name="thumbnail" xsi:type="string">thumbnail</item>
+                <item name="media_gallery" xsi:type="string">media_gallery</item>
+                <item name="special_price" xsi:type="string">special_price</item>
+                <item name="special_from_date" xsi:type="string">special_from_date</item>
+                <item name="special_to_date" xsi:type="string">special_to_date</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Index\Mapping\Product">
+        <arguments>
+            <argument name="additionalMapping" xsi:type="array">
+                <item name="bundle_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\BundleOptionsMapping</item>
+                <item name="product_links" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\ProductLinksMapping</item>
+                <item name="configurable_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\ConfigurableOptionsMapping</item>
+                <item name="category" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\CategoryMapping</item>
+                <item name="custom_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\CustomOptionsMapping</item>
+                <item name="tier_prices" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\TierPricesMapping</item>
+                <item name="attributes_meta" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\AttributesMetaMapping</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Divante\VsbridgeIndexerCatalog\Index\Mapping\AbstractMapping">
         <arguments>
             <argument name="staticFieldMapping" xsi:type="array">

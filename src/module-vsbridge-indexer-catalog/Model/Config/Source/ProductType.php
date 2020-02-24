@@ -9,7 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source;
 
 use Magento\Catalog\Model\ProductTypes\ConfigInterface;
-use \Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Option\ArrayInterface;
 
 /**
  * Class ProductType

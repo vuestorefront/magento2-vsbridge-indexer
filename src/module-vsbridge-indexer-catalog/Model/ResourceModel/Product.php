@@ -8,7 +8,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
@@ -52,6 +52,11 @@ class Product
      * @var int
      */
     private $statusAttributeId;
+
+    /**
+     * @var array
+     */
+    private $configurableAttributeIds;
 
     /**
      * @var ProductMetaData
@@ -264,6 +269,27 @@ class Product
             ->where('child_id IN(?)', array_map('intval', $childrenIds));
 
         return $this->getConnection()->fetchCol($select);
+    }
+
+    /**
+     * Get list of attribute ids used to create configurable products
+     * @return array
+     */
+    public function getConfigurableAttributeIds()
+    {
+        if (null === $this->configurableAttributeIds) {
+            $select = $this->getConnection()->select();
+            $select->from(
+                $this->resourceConnection->getTableName('catalog_product_super_attribute'),
+                ['attribute_id']
+            );
+
+            $select->distinct();
+
+            $this->configurableAttributeIds = $this->getConnection()->fetchCol($select);
+        }
+
+        return $this->configurableAttributeIds;
     }
 
     /**

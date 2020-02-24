@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * @package   Divante\VsbridgeIndexerCatalog
  * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -6,15 +6,13 @@
  * @license   See LICENSE_DIVANTE.txt for license details.
  */
 
-declare(strict_types = 1);
-
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\CatalogRule\Model\ResourceModel\Rule\Product\Price as CatalogRulePrice;
 
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\Product\PriceTableResolverProxy;
 

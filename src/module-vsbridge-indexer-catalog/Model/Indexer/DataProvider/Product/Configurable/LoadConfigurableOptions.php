@@ -6,16 +6,16 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Model\ConfigurableProcessor;
+namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Configurable;
 
 use Divante\VsbridgeIndexerCatalog\Model\Attribute\LoadOptionById;
 use Divante\VsbridgeIndexerCatalog\Model\Attribute\SortValues;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
- * Class GetConfigurableOptions
+ * Class LoadConfigurableOptions
  */
-class GetConfigurableOptions
+class LoadConfigurableOptions
 {
     /**
      * @var CatalogConfigurationInterface
@@ -33,7 +33,7 @@ class GetConfigurableOptions
     private $sortValues;
 
     /**
-     * GetConfigurableOptions constructor.
+     * LoadConfigurableOptions constructor.
      * @param LoadOptionById $loadOptionById
      * @param SortValues $sortValues
      * @param CatalogConfigurationInterface $catalogSettings

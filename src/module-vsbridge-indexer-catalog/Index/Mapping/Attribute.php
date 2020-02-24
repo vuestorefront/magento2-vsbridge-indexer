@@ -2,39 +2,28 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Index\Mapping;
 
+use Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute\OptionMapping;
 use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
-use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
-use Magento\Framework\Event\ManagerInterface as EventManager;
 
 /**
  * Class Attribute
  */
 class Attribute implements MappingInterface
 {
-
     /**
-     * @var EventManager
+     * @var OptionMapping
      */
-    private $eventManager;
-
-    /**
-     * @var GeneralMapping
-     */
-    private $generalMapping;
+    private $optionMapping;
 
     /**
      * Attribute constructor.
      *
-     * @param GeneralMapping $generalMapping
-     * @param EventManager $eventManager
+     * @param OptionMapping $optionMapping
      */
-    public function __construct(
-        GeneralMapping $generalMapping,
-        EventManager $eventManager
-    ) {
-        $this->eventManager = $eventManager;
-        $this->generalMapping = $generalMapping;
+    public function __construct(OptionMapping $optionMapping)
+    {
+        $this->optionMapping = $optionMapping;
     }
 
     /**
@@ -120,24 +109,8 @@ class Attribute implements MappingInterface
             $properties[$property] = ['type' => FieldInterface::TYPE_TEXT];
         }
 
-        $properties['options'] = [
-            'properties' => [
-                'value' => ['type' => FieldInterface::TYPE_TEXT],
-                'label' => ['type' => FieldInterface::TYPE_TEXT],
-                'sort_order' => ['type' => FieldInterface::TYPE_INTEGER],
-                'swatch' => $this->generalMapping->getSwatchProperties(),
-            ]
-        ];
+        $properties['options'] = $this->optionMapping->get();
 
-        $mapping = ['properties' => $properties];
-        $mappingObject = new \Magento\Framework\DataObject();
-        $mappingObject->setData($mapping);
-
-        $this->eventManager->dispatch(
-            'elasticsearch_attribute_mapping_properties',
-            ['mapping' => $mappingObject]
-        );
-
-        return $mappingObject->getData();
+        return ['properties' => $properties];
     }
 }

@@ -150,7 +150,7 @@ abstract class AbstractEavAttributes implements EavAttributesInterface
             return false;
         }
 
-        if (null === $allowedAttributes) {
+        if (null === $allowedAttributes || empty($allowedAttributes)) {
             return true;
         }
 

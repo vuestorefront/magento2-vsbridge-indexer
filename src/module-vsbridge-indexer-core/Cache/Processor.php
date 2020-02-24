@@ -27,9 +27,9 @@ class Processor
     ];
 
     /**
-     * @var Settings
+     * @var ConfigInterface
      */
-    private $settings;
+    private $config;
 
     /**
      * @var LoggerInterface
@@ -55,20 +55,20 @@ class Processor
      * Processor constructor.
      *
      * @param CurlFactory $curlFactory
-     * @param Settings $configSettings
+     * @param ConfigInterface $config
      * @param EventManager $manager
      * @param LoggerInterface $logger
      */
     public function __construct(
         CurlFactory $curlFactory,
-        Settings $configSettings,
+        ConfigInterface $config,
         EventManager $manager,
         LoggerInterface $logger
     ) {
         $this->eventManager = $manager;
         $this->curlFactory = $curlFactory;
         $this->logger = $logger;
-        $this->settings = $configSettings;
+        $this->config = $config;
     }
 
     /**
@@ -80,20 +80,14 @@ class Processor
      */
     public function cleanCacheByDocIds($storeId, $dataType, array $entityIds)
     {
-        if ($this->settings->clearCache($storeId)) {
+        if ($this->config->clearCache($storeId)) {
             if (!empty($entityIds)) {
-                $cacheInvalidateUrl = $this->getCacheInvalidateUrl($storeId, $dataType, $entityIds);
-
-                try {
-                    $this->call($storeId, $cacheInvalidateUrl);
-                } catch (\Exception $e) {
-                    $this->logger->error($e->getMessage());
-                }
+                $this->cleanCacheInBatches($storeId, $dataType, $entityIds);
             } else {
                 $cacheTags = $this->getCacheTags();
 
                 if (isset($cacheTags[$dataType])) {
-                    $this->cleanCacheByTags($storeId, [$dataType]);
+                    $this->cleanCacheInBatches($storeId, [$dataType]);
                 }
             }
         }
@@ -103,11 +97,39 @@ class Processor
 
     /**
      * @param int $storeId
+     * @param string $dataType
+     * @param array $entityIds
+     */
+    public function cleanCacheInBatches(int $storeId, string $dataType, array $entityIds)
+    {
+        $batchSize = $this->getInvalidateEntitiesBatchSize($storeId);
+        $batches = [$entityIds];
+
+        if ($batchSize) {
+            $batches = array_chunk($entityIds, $batchSize);
+        }
+
+        foreach ($batches as $batch) {
+            $this->logger->error('BATCHES ' . implode(', ', $batch));
+            $cacheInvalidateUrl = $this->getCacheInvalidateUrl($storeId, $dataType, $entityIds);
+
+            try {
+                $this->call($storeId, $cacheInvalidateUrl);
+            } catch (\Exception $e) {
+                $this->logger->error($e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @param int $storeId
      * @param array $tags
      */
     public function cleanCacheByTags($storeId, array $tags)
     {
-        if ($this->settings->clearCache($storeId)) {
+        $storeId = (int) $storeId;
+
+        if ($this->config->clearCache($storeId)) {
             $cacheTags = implode(',', $tags);
             $cacheInvalidateUrl = $this->getInvalidateCacheUrl($storeId) . $cacheTags;
 
@@ -120,12 +142,22 @@ class Processor
     }
 
     /**
+     * @param int $storeId
+     *
+     * @return int
+     */
+    private function getInvalidateEntitiesBatchSize(int $storeId)
+    {
+        return $this->config->getInvalidateEntitiesBatchSize($storeId);
+    }
+
+    /**
      * @param string $storeId
      * @param string $uri
      */
     private function call($storeId, $uri)
     {
-        $config = $this->settings->getConnectionOptions($storeId);
+        $config = $this->config->getConnectionOptions($storeId);
         /** @var \Magento\Framework\HTTP\Adapter\Curl $curl */
         $curl = $this->curlFactory->create();
         $curl->setConfig($config);
@@ -165,8 +197,8 @@ class Processor
      */
     private function getInvalidateCacheUrl($storeId)
     {
-        $url = $this->settings->getVsfBaseUrl($storeId);
-        $url .= sprintf('invalidate?key=%s&tag=', $this->settings->getInvalidateCacheKey($storeId));
+        $url = $this->config->getVsfBaseUrl($storeId);
+        $url .= sprintf('invalidate?key=%s&tag=', $this->config->getInvalidateCacheKey($storeId));
 
         return $url;
     }

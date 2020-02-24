@@ -22,6 +22,8 @@
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexInterface" type="Divante\VsbridgeIndexerCore\Index\Index"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexOperationInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperations"/>
 
+    <preference for="Divante\VsbridgeIndexerCore\Cache\ConfigInterface" type="Divante\VsbridgeIndexerCore\Cache\Config"/>
+
     <type name="Divante\VsbridgeIndexerCore\Logger\IndexerLogger">
         <arguments>
             <argument name="name" xsi:type="string">vsbridgeIndexerLogger</argument>

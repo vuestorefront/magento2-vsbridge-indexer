@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @package  Divante\VsbridgeIndexerCore
  * @author Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -11,15 +14,10 @@ namespace Divante\VsbridgeIndexerCore\Cache;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
 
 /**
- * Class Settings
+ * @inheritdoc
  */
-class Settings
+class Config implements ConfigInterface
 {
-    /**
-     * XML PATH Prefix for redis cache settings
-     */
-    const CACHE_SETTINGS_XML_PREFIX = 'vsbridge_indexer_settings/redis_cache_settings';
-
     /**
      * @var ScopeConfigInterface
      */
@@ -40,29 +38,9 @@ class Settings
      *
      * @return bool
      */
-    public function clearCache($storeId)
+    public function clearCache($storeId): bool
     {
-        return (bool) $this->getConfigParam('clear_cache', $storeId);
-    }
-
-    /**
-     * @param int $storeId
-     *
-     * @return string
-     */
-    public function getVsfBaseUrl($storeId)
-    {
-        return (string) $this->getConfigParam('vsf_base_url', $storeId);
-    }
-
-    /**
-     * @param int $storeId
-     *
-     * @return string
-     */
-    public function getInvalidateCacheKey($storeId)
-    {
-        return (string) $this->getConfigParam('invalidate_cache_key', $storeId);
+        return (bool) $this->getConfigParam(self::CLEAR_CACHE_FIELD, $storeId);
     }
 
     /**
@@ -70,9 +48,39 @@ class Settings
      *
      * @return int
      */
-    public function getTimeout($storeId)
+    public function getInvalidateEntitiesBatchSize(int $storeId): int
     {
-        return (int) $this->getConfigParam('connection_timeout', $storeId);
+        return (int) $this->getConfigParam(self::INVALIDATE_CACHE_ENTITIES_BATCH_SIZE_FIELD, $storeId);
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return string
+     */
+    public function getVsfBaseUrl($storeId): string
+    {
+        return (string) $this->getConfigParam(self::VSF_BASE_URL_FIELD, $storeId);
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return string
+     */
+    public function getInvalidateCacheKey($storeId): string
+    {
+        return (string) $this->getConfigParam(self::INVALIDATE_CACHE_FIELD, $storeId);
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return int
+     */
+    public function getTimeout($storeId): int
+    {
+        return (int) $this->getConfigParam(self::CONNECTION_TIMEOUT_FIELD, $storeId);
     }
 
     /**
@@ -80,11 +88,9 @@ class Settings
      *
      * @return array
      */
-    public function getConnectionOptions($storeId)
+    public function getConnectionOptions($storeId): array
     {
-        $options = ['timeout' => $this->getTimeout($storeId)];
-
-        return $options;
+        return ['timeout' => $this->getTimeout($storeId)];
     }
 
     /**

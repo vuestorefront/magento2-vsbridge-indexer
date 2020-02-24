@@ -3,7 +3,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Plugin\Mview;
 
 use Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductProcessor;
-use Divante\VsbridgeIndexerCatalog\Api\Data\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Magento\Framework\Mview\ViewInterface;
 
 /**
