@@ -41,6 +41,11 @@ interface CatalogConfigurationInterface
     const CHILD_ATTRIBUTES = 'child_attributes';
 
     /**
+     * Export attributes metadata config field
+     */
+    const EXPORT_ATTRIBUTES_METADATA = 'export_attributes_metadata';
+
+    /**
      * @return bool
      */
     public function useMagentoUrlKeys();
@@ -59,6 +64,11 @@ interface CatalogConfigurationInterface
      * @return bool
      */
     public function syncTierPrices();
+
+    /**
+     * @return bool
+     */
+    public function canExportAttributesMetadata(): bool;
 
     /**
      * @return bool

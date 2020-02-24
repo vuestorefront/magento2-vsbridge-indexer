@@ -1,0 +1,98 @@
+[
+  {
+    "id": 141,
+    "default_frontend_label": "Size",
+    "is_visible_on_front": false,
+    "is_visible": true,
+    "attribute_id": 141,
+    "entity_type_id": 4,
+    "frontend_input": "select",
+    "is_user_defined": true,
+    "is_comparable": false,
+    "attribute_code": "size",
+    "options": [
+      {
+        "value": "167",
+        "label": "XS",
+        "sort_order": 1
+      },
+      {
+        "value": "168",
+        "label": "S",
+        "sort_order": 3
+      },
+      {
+        "value": "169",
+        "label": "M",
+        "sort_order": 5
+      },
+      {
+        "value": "170",
+        "label": "L",
+        "sort_order": 7
+      },
+      {
+        "value": "171",
+        "label": "XL",
+        "sort_order": 9
+      }
+    ]
+  },
+  {
+    "id": 142,
+    "default_frontend_label": "Eco Collection",
+    "is_visible_on_front": false,
+    "is_visible": true,
+    "attribute_id": 142,
+    "entity_type_id": 4,
+    "frontend_input": "boolean",
+    "is_user_defined": true,
+    "is_comparable": false,
+    "attribute_code": "eco_collection",
+    "options": [
+      {
+        "label": "Yes",
+        "value": "1"
+      }
+    ]
+  },
+  {
+    "id": 153,
+    "default_frontend_label": "Climate",
+    "is_visible_on_front": true,
+    "is_visible": true,
+    "attribute_id": 153,
+    "entity_type_id": 4,
+    "frontend_input": "multiselect",
+    "is_user_defined": true,
+    "is_comparable": false,
+    "attribute_code": "climate",
+    "options": [
+      {
+        "value": "202",
+        "label": "All-Weather",
+        "sort_order": 0
+      },
+      {
+        "value": "204",
+        "label": "Cool",
+        "sort_order": 2
+      },
+      {
+        "value": "205",
+        "label": "Indoor",
+        "sort_order": 3
+      },
+      {
+        "value": "208",
+        "label": "Spring",
+        "sort_order": 6
+      },
+      {
+        "value": "210",
+        "label": "Windy",
+        "sort_order": 8
+      }
+    ]
+  }
+]
