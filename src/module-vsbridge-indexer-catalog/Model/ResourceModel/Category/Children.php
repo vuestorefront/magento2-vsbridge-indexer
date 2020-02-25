@@ -8,16 +8,20 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category;
 
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Category\Collection;
-use Magento\Framework\App\ResourceConnection;
 use Divante\VsbridgeIndexerCatalog\Model\CategoryMetaData;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\BaseSelectModifierInterface;
+use Magento\Framework\App\ResourceConnection;
 
 /**
  * Class Children
  */
 class Children
 {
+    /**
+     * Alias form category entity table
+     */
+    const MAIN_TABLE_ALIAS = 'entity';
+
     /**
      * @var ResourceConnection
      */
@@ -29,14 +33,14 @@ class Children
     private $isActiveAttributeId;
 
     /**
-     * @var AttributeDataProvider
+     * @var LoadAttributes
      */
     private $attributeDataProvider;
 
     /**
-     * @var CollectionFactory
+     * @var BaseSelectModifierInterface
      */
-    private $collectionFactory;
+    private $baseSelectModifier;
 
     /**
      * @var CategoryMetaData
@@ -46,21 +50,21 @@ class Children
     /**
      * Children constructor.
      *
-     * @param AttributeDataProvider $attributeDataProvider
+     * @param LoadAttributes $attributeDataProvider
      * @param CollectionFactory $collectionFactory
      * @param ResourceConnection $resourceModel
      * @param CategoryMetaData $categoryMetaData
      */
     public function __construct(
-        AttributeDataProvider $attributeDataProvider,
-        CollectionFactory $collectionFactory,
+        LoadAttributes $attributeDataProvider,
+        BaseSelectModifierInterface $baseSelectModifier,
         ResourceConnection $resourceModel,
         CategoryMetaData $categoryMetaData
     ) {
         $this->attributeDataProvider = $attributeDataProvider;
-        $this->collectionFactory = $collectionFactory;
         $this->resource = $resourceModel;
         $this->categoryMetaData = $categoryMetaData;
+        $this->baseSelectModifier = $baseSelectModifier;
     }
 
     /**
@@ -74,12 +78,13 @@ class Children
     {
         $childIds = $this->getChildrenIds($category, $storeId);
 
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->addIsActiveFilter();
+        $select = $this->getConnection()->select()->from(
+            [self::MAIN_TABLE_ALIAS => $this->getEntityTable()]
+        );
 
-        $select = $collection->getSelect();
-        $select->where('e.entity_id IN (?)', $childIds);
+        $select = $this->baseSelectModifier->execute($select, $storeId);
+
+        $select->where(sprintf("%s.entity_id IN (?)", self::MAIN_TABLE_ALIAS), $childIds);
         $select->order('path asc');
         $select->order('position asc');
 
@@ -89,72 +94,38 @@ class Children
     /**
      * @param array $category
      * @param int $storeId
-     * @param bool $recursive
      *
      * @return array
      * @throws \Exception
      */
-    private function getChildrenIds(array $category, $storeId, $recursive = true)
+    private function getChildrenIds(array $category, $storeId)
     {
-        $linkField = $this->categoryMetaData->get()->getLinkField();
-        $attributeId = $this->getIsActiveAttributeId();
-        $backendTable = $this->resource->getTableName([$this->getEntityTable(), 'int']);
         $connection = $this->getConnection();
         $checkSql = $connection->getCheckSql('c.value_id > 0', 'c.value', 'd.value');
-        $bind = [
-            'attribute_id' => $attributeId,
-            'store_id' => $storeId,
-            'scope' => 1,
-            'c_path' => $category['path'] . '/%',
-        ];
+
+        $bind = ['c_path' => $category['path'] . '/%'];
+
         $select = $this->getConnection()->select()->from(
-            ['m' => $this->getEntityTable()],
+            [self::MAIN_TABLE_ALIAS => $this->getEntityTable()],
             'entity_id'
-        )->joinLeft(
-            ['d' => $backendTable],
-            "d.attribute_id = :attribute_id AND d.store_id = 0 AND d.{$linkField} = m.{$linkField}",
-            []
-        )->joinLeft(
-            ['c' => $backendTable],
-            "c.attribute_id = :attribute_id AND c.store_id = :store_id AND c.{$linkField} = m.{$linkField}",
-            []
-        )->where(
-            $checkSql . ' = :scope'
         )->where(
             $connection->quoteIdentifier('path') . ' LIKE :c_path'
         );
 
-        if (!$recursive) {
-            $select->where($connection->quoteIdentifier('level') . ' <= :c_level');
-            $bind['c_level'] = $category['level'] + 1;
-        }
+        $select = $this->baseSelectModifier->execute($select, $storeId);
 
         return $this->getConnection()->fetchCol($select, $bind);
     }
 
     /**
+     * Retrieve category entity table
+     *
      * @return string
      * @throws \Exception
      */
     private function getEntityTable()
     {
         return $this->categoryMetaData->get()->getEntityTable();
-    }
-
-    /**
-     * Get "is_active" attribute identifier
-     *
-     * @return int
-     */
-    private function getIsActiveAttributeId()
-    {
-        if ($this->isActiveAttributeId === null) {
-            $this->isActiveAttributeId = (int)$this->attributeDataProvider
-                ->getAttributeByCode('is_active')
-                ->getAttributeId();
-        }
-
-        return $this->isActiveAttributeId;
     }
 
     /**
