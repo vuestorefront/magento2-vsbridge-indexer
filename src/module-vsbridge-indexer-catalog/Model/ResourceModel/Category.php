@@ -9,6 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
 use Divante\VsbridgeIndexerCatalog\Model\CategoryMetaData;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\BaseSelectModifierInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\Category as CoreCategoryModel;
@@ -19,6 +20,10 @@ use Magento\Framework\DB\Select;
  */
 class Category
 {
+    /**
+     * Alias form category entity table
+     */
+    const MAIN_TABLE_ALIAS = 'entity';
 
     /**
      * @var ResourceConnection
@@ -31,6 +36,11 @@ class Category
     private $storeManager;
 
     /**
+     * @var BaseSelectModifierInterface
+     */
+    private $baseSelectModifier;
+
+    /**
      * @var CategoryMetaData
      */
     private $categoryMetaData;
@@ -38,11 +48,13 @@ class Category
     /**
      * Category constructor.
      *
+     * @param BaseSelectModifierInterface $baseSelectModifier
      * @param ResourceConnection $resourceConnection
      * @param CategoryMetaData $categoryMetaData
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
+        BaseSelectModifierInterface $baseSelectModifier,
         ResourceConnection $resourceConnection,
         CategoryMetaData $categoryMetaData,
         StoreManagerInterface $storeManager
@@ -50,6 +62,7 @@ class Category
         $this->resource = $resourceConnection;
         $this->categoryMetaData = $categoryMetaData;
         $this->storeManager = $storeManager;
+        $this->baseSelectModifier = $baseSelectModifier;
     }
 
     /**
@@ -63,45 +76,18 @@ class Category
      */
     public function getCategories($storeId = 1, array $categoryIds = [], $fromId = 0, $limit = 1000)
     {
-        $select = $this->filterByStore($storeId, $categoryIds);
+        $select = $this->filterByStore($storeId);
+        $tableName = self::MAIN_TABLE_ALIAS;
 
         if (!empty($categoryIds)) {
-            $select->where('entity.entity_id IN (?)', $categoryIds);
+            $select->where(sprintf("%s.entity_id IN (?)", $tableName), $categoryIds);
         }
 
-        $select->where('entity.entity_id > ?', $fromId);
+        $select->where(sprintf("%s.entity_id > ?", $tableName), $fromId);
         $select->limit($limit);
-        $select->order('entity.entity_id ASC');
+        $select->order(sprintf("%s.entity_id ASC", $tableName));
 
         return $this->getConnection()->fetchAll($select);
-    }
-
-    /**
-     * @param int $storeId
-     *
-     * @return \Magento\Framework\DB\Select
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function filterByStore($storeId)
-    {
-        $metaData = $this->categoryMetaData->get();
-        $store = $this->storeManager->getStore($storeId);
-        $connection = $this->getConnection();
-
-        $rootId = CoreCategoryModel::TREE_ROOT_ID;
-        $rootCatIdExpr = $connection->quote("{$rootId}/{$store->getRootCategoryId()}");
-        $catIdExpr = $connection->quote("{$rootId}/{$store->getRootCategoryId()}/%");
-
-        $select = $this->getConnection()->select()->from(
-            ['entity' => $metaData->getEntityTable()]
-        );
-
-        $select->where(
-            "path = {$rootCatIdExpr} OR path like {$catIdExpr}"
-        );
-
-        return $select;
     }
 
     /**
@@ -116,11 +102,10 @@ class Category
         $select = $this->filterByStore($storeId);
         $table = $this->resource->getTableName('catalog_category_product');
         $entityIdField = $this->categoryMetaData->get()->getIdentifierField();
-
         $select->reset(Select::COLUMNS);
         $select->joinInner(
             ['cpi' => $table],
-            "entity.$entityIdField = cpi.category_id",
+            self::MAIN_TABLE_ALIAS . ".$entityIdField = cpi.category_id",
             [
                 'category_id',
                 'product_id',
@@ -143,7 +128,7 @@ class Category
         $entityField = $metaData->getIdentifierField();
 
         $select = $this->getConnection()->select()->from(
-            ['entity' => $metaData->getEntityTable()],
+            [self::MAIN_TABLE_ALIAS => $metaData->getEntityTable()],
             ['path']
         );
 
@@ -182,7 +167,7 @@ class Category
         $entityField = $metaData->getIdentifierField();
         $connection = $this->getConnection();
         $select = $connection->select()->from(
-            ['entity' => $metaData->getEntityTable()],
+            [self::MAIN_TABLE_ALIAS => $metaData->getEntityTable()],
             [$entityField]
         );
 
@@ -190,6 +175,23 @@ class Category
         $select->where("path like {$catIdExpr}");
 
         return $connection->fetchCol($select);
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return \Magento\Framework\DB\Select
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function filterByStore($storeId)
+    {
+        $metaData = $this->categoryMetaData->get();
+        $select = $this->getConnection()->select()->from(
+            [self::MAIN_TABLE_ALIAS => $metaData->getEntityTable()]
+        );
+
+        return $this->baseSelectModifier->execute($select, (int) $storeId);
     }
 
     /**
