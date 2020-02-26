@@ -149,6 +149,21 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeWithStoreChildrenModifier"
+                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeBaseSelectModifier">
+        <arguments>
+            <argument name="baseSelectModifiers" xsi:type="array">
+                <item name="is_active" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ActiveSelectModifier</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\Children">
+        <arguments>
+            <argument name="baseSelectModifier" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeWithStoreChildrenModifier</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Catalog\Model\Product">
         <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Product\Save\UpdateProductDataPlugin"/>
     </type>
