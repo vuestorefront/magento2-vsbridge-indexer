@@ -119,16 +119,6 @@ class ActiveSelectModifier implements BaseSelectModifierInterface
     }
 
     /**
-     * Retrieve Category Metadata
-     *
-     * @return EntityMetadataInterface
-     */
-    private function getCategoryMetadata(): EntityMetadataInterface
-    {
-        return $this->categoryMataData->get();
-    }
-
-    /**
      * Retrieve Vendor Attribute
      *
      * @return Attribute

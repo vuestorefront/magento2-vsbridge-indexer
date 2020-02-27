@@ -10,18 +10,20 @@ namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel;
 
 use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
-use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\BaseSelectModifierInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Helper as DbHelper;
 use Magento\Framework\DB\Select;
-use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Product
  */
 class Product
 {
+    /**
+     * Alias for catalog_product_entity table
+     */
+    const MAIN_TABLE_ALIAS = 'entity';
 
     /**
      * @var ResourceConnection
@@ -29,29 +31,14 @@ class Product
     private $resourceConnection;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * @var DbHelper
      */
     private $dbHelper;
 
     /**
-     * @var AttributeDataProvider
-     */
-    private $attributeDataProvider;
-
-    /**
      * @var CatalogConfigurationInterface
      */
     private $productSettings;
-
-    /**
-     * @var int
-     */
-    private $statusAttributeId;
 
     /**
      * @var array
@@ -64,28 +51,30 @@ class Product
     private $productMetaData;
 
     /**
+     * @var BaseSelectModifierInterface
+     */
+    private $baseSelectModifier;
+
+    /**
      * Product constructor.
      *
      * @param CatalogConfigurationInterface $configSettings
-     * @param AttributeDataProvider $attributeDataProvider
+     * @param BaseSelectModifierInterface $baseSelectModifier
      * @param ResourceConnection $resourceConnection
-     * @param StoreManagerInterface $storeManager
      * @param ProductMetaData $productMetaData
      * @param DbHelper $dbHelper
      */
     public function __construct(
         CatalogConfigurationInterface $configSettings,
-        AttributeDataProvider $attributeDataProvider,
+        BaseSelectModifierInterface $baseSelectModifier,
         ResourceConnection $resourceConnection,
-        StoreManagerInterface $storeManager,
         ProductMetaData $productMetaData,
         DbHelper $dbHelper
     ) {
-        $this->attributeDataProvider = $attributeDataProvider;
         $this->resourceConnection = $resourceConnection;
-        $this->storeManager = $storeManager;
         $this->dbHelper = $dbHelper;
         $this->productSettings = $configSettings;
+        $this->baseSelectModifier = $baseSelectModifier;
         $this->productMetaData = $productMetaData;
     }
 
@@ -104,14 +93,15 @@ class Product
     {
         $select = $this->prepareBaseProductSelect($this->getRequiredColumns(), $storeId);
         $select = $this->addProductTypeFilter($select, $storeId);
+        $tableName = self::MAIN_TABLE_ALIAS;
 
         if (!empty($productIds)) {
-            $select->where('entity.entity_id IN (?)', $productIds);
+            $select->where(sprintf("%s.entity_id IN (?)", $tableName), $productIds);
         }
 
         $select->limit($limit);
-        $select->where('entity.entity_id > ?', $fromId);
-        $select->order('entity.entity_id ASC');
+        $select->where(sprintf("%s.entity_id > ?", $tableName), $fromId);
+        $select->order(sprintf("%s.entity_id ASC", $tableName));
 
         return $this->getConnection()->fetchAll($select);
     }
@@ -128,12 +118,11 @@ class Product
     {
         $select = $this->getConnection()->select()
             ->from(
-                ['entity' => $this->productMetaData->get()->getEntityTable()],
+                [self::MAIN_TABLE_ALIAS => $this->productMetaData->get()->getEntityTable()],
                 $requiredColumns
             );
 
-        $select = $this->addStatusFilter($select, $storeId);
-        $select = $this->addWebsiteFilter($select, $storeId);
+        $select = $this->baseSelectModifier->execute($select, $storeId);
 
         return $select;
     }
@@ -187,7 +176,7 @@ class Product
 
         $select->join(
             ['link_table' => $this->resourceConnection->getTableName('catalog_product_super_link')],
-            'link_table.product_id = entity.entity_id',
+            sprintf('link_table.product_id = %s.entity_id', self::MAIN_TABLE_ALIAS),
             []
         );
 
@@ -204,46 +193,13 @@ class Product
      * @param int $storeId
      *
      * @return \Magento\Framework\DB\Select
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    private function addWebsiteFilter(Select $select, $storeId)
-    {
-        $websiteId = $this->getWebsiteId($storeId);
-        $indexTable = $this->resourceConnection->getTableName('catalog_product_website');
-
-        $conditions = ['websites.product_id = entity.entity_id'];
-        $conditions[] = $this->getConnection()->quoteInto('websites.website_id = ?', $websiteId);
-
-        $select->join(['websites' => $indexTable], join(' AND ', $conditions), []);
-
-        return $select;
-    }
-
-    /**
-     * @param int $storeId
-     *
-     * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    private function getWebsiteId($storeId)
-    {
-        $store = $this->storeManager->getStore($storeId);
-
-        return $store->getWebsiteId();
-    }
-
-    /**
-     * @param \Magento\Framework\DB\Select $select
-     * @param int $storeId
-     *
-     * @return \Magento\Framework\DB\Select
      */
     private function addProductTypeFilter(Select $select, $storeId)
     {
         $types = $this->productSettings->getAllowedProductTypes($storeId);
 
         if (!empty($types)) {
-            $select->where('entity.type_id IN (?)', $types);
+            $select->where(sprintf('%s.type_id IN (?)', self::MAIN_TABLE_ALIAS), $types);
         }
 
         return $select;
@@ -290,73 +246,6 @@ class Product
         }
 
         return $this->configurableAttributeIds;
-    }
-
-    /**
-     * @param \Magento\Framework\DB\Select $select
-     * @param int $storeId
-     *
-     * @return \Magento\Framework\DB\Select
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function addStatusFilter(Select $select, $storeId)
-    {
-        $linkFieldId = $this->productMetaData->get()->getLinkField();
-
-        $backendTable = $this->resourceConnection->getTableName(
-            [
-                'catalog_product_entity',
-                'int',
-            ]
-        );
-        $checkSql = $this->getConnection()->getCheckSql('c.value_id > 0', 'c.value', 'd.value');
-        $attributeId = (int) $this->getStatusAttributeId();
-
-        $joinCondition = [
-            'd.attribute_id = ?',
-            'd.store_id = 0',
-            "d.$linkFieldId = entity.$linkFieldId",
-        ];
-
-        $defaultJoinCond = $this->getConnection()->quoteInto(
-            implode(' AND ', $joinCondition),
-            $attributeId
-        );
-
-        $storeJoinCond = [
-            $this->getConnection()->quoteInto("c.attribute_id = ?", $attributeId),
-            $this->getConnection()->quoteInto("c.store_id = ?", $storeId),
-            "c.$linkFieldId = entity.$linkFieldId",
-        ];
-
-        $select->joinLeft(
-            ['d' => $backendTable],
-            $defaultJoinCond,
-            []
-        )->joinLeft(
-            ['c' => $backendTable],
-            implode(' AND ', $storeJoinCond),
-            []
-        )->where($checkSql . ' = ?', Status::STATUS_ENABLED);
-
-        return $select;
-    }
-
-    /**
-     * Get status attribute id
-     *
-     * @return int
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function getStatusAttributeId()
-    {
-        if ($this->statusAttributeId === null) {
-            $this->statusAttributeId = (int) $this->attributeDataProvider
-                ->getAttributeByCode('status')
-                ->getAttributeId();
-        }
-
-        return $this->statusAttributeId;
     }
 
     /**

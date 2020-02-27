@@ -13,7 +13,7 @@ use Divante\VsbridgeIndexerCatalog\Index\Mapping\Product as ProductMapping;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\AbstractEavAttributes;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\EntityManager\MetadataPool;
-use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Eav\Model\Entity\Attribute;
 
 /**
  * Products Attribute provider
