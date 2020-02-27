@@ -137,6 +137,19 @@
         </arguments>
     </type>
 
+    <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\BaseSelectModifierInterface"
+                type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeWithWebsiteModifier" />
+
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeWithWebsiteModifier"
+                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeBaseSelectModifier">
+        <arguments>
+            <argument name="baseSelectModifiers" xsi:type="array">
+                <item name="website" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\WebsiteSelectModifier</item>
+                <item name="status" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\StatusSelectModifier</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\BaseSelectModifierInterface"
                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeWithStoreModifier" />
 

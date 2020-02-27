@@ -8,7 +8,7 @@ declare(strict_types=1);
  * @copyright 2020 Divante Sp. z o.o.
  * @license   See LICENSE_DIVANTE.txt for license details.
  */
-namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category;
+namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Magento\Framework\DB\Select;
 use Magento\Framework\Exception\InputException;
