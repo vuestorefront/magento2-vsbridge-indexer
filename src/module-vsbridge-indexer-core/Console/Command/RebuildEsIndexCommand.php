@@ -155,14 +155,21 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
 
         if ($storeId) {
             $store = $this->getStoreManager()->getStore($storeId);
-            $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+            $returnValue = false;
 
-            $returnValue = $this->reindexStore($store, $output);
+            $allowedStores = $this->getStoresAllowedToReindex();
 
-            $output->writeln("<info>Reindexing has completed!</info>");
+            foreach ($allowedStores as $allowedStore) {
+                if ($store->getId() === $allowedStore->getId()) {
+                    $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+                    $returnValue = $this->reindexStore($store, $output);
+                    $output->writeln("<info>Reindexing has completed!</info>");
+                } else {
+                    $output->writeln("<info>Store " . $store->getName() . " is not allowed.</info>");
+                }
+            }
 
             return $returnValue;
-
         } elseif ($allStores) {
             $output->writeln("<info>Reindexing all stores...</info>");
             $returnValues = [];
@@ -192,7 +199,7 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     {
         $indexOperations = $this->getIndexOperationProvider()->getOperationByStore($store->getId());
 
-        $this->getIndexerStoreManager()->setLoadedStores([$store]);
+        $this->getIndexerStoreManager()->override([$store]);
         $index = $indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
         $this->getIndexerRegistry()->setFullReIndexationIsInProgress();
 
@@ -243,6 +250,15 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         }
 
         return $vsbridgeIndexers;
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function getStoresAllowedToReindex(): array
+    {
+        return $this->getIndexerStoreManager()->getStores();
     }
 
     /**
