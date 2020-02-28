@@ -102,7 +102,7 @@ class SingleEntityIndexCommand extends AbstractIndexerCommand
         $id = $input->getArgument(self::INPUT_ENTITY_ID);
 
         $store = $this->getStoreManager()->getStore($storeId);
-        $this->getIndexerStoreManager()->setLoadedStores([$store]);
+        $this->getIndexerStoreManager()->override([$store]);
         $indexer = $this->getIndex($index);
 
         if ($indexer) {

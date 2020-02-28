@@ -12,11 +12,10 @@ use Divante\VsbridgeIndexerCore\System\GeneralConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
- * Class StoreManager
+ * Class StoreManager is responsible for getting stores allowed to reindex
  */
 class StoreManager
 {
-
     /**
      * @var StoreManagerInterface
      */
@@ -83,7 +82,7 @@ class StoreManager
     /**
      * @param array $stores
      */
-    public function setLoadedStores(array $stores)
+    public function override(array $stores)
     {
         $this->loadedStores = $stores;
     }
