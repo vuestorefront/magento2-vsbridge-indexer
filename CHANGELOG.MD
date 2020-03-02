@@ -4,6 +4,11 @@
 
 ## [1.11.0] (2020.02.24)
 
+### Fixed
+- Fix exporting products for Magento EE ([#226](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/226))
+- Hide vsbridge_product_category indexer in Admin Panel: ([#184](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/184))
+- Too long invalidate redis cache url for mass actions or large amount of products in a shop ([#183] (https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/183))
+
 ### Added
 - Add option to export "attributes_metadata" for products. Only visible attributes are exported by default.
 Sample: `docs/sample/attributes-metadata.json`
