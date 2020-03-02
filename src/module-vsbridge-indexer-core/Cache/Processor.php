@@ -87,7 +87,7 @@ class Processor
                 $cacheTags = $this->getCacheTags();
 
                 if (isset($cacheTags[$dataType])) {
-                    $this->cleanCacheInBatches($storeId, [$dataType]);
+                    $this->cleanCacheByTags($storeId, [$dataType]);
                 }
             }
         }
