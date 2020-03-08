@@ -27,8 +27,7 @@ class Reader extends Filesystem
      */
     private $idAttributes = [
         '/indices/index' => 'identifier',
-        '/indices/index/type' => 'name',
-        '/indices/index/type/data_providers/data_provider' => 'name',
+        '/indices/index/data_providers/data_provider' => 'name',
     ];
 
     /**
