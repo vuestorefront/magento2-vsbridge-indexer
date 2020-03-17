@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+- If price scope is set to per Website, check for bundle selection price per website, falling back to global if none found. - [@rain2o](https://github.com/rain2o)
+
 ### Added
 - Add option to export data for store views to different ES instances
 

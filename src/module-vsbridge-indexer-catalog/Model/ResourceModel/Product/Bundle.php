@@ -9,8 +9,10 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 
 use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
+use Magento\Catalog\Helper\Data;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Bundle
@@ -43,17 +45,34 @@ class Bundle
     private $productMetaData;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var Data
+     */
+    private $catalogHelper;
+
+    /**
      * Bundle constructor.
      *
      * @param ProductMetaData $productMetaData
      * @param ResourceConnection $resourceModel
+     * @param StoreManagerInterface $storeManager
+     * @param Data $catalogHelper
      */
     public function __construct(
         ProductMetaData $productMetaData,
-        ResourceConnection $resourceModel
+        ResourceConnection $resourceModel,
+        StoreManagerInterface $storeManager,
+        Data $catalogHelper
     ) {
         $this->resource = $resourceModel;
         $this->productMetaData = $productMetaData;
+        $this->storeManager = $storeManager;
+        $this->catalogHelper = $catalogHelper;
+        parent::__construct($productMetaData, $resourceModel);
     }
 
     /**
@@ -96,7 +115,7 @@ class Bundle
         }
 
         $this->initOptions($storeId);
-        $this->initSelection();
+        $this->initSelection($storeId);
 
         return $this->bundleOptionsByProduct;
     }
@@ -134,9 +153,9 @@ class Bundle
      *
      * @return void
      */
-    private function initSelection()
+    private function initSelection($storeId)
     {
-        $bundleSelections = $this->getBundleSelections();
+        $bundleSelections = $this->getBundleSelections($storeId);
         $simpleIds = array_column($bundleSelections, 'product_id');
         $simpleSkuList = $this->getProductSku($simpleIds);
 
@@ -167,15 +186,43 @@ class Bundle
     /**
      * @return array
      */
-    private function getBundleSelections()
+    private function getBundleSelections($storeId)
     {
         $productIds = $this->getBundleIds();
+        $connection = $this->getConnection();
 
-        $select = $this->getConnection()->select()->from(
+        $select = $connection->select()->from(
             ['selection' => $this->resource->getTableName('catalog_product_bundle_selection')]
         );
+        $productIdColumn = 'parent_product_id';
 
-        $select->where('parent_product_id IN (?)', $productIds);
+        if (!$this->catalogHelper->isPriceGlobal() && $storeId) {
+            $websiteId = $this->storeManager->getStore($storeId)
+                ->getWebsiteId();
+            $priceType = $connection->getCheckSql(
+                'price.selection_price_type IS NOT NULL',
+                'price.selection_price_type',
+                'selection.selection_price_type'
+            );
+            $priceValue = $connection->getCheckSql(
+                'price.selection_price_value IS NOT NULL',
+                'price.selection_price_value',
+                'selection.selection_price_value'
+            );
+            $select->joinLeft(
+                ['price' => $this->resource->getTableName('catalog_product_bundle_selection_price')],
+                'selection.selection_id = price.selection_id AND price.website_id = ' . (int)$websiteId .
+                ' AND selection.parent_product_id = price.parent_product_id',
+                [
+                    'selection_price_type' => $priceType,
+                    'selection_price_value' => $priceValue,
+                    'parent_product_id' => 'selection.parent_product_id'
+                ]
+            );
+            $productIdColumn = 'selection.' . $productIdColumn;
+        }
+
+        $select->where("$productIdColumn IN (?)", $productIds);
 
         return $this->getConnection()->fetchAll($select);
     }
