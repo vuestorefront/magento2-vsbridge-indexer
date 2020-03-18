@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## [1.11.1] (2020.03.18)
+
+### Fixed
+- Resolve issue ([#184](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/184)), hide 'vsbridge_product_category' indexer from magento commands: `indexer:reindex`, `indexer:info`
+
 ## [1.11.0] (2020.02.24)
 
 ### Fixed
