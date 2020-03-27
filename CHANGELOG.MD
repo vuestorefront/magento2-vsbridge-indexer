@@ -2,13 +2,19 @@
 
 ## Unreleased
 
+## [1.12.0] (2020.03.27)
+
 ### Added
 - Add option to export data for store views to different ES instances
 
-## [1.11.1] (2020.03.18)
+## [1.11.2] (2020.03.18)
 
 ### Fixed
 - Resolve issue ([#184](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/184)), hide 'vsbridge_product_category' indexer from magento commands: `indexer:reindex`, `indexer:info`
+
+## [1.11.1]
+
+- Fix cleaning cache after reindex. Related to: ([#183] (https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/183))
 
 ## [1.11.0] (2020.02.24)
 
