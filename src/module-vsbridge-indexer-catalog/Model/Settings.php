@@ -11,6 +11,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model;
 use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\ProductConfig as ConfigResource;
 use Divante\VsbridgeIndexerCatalog\Model\Product\GetAttributeCodesByIds;
+use Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -198,11 +199,34 @@ class Settings implements CatalogConfigurationInterface
         if (!isset($this->settings[$key])) {
             $sortBy = $this->scopeConfig->getValue(
                 $path,
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
 
             $this->settings[$key] = (string) $sortBy;
+        }
+
+        return $this->settings[$key];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCategoryUrlSuffix(int $storeId): string
+    {
+        $key = sprintf(
+            '%s_%s',
+            CategoryUrlPathGenerator::XML_PATH_CATEGORY_URL_SUFFIX,
+            $storeId
+        );
+
+        if (!isset($this->settings[$key])) {
+            $configValue = $this->scopeConfig->getValue(
+                CategoryUrlPathGenerator::XML_PATH_CATEGORY_URL_SUFFIX,
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            $this->settings[$key] = $configValue;
         }
 
         return $this->settings[$key];
