@@ -9,7 +9,8 @@
 namespace Divante\VsbridgeIndexerCore\Elasticsearch;
 
 use Divante\VsbridgeIndexerCore\Api\Client\ConfigurationInterface as ClientConfigurationInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class ClientConfiguration
@@ -24,13 +25,22 @@ class ClientConfiguration implements ClientConfigurationInterface
     private $scopeConfig;
 
     /**
+     * @var int
+     */
+    private $storeId = null;
+
+    /**
      * ClientConfiguration constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
+     * @param int $storeId
      */
-    public function __construct(ScopeConfigInterface $scopeConfig)
-    {
+    public function __construct(
+        int $storeId,
+        ScopeConfigInterface $scopeConfig
+    ) {
         $this->scopeConfig = $scopeConfig;
+        $this->storeId = $storeId;
     }
 
     /**
@@ -79,9 +89,7 @@ class ClientConfiguration implements ClientConfigurationInterface
      */
     public function isHttpsModeEnabled()
     {
-        $httpsModeEnabled = (bool)$this->getConfigParam('enable_https_mode');
-
-        return $httpsModeEnabled;
+        return (bool)$this->getConfigParam('enable_https_mode');
     }
 
     /**
@@ -119,6 +127,6 @@ class ClientConfiguration implements ClientConfigurationInterface
     {
         $path = self::ES_CLIENT_CONFIG_XML_PREFIX . '/' . $configField;
 
-        return $this->scopeConfig->getValue($path);
+        return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $this->storeId);
     }
 }

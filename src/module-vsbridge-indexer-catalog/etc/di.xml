@@ -17,6 +17,9 @@
     <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface"
                 type="Divante\VsbridgeIndexerCatalog\Model\Product\LoadTierPrices" />
 
+    <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CategorySelectBuilderInterface"
+                type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CategorySelectBuilder"/>
+
     <type name="Divante\VsbridgeIndexerCatalog\Logger\CatalogIndexerLogger">
         <arguments>
             <argument name="name" xsi:type="string">vsbridgeCatalogIndexerLogger</argument>
@@ -133,6 +136,46 @@
     <type name="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\CustomOptionConverter">
         <arguments>
             <argument name="dataFilter" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\CustomOptionsDataFilterVirtual</argument>
+        </arguments>
+    </type>
+
+    <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\BaseSelectModifierInterface"
+                type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeWithWebsiteModifier" />
+
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeWithWebsiteModifier"
+                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeBaseSelectModifier">
+        <arguments>
+            <argument name="baseSelectModifiers" xsi:type="array">
+                <item name="website" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\WebsiteSelectModifier</item>
+                <item name="status" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\StatusSelectModifier</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\BaseSelectModifierInterface"
+                type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeWithStoreModifier" />
+
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeWithStoreModifier"
+                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeBaseSelectModifier">
+        <arguments>
+            <argument name="baseSelectModifiers" xsi:type="array">
+                <item name="store" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\StoreSelectModifier</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeWithStoreChildrenModifier"
+                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeBaseSelectModifier">
+        <arguments>
+            <argument name="baseSelectModifiers" xsi:type="array">
+                <item name="is_active" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ActiveSelectModifier</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\Children">
+        <arguments>
+            <argument name="baseSelectModifier" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\CompositeWithStoreChildrenModifier</argument>
         </arguments>
     </type>
 

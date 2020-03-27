@@ -8,22 +8,21 @@
 
 namespace Divante\VsbridgeIndexerCore\Indexer;
 
-use Divante\VsbridgeIndexerCore\Config\GeneralSettings;
-use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
+use Divante\VsbridgeIndexerCore\System\GeneralConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
- * Class StoreManager
+ * Class StoreManager is responsible for getting stores allowed to reindex
  */
 class StoreManager
 {
-
     /**
      * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var GeneralSettings
+     * @var GeneralConfigInterface
      */
     private $generalSettings;
 
@@ -35,11 +34,11 @@ class StoreManager
     /**
      * StoreManager constructor.
      *
-     * @param GeneralSettings $generalSettings
+     * @param GeneralConfigInterface $generalSettings
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        GeneralSettings $generalSettings,
+        GeneralConfigInterface $generalSettings,
         StoreManagerInterface $storeManager
     ) {
         $this->generalSettings = $generalSettings;
@@ -83,7 +82,7 @@ class StoreManager
     /**
      * @param array $stores
      */
-    public function setLoadedStores(array $stores)
+    public function override(array $stores)
     {
         $this->loadedStores = $stores;
     }

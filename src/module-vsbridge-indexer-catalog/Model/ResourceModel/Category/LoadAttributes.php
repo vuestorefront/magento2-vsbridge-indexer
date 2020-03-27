@@ -10,7 +10,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category;
 
 use Magento\Catalog\Model\ResourceModel\Category\Attribute\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Eav\Model\Entity\Attribute;
 
 /**
  * Class LoadAttributes

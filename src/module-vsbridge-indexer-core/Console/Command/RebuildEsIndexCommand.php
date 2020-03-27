@@ -10,7 +10,8 @@ namespace Divante\VsbridgeIndexerCore\Console\Command;
 
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
-use Divante\VsbridgeIndexerCore\Model\IndexerRegistry as IndexerRegistry;
+use Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface;
+use Divante\VsbridgeIndexerCore\Model\IndexerRegistry;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\LocalizedException;
@@ -20,7 +21,7 @@ use Magento\Store\Api\Data\StoreInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class IndexerReindexCommand
@@ -154,14 +155,21 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
 
         if ($storeId) {
             $store = $this->getStoreManager()->getStore($storeId);
-            $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+            $returnValue = false;
 
-            $returnValue = $this->reindexStore($store, $output);
+            $allowedStores = $this->getStoresAllowedToReindex();
 
-            $output->writeln("<info>Reindexing has completed!</info>");
+            foreach ($allowedStores as $allowedStore) {
+                if ($store->getId() === $allowedStore->getId()) {
+                    $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+                    $returnValue = $this->reindexStore($store, $output);
+                    $output->writeln("<info>Reindexing has completed!</info>");
+                } else {
+                    $output->writeln("<info>Store " . $store->getName() . " is not allowed.</info>");
+                }
+            }
 
             return $returnValue;
-
         } elseif ($allStores) {
             $output->writeln("<info>Reindexing all stores...</info>");
             $returnValues = [];
@@ -189,8 +197,10 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
      */
     private function reindexStore(StoreInterface $store, OutputInterface $output)
     {
-        $this->getIndexerStoreManager()->setLoadedStores([$store]);
-        $index = $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store);
+        $indexOperations = $this->getIndexOperationProvider()->getOperationByStore($store->getId());
+
+        $this->getIndexerStoreManager()->override([$store]);
+        $index = $indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
         $this->getIndexerRegistry()->setFullReIndexationIsInProgress();
 
         $returnValue = Cli::RETURN_FAILURE;
@@ -213,12 +223,11 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             }
         }
 
-        $this->indexOperations->switchIndexer($index->getName(), $index->getIdentifier());
+        $indexOperations->switchIndexer($index->getName(), $index->getIdentifier());
 
         $output->writeln(
             sprintf('<info>Index name: %s, index alias: %s</info>', $index->getName(), $index->getIdentifier())
         );
-        $this->getIndexOperations()->switchIndexer($index->getName(), $index->getIdentifier());
 
         return $returnValue;
     }
@@ -241,6 +250,15 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         }
 
         return $vsbridgeIndexers;
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function getStoresAllowedToReindex(): array
+    {
+        return $this->getIndexerStoreManager()->getStores();
     }
 
     /**
@@ -280,12 +298,12 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     }
 
     /**
-     * @return IndexOperationInterface
+     * @return IndexOperationProviderInterface
      */
-    private function getIndexOperations()
+    private function getIndexOperationProvider()
     {
         if (null === $this->indexOperations) {
-            $this->indexOperations = $this->getObjectManager()->get(IndexOperationInterface::class);
+            $this->indexOperations = $this->getObjectManager()->get(IndexOperationProviderInterface::class);
         }
 
         return $this->indexOperations;

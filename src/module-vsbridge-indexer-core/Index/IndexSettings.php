@@ -15,7 +15,7 @@ class IndexSettings
     /**
      * @var StoreManagerInterface
      */
-    private $storeManagerInterface;
+    private $storeManager;
 
     /**
      * @var IndicesConfig
@@ -41,7 +41,7 @@ class IndexSettings
     ) {
         $this->indicesConfig = $config;
         $this->settingConfig = $settingsConfig;
-        $this->storeManagerInterface = $storeManager;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -63,18 +63,18 @@ class IndexSettings
                 'analyzer' => [
                     'autocomplete' => [
                         'tokenizer' => 'autocomplete',
-                        'filter' => ['lowercase']
+                        'filter' => ['lowercase'],
                     ],
                     'autocomplete_search' => [
                         'tokenizer'=> 'lowercase'
                     ]
                 ],
-                'tokenizer'=> [
+                'tokenizer' => [
                     'autocomplete' => [
-                        'type'=> 'edge_ngram',
-                        'min_gram'=> 2,
-                        'max_gram'=> 10,
-                        'token_chars'=> ['letter']
+                        'type' => 'edge_ngram',
+                        'min_gram' => 2,
+                        'max_gram' => 10,
+                        'token_chars' => ['letter'],
                     ]
                 ]
             ]
@@ -108,7 +108,7 @@ class IndexSettings
             $indexNamePrefix .= '_' . $storeIdentifier;
         }
 
-        return $indexNamePrefix;
+        return strtolower($indexNamePrefix);
     }
 
     /**
@@ -119,7 +119,7 @@ class IndexSettings
     private function getStoreIdentifier(StoreInterface $store)
     {
         if (!$this->settingConfig->addIdentifierToDefaultStoreView()) {
-            $defaultStoreView = $this->storeManagerInterface->getDefaultStoreView();
+            $defaultStoreView = $this->storeManager->getDefaultStoreView();
 
             if ($defaultStoreView->getId() === $store->getId()) {
                 return '';
