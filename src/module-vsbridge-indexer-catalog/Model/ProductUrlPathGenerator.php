@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @package  Divante\VsbridgeIndexerCatalog
  * @author Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -9,7 +12,6 @@
 namespace Divante\VsbridgeIndexerCatalog\Model;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Rewrite as RewriteResource;
-use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
 
 /**
  * Class ProductUrlPathGenerator
@@ -22,26 +24,12 @@ class ProductUrlPathGenerator
     private $rewriteResource;
 
     /**
-     * @var string
-     */
-    private $productUrlSuffix;
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
      * ProductUrlPathGenerator constructor.
      *
      * @param RewriteResource $rewrite
-     * @param ScopeConfigInterface $config
      */
-    public function __construct(
-        RewriteResource $rewrite,
-        ScopeConfigInterface $config
-    ) {
-        $this->scopeConfig = $config;
+    public function __construct(RewriteResource $rewrite)
+    {
         $this->rewriteResource = $rewrite;
     }
 
@@ -53,37 +41,15 @@ class ProductUrlPathGenerator
      *
      * @return array
      */
-    public function addUrlPath(array $products, $storeId)
+    public function addUrlPath(array $products, $storeId): array
     {
         $productIds = array_keys($products);
-        $urlSuffix = $this->getProductUrlSuffix();
-
         $rewrites = $this->rewriteResource->getRawRewritesData($productIds, $storeId);
 
         foreach ($rewrites as $productId => $rewrite) {
-            if ($urlSuffix != "") {
-                $rewrite = mb_substr($rewrite, 0, -strlen($urlSuffix));
-            }
-
             $products[$productId]['url_path'] = $rewrite;
         }
 
         return $products;
-    }
-
-    /**
-     * Retrieve product rewrite suffix for store
-     *
-     * @return string
-     */
-    private function getProductUrlSuffix()
-    {
-        if (null === $this->productUrlSuffix) {
-            $this->productUrlSuffix = (string) $this->scopeConfig->getValue(
-                \Magento\CatalogUrlRewrite\Model\ProductUrlPathGenerator::XML_PATH_PRODUCT_URL_SUFFIX
-            );
-        }
-
-        return $this->productUrlSuffix;
     }
 }
