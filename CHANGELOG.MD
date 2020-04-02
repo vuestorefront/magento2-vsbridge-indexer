@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## [1.14.0] (2020.04.02)
+- Add option to set up configurable children batch size.
+
 ## [1.13.0] (2020.04.02)
 
 ### Added

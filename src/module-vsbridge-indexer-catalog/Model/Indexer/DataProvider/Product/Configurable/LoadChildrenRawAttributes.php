@@ -22,11 +22,6 @@ use Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface;
 class LoadChildrenRawAttributes
 {
     /**
-     * @var int
-     */
-    private $batchSize;
-
-    /**
      * @var LoadTierPricesInterface
      */
     private $loadTierPrices;
@@ -73,10 +68,8 @@ class LoadChildrenRawAttributes
         ConfigurableAttributes $configurableAttributes,
         LoadTierPricesInterface $loadTierPrices,
         LoadMediaGalleryInterface $loadMediaGallery,
-        PriceResourceModel $priceResourceModel,
-        $batchSize = 500
+        PriceResourceModel $priceResourceModel
     ) {
-        $this->batchSize = $batchSize;
         $this->settings = $catalogConfiguration;
         $this->loadTierPrices = $loadTierPrices;
         $this->mediaGalleryLoader = $loadMediaGallery;
@@ -107,7 +100,7 @@ class LoadChildrenRawAttributes
 
         $requiredAttribute = array_unique($requiredAttributes);
 
-        foreach ($this->getChildrenInBatches($allChildren, $this->batchSize) as $batch) {
+        foreach ($this->getChildrenInBatches($allChildren, $storeId) as $batch) {
             $childIds = array_keys($batch);
             $priceData = $this->priceResourceModel->loadPriceData($storeId, $childIds);
 
@@ -173,13 +166,15 @@ class LoadChildrenRawAttributes
     }
 
     /**
+     * @param int $storeId
+     *
      * @param array $documents
-     * @param int $batchSize
      *
      * @return \Generator
      */
-    private function getChildrenInBatches(array $documents, $batchSize)
+    private function getChildrenInBatches(array $documents, int $storeId)
     {
+        $batchSize = $this->getBatchSize($storeId);
         $i = 0;
         $batch = [];
 
@@ -196,5 +191,17 @@ class LoadChildrenRawAttributes
         if (count($batch) > 0) {
             yield $batch;
         }
+    }
+
+    /**
+     * Retrieve batch size
+     *
+     * @param int $storeId
+     *
+     * @return int
+     */
+    private function getBatchSize(int $storeId): int
+    {
+        return $this->settings->getConfigurableChildrenBatchSize($storeId);
     }
 }

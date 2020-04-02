@@ -46,6 +46,11 @@ interface CatalogConfigurationInterface
     const EXPORT_ATTRIBUTES_METADATA = 'export_attributes_metadata';
 
     /**
+     * @const int
+     */
+    const CONFIGURABLE_CHILDREN_BATCH_SIZE = 'configurable_children_batch_size';
+
+    /**
      * @return bool
      */
     public function useMagentoUrlKeys();
@@ -118,4 +123,13 @@ interface CatalogConfigurationInterface
      * @return string
      */
     public function getCategoryUrlSuffix(int $storeId): string;
+
+    /**
+     * Retrieve configurable children batch size
+     *
+     * @param int $storeId
+     *
+     * @return int
+     */
+    public function getConfigurableChildrenBatchSize(int $storeId): int;
 }
