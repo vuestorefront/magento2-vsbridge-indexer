@@ -17,6 +17,7 @@
                 <use_catalog_rules>0</use_catalog_rules>
                 <export_attributes_metadata>0</export_attributes_metadata>
                 <add_swatches_to_configurable_options>0</add_swatches_to_configurable_options>
+                <configurable_children_batch_size>500</configurable_children_batch_size>
             </catalog_settings>
         </vsbridge_indexer_settings>
     </default>

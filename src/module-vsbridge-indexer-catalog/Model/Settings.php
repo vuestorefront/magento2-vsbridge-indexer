@@ -231,4 +231,15 @@ class Settings implements CatalogConfigurationInterface
 
         return $this->settings[$key];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getConfigurableChildrenBatchSize(int $storeId): int
+    {
+        return (int) $this->getConfigParam(
+            CatalogConfigurationInterface::CONFIGURABLE_CHILDREN_BATCH_SIZE,
+            $storeId
+        );
+    }
 }
