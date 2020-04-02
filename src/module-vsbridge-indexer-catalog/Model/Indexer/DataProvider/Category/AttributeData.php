@@ -267,7 +267,6 @@ class AttributeData implements AttributeDataProviderInterface
         if (!isset($categoryDTO['url_path'])) {
             $categoryDTO['url_path'] = $categoryDTO['slug'];
         } else {
-            var_dump($this->settings->getCategoryUrlSuffix($storeId));
             $categoryDTO['url_path'] .= $this->settings->getCategoryUrlSuffix($storeId);
         }
 
