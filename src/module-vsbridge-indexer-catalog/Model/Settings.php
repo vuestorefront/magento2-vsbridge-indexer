@@ -226,7 +226,7 @@ class Settings implements CatalogConfigurationInterface
                 ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            $this->settings[$key] = $configValue;
+            $this->settings[$key] = (string) $configValue;
         }
 
         return $this->settings[$key];
