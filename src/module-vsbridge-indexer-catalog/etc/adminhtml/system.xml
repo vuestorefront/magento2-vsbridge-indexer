@@ -69,6 +69,11 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>If you use Catalog Prices Rules and Magento 2.2.4 (or previous version) set option to Yes.</comment>
                 </field>
+                <field id="configurable_children_batch_size" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Configurable Children Batch Size</label>
+                    <validate>required-entry validate-digits</validate>
+                    <comment>Set Batch Size for processing configurable children. For big numbers of configurable children we have to load attributes, prices, media gallery in smaller batches.</comment>
+                </field>
             </group>
         </section>
     </system>
