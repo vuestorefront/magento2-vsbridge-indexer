@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @package  Divante\VsbridgeIndexerCatalog
  * @author Agata Firlejczyk <afirlejczyk@divante.pl>
@@ -17,15 +20,17 @@ interface AttributeDataProviderInterface extends DataProviderInterface
 {
     /**
      * @param array $categoryDTO
+     * @param int $storeId
      *
      * @return array
      */
-    public function prepareParentCategory(array $categoryDTO);
+    public function prepareParentCategory(array $categoryDTO, int $storeId);
 
     /**
      * @param array $categoryDTO
+     * @param int $storeId
      *
      * @return array
      */
-    public function prepareChildCategory(array $categoryDTO);
+    public function prepareChildCategory(array $categoryDTO, int $storeId);
 }

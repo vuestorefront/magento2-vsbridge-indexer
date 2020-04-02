@@ -18,6 +18,10 @@ use Magento\Framework\DB\Select;
  */
 class Links
 {
+    /**
+     * @const string
+     */
+    const POSITION_ATTRIBUTE_CODE = 'position';
 
     /**
      * @var array
@@ -38,12 +42,7 @@ class Links
      * @var LinkTypeMapper
      */
     private $linkTypeMapper;
-
-    /**
-     * @var array
-     */
-    private $positionAttribute;
-
+    
     /**
      * @var ProductMetaData
      */
@@ -140,7 +139,7 @@ class Links
     private function getAllLinkedProducts()
     {
         if (null === $this->links) {
-            $select = $this->prepareLinksSelect();
+            $select = $this->buildLinksSelect();
             $links = $this->getConnection()->fetchAll($select);
             $groupByProduct = [];
 
@@ -160,7 +159,7 @@ class Links
     /**
      * @return Select
      */
-    private function prepareLinksSelect()
+    private function buildLinksSelect()
     {
         $productIds = $this->getProductsIds();
 
@@ -195,52 +194,20 @@ class Links
     private function joinPositionAttribute(Select $select)
     {
         $alias = 'link_position';
-        $attributePosition = $this->fetchPositionAttributeData();
 
-        if (empty($attributePosition)) {
-            return $select;
-        }
-
-        $table = $this->resource->getTableName($this->getAttributeTypeTable($attributePosition['type']));
+        $table = $this->resource->getTableName($this->getAttributeTypeTable());
 
         $joinCondition = [
             "{$alias}.link_id = links.link_id",
-            $this->getConnection()->quoteInto(
-                "{$alias}.product_link_attribute_id = ?",
-                $attributePosition['id']
-            ),
         ];
 
         $select->joinLeft(
             [$alias => $table],
             implode(' AND ', $joinCondition),
-            [$attributePosition['code'] => 'value']
+            [self::POSITION_ATTRIBUTE_CODE => 'value']
         );
 
         return $select;
-    }
-
-    /**
-     * @return array
-     */
-    private function fetchPositionAttributeData()
-    {
-        if (null === $this->positionAttribute) {
-            $select = $this->getConnection()->select()
-                ->from(
-                    $this->resource->getTableName('catalog_product_link_attribute'),
-                    [
-                        'id' => 'product_link_attribute_id',
-                        'code' => 'product_link_attribute_code',
-                        'type' => 'data_type',
-                    ]
-                )
-                ->where('product_link_attribute_code = ?', 'position');
-
-            $this->positionAttribute = $this->getConnection()->fetchRow($select);
-        }
-
-        return $this->positionAttribute;
     }
 
     /**
@@ -252,13 +219,11 @@ class Links
     }
 
     /**
-     * @param string $type
-     *
      * @return string
      */
-    private function getAttributeTypeTable($type)
+    private function getAttributeTypeTable()
     {
-        return $this->resource->getTableName('catalog_product_link_attribute_' . $type);
+        return $this->resource->getTableName('catalog_product_link_attribute_int');
     }
 
     /**

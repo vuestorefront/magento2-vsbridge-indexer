@@ -133,7 +133,7 @@ class AttributeData implements AttributeDataProviderInterface
 
         foreach ($attributes as $entityId => $attributesData) {
             $categoryData = array_merge($indexData[$entityId], $attributesData);
-            $categoryData = $this->prepareParentCategory($categoryData);
+            $categoryData = $this->prepareParentCategory($categoryData, $storeId);
             $categoryData = $this->addSortOptions($categoryData, $storeId);
             $categoryData['product_count'] = $productCount[$entityId];
 
@@ -155,7 +155,7 @@ class AttributeData implements AttributeDataProviderInterface
             $this->childrenProductCount = $this->productCountResource->loadProductCount(
                 array_keys($groupedChildrenById)
             );
-            $indexData[$categoryId] = $this->addChildrenData($categoryData, $groupedChildrenById);
+            $indexData[$categoryId] = $this->addChildrenData($categoryData, $groupedChildrenById, $storeId);
         }
 
         return $indexData;
@@ -164,13 +164,14 @@ class AttributeData implements AttributeDataProviderInterface
     /**
      * @param array $category
      * @param array $groupedChildren
+     * @param int $storeId
      *
      * @return array
      */
-    private function addChildrenData(array $category, array $groupedChildren)
+    private function addChildrenData(array $category, array $groupedChildren, int $storeId)
     {
         $categoryId = $category['id'];
-        $childrenData = $this->plotTree($groupedChildren, $categoryId);
+        $childrenData = $this->plotTree($groupedChildren, $categoryId, $storeId);
 
         $category['children_data'] = $childrenData;
         $category['children_count'] = count($childrenData);
@@ -198,10 +199,11 @@ class AttributeData implements AttributeDataProviderInterface
     /**
      * @param array $categories
      * @param int $rootId
+     * @param int $storeId
      *
      * @return array
      */
-    private function plotTree(array $categories, $rootId)
+    private function plotTree(array $categories, int $rootId, int $storeId)
     {
         $categoryTree = [];
 
@@ -218,8 +220,8 @@ class AttributeData implements AttributeDataProviderInterface
                 }
 
                 $categoryData['product_count'] = $this->childrenProductCount[$categoryId];
-                $categoryData = $this->prepareChildCategory($categoryData);
-                $categoryData['children_data'] = $this->plotTree($categories, $categoryId);
+                $categoryData = $this->prepareChildCategory($categoryData, $storeId);
+                $categoryData['children_data'] = $this->plotTree($categories, $categoryId, $storeId);
                 $categoryData['children_count'] = count($categoryData['children_data']);
                 $categoryTree[] = $categoryData;
             }
@@ -230,30 +232,33 @@ class AttributeData implements AttributeDataProviderInterface
 
     /**
      * @param array $categoryDTO
+     * @param int $storeId
      *
      * @return array
      */
-    public function prepareParentCategory(array $categoryDTO)
+    public function prepareParentCategory(array $categoryDTO, int $storeId)
     {
-        return $this->prepareCategory($categoryDTO);
+        return $this->prepareCategory($categoryDTO, $storeId);
     }
 
     /**
      * @param array $categoryDTO
+     * @param int $storeId
      *
      * @return array
      */
-    public function prepareChildCategory(array $categoryDTO)
+    public function prepareChildCategory(array $categoryDTO, int $storeId)
     {
-        return $this->prepareCategory($categoryDTO);
+        return $this->prepareCategory($categoryDTO, $storeId);
     }
 
     /**
      * @param array $categoryDTO
+     * @param int $storeId
      *
      * @return array
      */
-    private function prepareCategory(array $categoryDTO)
+    private function prepareCategory(array $categoryDTO, int $storeId)
     {
         $categoryDTO['id'] = (int)$categoryDTO['entity_id'];
 
@@ -261,6 +266,8 @@ class AttributeData implements AttributeDataProviderInterface
 
         if (!isset($categoryDTO['url_path'])) {
             $categoryDTO['url_path'] = $categoryDTO['slug'];
+        } else {
+            $categoryDTO['url_path'] .= $this->settings->getCategoryUrlSuffix($storeId);
         }
 
         $categoryDTO = array_diff_key($categoryDTO, array_flip($this->fieldsToRemove));

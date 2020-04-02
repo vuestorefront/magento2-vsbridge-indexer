@@ -109,4 +109,13 @@ interface CatalogConfigurationInterface
      * @return string
      */
     public function getProductListDefaultSortBy($storeId);
+
+    /**
+     * Retrieve Category Url Suffix
+     *
+     * @param int $storeId
+     *
+     * @return string
+     */
+    public function getCategoryUrlSuffix(int $storeId): string;
 }
