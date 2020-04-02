@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [1.13.0] (2020.04.02)
+
+### Added
+- Export category,product url suffixes base on Magento configuration.
+
+### Fixed
+- Fix exporting positions for linked products ([#242](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/242))
+
 ## [1.12.0] (2020.03.27)
 
 ### Added
