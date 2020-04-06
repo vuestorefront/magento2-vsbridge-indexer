@@ -182,7 +182,7 @@ class GenericIndexerHandler
     public function cleanUpByTransactionKey(StoreInterface $store, array $docIds = null)
     {
         try {
-            $indexAlias = $this->getIndexOperation($store->getId())->getIndexAlias($store);
+            $indexAlias = $this->getIndexOperation($store->getId())->getIndexAlias($this->indexIdentifier, $store);
 
             if ($this->getIndexOperation($store->getId())->indexExists($indexAlias)) {
                 $index = $this->getIndexOperation($store->getId())->getIndexByName($this->indexIdentifier, $store);
