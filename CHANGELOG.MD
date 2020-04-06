@@ -2,15 +2,14 @@
 
 ## Unreleased
 
-## [1.14.0] (2020.04.02)
-- Add option to set up configurable children batch size.
-
-
-## [1.13.1] (2020.04.06)
+## [1.14.1] (2020.04.06)
 
 ### Fixed
 - Fix BulkLogger
 - Fix `vsbridge:reindex --all` option: reindex only allowed stores.
+
+## [1.14.0] (2020.04.02)
+- Add option to set up configurable children batch size.
 
 ## [1.13.0] (2020.04.02)
 
