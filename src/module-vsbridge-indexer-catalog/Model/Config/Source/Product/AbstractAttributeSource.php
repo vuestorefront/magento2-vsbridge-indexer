@@ -1,12 +1,8 @@
-<?php declare(strict_types=1);
-/**
- * @package  Divante\VsbridgeIndexerCatalog
- * @author Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
- */
+<?php
 
-namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source;
+declare(strict_types=1);
+
+namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source\Product;
 
 use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection;
@@ -14,9 +10,9 @@ use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
- * Class AbstractProductAttributeSource
+ * Class AbstractAttributeSource
  */
-abstract class AbstractProductAttributeSource implements ArrayInterface
+abstract class AbstractAttributeSource implements ArrayInterface
 {
     /**
      * @var array|null
@@ -29,7 +25,7 @@ abstract class AbstractProductAttributeSource implements ArrayInterface
     private $collectionFactory;
 
     /**
-     * ProductAttributes constructor.
+     * Attributes constructor.
      *
      * @param CollectionFactory $collectionFactory
      */
@@ -39,6 +35,8 @@ abstract class AbstractProductAttributeSource implements ArrayInterface
     }
 
     /**
+     * @inheritDoc
+     *
      * @return array
      */
     public function toOptionArray()
@@ -57,8 +55,14 @@ abstract class AbstractProductAttributeSource implements ArrayInterface
             /** @var ProductAttributeInterface $attribute */
             foreach ($attributes as $attribute) {
                 if ($this->canAddAttribute($attribute)) {
+                    $label = sprintf(
+                        '%s (%s)',
+                        $attribute->getDefaultFrontendLabel(),
+                        $attribute->getAttributeCode()
+                    );
+
                     $this->options[] = [
-                        'label' => $attribute->getAttributeCode(),
+                        'label' => $label,
                         'value' => $attribute->getAttributeId(),
                     ];
                 }
@@ -69,6 +73,8 @@ abstract class AbstractProductAttributeSource implements ArrayInterface
     }
 
     /**
+     * Validate if attribute can be shown
+     *
      * @param ProductAttributeInterface $attribute
      *
      * @return bool

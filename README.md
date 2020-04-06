@@ -202,9 +202,8 @@ Module was tested on:
 
 
 ### TODO
-- add a limitation of the attributes (categories) sent to ElasticSearch
 - add a limitation of the categories sent to ElasticSearch, by adding new configurations: send only categories visible in the menu, send only active categories @Agata
 - add a new command allowing to enable/disable following indexes: CMS Block, CMS Page.
 - add an option to exclude the default Magento indexes (which do not impact new indexes operations)
 - split catalog module to smaller modules
-- remove "vsbridge_product_indexer" all together and run partial update in ES in different way
+- remove "vsbridge_product_category" all together and run partial update in ES in different way

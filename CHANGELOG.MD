@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## [1.15.0] (2020.04.06)
+
+### Added
+ Manage exported attributes for categories. Customize indexed attributes for `category` and `category.child_data`.
+
 ## [1.14.1] (2020.04.06)
 
 ### Fixed
@@ -9,6 +14,8 @@
 - Fix `vsbridge:reindex --all` option: reindex only allowed stores.
 
 ## [1.14.0] (2020.04.02)
+
+### Added
 - Add option to set up configurable children batch size.
 
 ## [1.13.0] (2020.04.02)

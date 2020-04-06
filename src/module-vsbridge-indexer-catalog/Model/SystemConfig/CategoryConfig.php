@@ -6,19 +6,19 @@
  * @license   See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Model;
+namespace Divante\VsbridgeIndexerCatalog\Model\SystemConfig;
 
-use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\ProductConfig as ConfigResource;
-use Divante\VsbridgeIndexerCatalog\Model\Product\GetAttributeCodesByIds;
+use Divante\VsbridgeIndexerCatalog\Model\Category\GetAttributeCodesByIds;
+use Magento\Catalog\Model\Config;
 use Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\ProductConfig as ConfigResource;
 
 /**
- * Class Settings
+ * Class CategoryConfig
  */
-class Settings implements CatalogConfigurationInterface
+class CategoryConfig implements CategoryConfigInterface
 {
     /**
      * @var array
@@ -64,75 +64,15 @@ class Settings implements CatalogConfigurationInterface
 
     /**
      * @inheritdoc
-     */
-    public function useMagentoUrlKeys()
-    {
-        return (bool) $this->getConfigParam(CatalogConfigurationInterface::USE_MAGENTO_URL_KEYS);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function useUrlKeyToGenerateSlug()
-    {
-        return (bool) $this->getConfigParam(CatalogConfigurationInterface::USE_URL_KEY_TO_GENERATE_SLUG);
-    }
-
-    /***
-     * @inheritdoc
-     */
-    public function useCatalogRules()
-    {
-        return (bool) $this->getConfigParam(CatalogConfigurationInterface::USE_CATALOG_RULES);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function syncTierPrices()
-    {
-        return (bool) $this->getConfigParam(CatalogConfigurationInterface::SYNC_TIER_PRICES);
-    }
-
-    /**
-     * @return bool
-     */
-    public function addSwatchesToConfigurableOptions()
-    {
-        return (bool) $this->getConfigParam(CatalogConfigurationInterface::ADD_SWATCHES_OPTIONS);
-    }
-
-    /**
-     * @return bool
-     */
-    public function canExportAttributesMetadata(): bool
-    {
-        return (bool) $this->getConfigParam(CatalogConfigurationInterface::EXPORT_ATTRIBUTES_METADATA);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAllowedProductTypes($storeId)
-    {
-        $types = $this->getConfigParam(CatalogConfigurationInterface::ALLOWED_PRODUCT_TYPES, $storeId);
-
-        if (null === $types || '' === $types) {
-            $types = [];
-        } else {
-            $types = explode(',', $types);
-        }
-
-        return $types;
-    }
-
-    /**
-     * @inheritdoc
+     *
+     * @param int $storeId
+     *
+     * @return array
      */
     public function getAllowedAttributesToIndex(int $storeId): array
     {
         $attributes = (string)$this->getConfigParam(
-            CatalogConfigurationInterface::PRODUCT_ATTRIBUTES,
+            CategoryConfigInterface::CATEGORY_ATTRIBUTES,
             $storeId
         );
 
@@ -141,11 +81,15 @@ class Settings implements CatalogConfigurationInterface
 
     /**
      * @inheritdoc
+     *
+     * @param int $storeId
+     *
+     * @return array
      */
     public function getAllowedChildAttributesToIndex(int $storeId): array
     {
         $attributes = (string)$this->getConfigParam(
-            CatalogConfigurationInterface::CHILD_ATTRIBUTES,
+            CategoryConfigInterface::CHILD_ATTRIBUTES,
             $storeId
         );
 
@@ -153,30 +97,11 @@ class Settings implements CatalogConfigurationInterface
     }
 
     /**
-     * @param string $configField
-     * @param int|null $storeId
-     *
-     * @return string|null
-     */
-    private function getConfigParam(string $configField, $storeId = null)
-    {
-        $key = $configField . (string) $storeId;
-
-        if (!isset($this->settings[$key])) {
-            $path = CatalogConfigurationInterface::CATALOG_SETTINGS_XML_PREFIX . '/' . $configField;
-            $scopeType = ($storeId) ? ScopeInterface::SCOPE_STORES : ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
-
-            $configValue = $this->scopeConfig->getValue($path, $scopeType, $storeId);
-            $this->settings[$key] = $configValue;
-        }
-
-        return $this->settings[$key];
-    }
-
-    /**
      * @inheritdoc
+     *
+     * @return array
      */
-    public function getAttributesUsedForSortBy()
+    public function getAttributesUsedForSortBy(): array
     {
         if (empty($this->attributesSortBy)) {
             $attributes = $this->catalogConfigResource->getAttributesUsedForSortBy();
@@ -190,10 +115,14 @@ class Settings implements CatalogConfigurationInterface
 
     /**
      * @inheritdoc
+     *
+     * @param int $storeId
+     *
+     * @return string
      */
-    public function getProductListDefaultSortBy($storeId)
+    public function getProductListDefaultSortBy(int $storeId): string
     {
-        $path = \Magento\Catalog\Model\Config::XML_PATH_LIST_DEFAULT_SORT_BY;
+        $path = Config::XML_PATH_LIST_DEFAULT_SORT_BY;
         $key = $path . (string) $storeId;
 
         if (!isset($this->settings[$key])) {
@@ -210,7 +139,11 @@ class Settings implements CatalogConfigurationInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     *
+     * @param int $storeId
+     *
+     * @return string
      */
     public function getCategoryUrlSuffix(int $storeId): string
     {
@@ -233,13 +166,25 @@ class Settings implements CatalogConfigurationInterface
     }
 
     /**
-     * @inheritDoc
+     * Retrieve config value by path and scope.
+     *
+     * @param string $configField
+     * @param int|null $storeId
+     *
+     * @return string|null
      */
-    public function getConfigurableChildrenBatchSize(int $storeId): int
+    private function getConfigParam(string $configField, int $storeId = null)
     {
-        return (int) $this->getConfigParam(
-            CatalogConfigurationInterface::CONFIGURABLE_CHILDREN_BATCH_SIZE,
-            $storeId
-        );
+        $key = $configField . (string) $storeId;
+
+        if (!isset($this->settings[$key])) {
+            $path = CategoryConfigInterface::CATEGORY_SETTINGS_XML_PREFIX . '/' . $configField;
+            $scopeType = ($storeId) ? ScopeInterface::SCOPE_STORES : ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+
+            $configValue = $this->scopeConfig->getValue($path, $scopeType, $storeId);
+            $this->settings[$key] = $configValue;
+        }
+
+        return $this->settings[$key];
     }
 }
