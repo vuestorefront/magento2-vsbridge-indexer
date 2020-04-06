@@ -6,12 +6,14 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source;
+namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source\Product;
+
+use Magento\Catalog\Api\Data\ProductAttributeInterface;
 
 /**
- * Class ProductAttributes
+ * Class Attributes
  */
-class ProductAttributes extends AbstractProductAttributeSource
+class Attributes extends AbstractAttributeSource
 {
     /**
      *
@@ -35,11 +37,13 @@ class ProductAttributes extends AbstractProductAttributeSource
     ];
 
     /**
-     * @param \Magento\Catalog\Api\Data\ProductAttributeInterface $attribute
+     * @inheritDoc
+     *
+     * @param ProductAttributeInterface $attribute
      *
      * @return bool
      */
-    public function canAddAttribute(\Magento\Catalog\Api\Data\ProductAttributeInterface $attribute): bool
+    public function canAddAttribute(ProductAttributeInterface $attribute): bool
     {
         return !in_array($attribute->getAttributeCode(), self::GENERAL_RESTRICTED_ATTRIBUTES);
     }

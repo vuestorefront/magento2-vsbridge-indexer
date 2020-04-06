@@ -1,24 +1,18 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="Magento\Indexer\Console\Command\IndexerInfoCommand"
-                type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerInfoCommand"/>
-    <preference for="Magento\Indexer\Console\Command\IndexerReindexCommand"
-                type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerReindexCommand"/>
+    <preference for="Magento\Indexer\Console\Command\IndexerInfoCommand" type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerInfoCommand"/>
+    <preference for="Magento\Indexer\Console\Command\IndexerReindexCommand" type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerReindexCommand"/>
+
     <preference for="Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface" type="Divante\VsbridgeIndexerCatalog\Model\SlugGenerator"/>
-    <preference for="Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\Settings"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CatalogConfig"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface" type="Divante\VsbridgeIndexerCatalog\Model\LoadInventory"/>
-    <preference for="Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\InventoryConverterInterface"
-                type="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\InventoryConverter" />
-    <preference for="Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\CustomOptionConverterInterface"
-                type="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\CustomOptionConverter"/>
-    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface"
-                type="Divante\VsbridgeIndexerCatalog\Model\Product\LoadMediaGallery"/>
-    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface"
-                type="Divante\VsbridgeIndexerCatalog\Model\Product\LoadTierPrices" />
-
-    <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CategorySelectBuilderInterface"
-                type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CategorySelectBuilder"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\InventoryConverterInterface" type="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\InventoryConverter" />
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\CustomOptionConverterInterface" type="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\CustomOptionConverter"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadMediaGalleryInterface" type="Divante\VsbridgeIndexerCatalog\Model\Product\LoadMediaGallery"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Api\LoadTierPricesInterface" type="Divante\VsbridgeIndexerCatalog\Model\Product\LoadTierPrices" />
+    <preference for="Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CategoryConfigInterface" type="Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CategoryConfig"/>
+    <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CategorySelectBuilderInterface" type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CategorySelectBuilder"/>
 
     <type name="Divante\VsbridgeIndexerCatalog\Logger\CatalogIndexerLogger">
         <arguments>
@@ -206,7 +200,15 @@
         <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Controller\Catalog\Adminhtml\Product\Action\AttributeSavePlugin"/>
     </type>
 
-    <type name="Divante\VsbridgeIndexerCatalog\Setup\UpgradeData\SetDefaultAttributes">
+    <type name="Divante\VsbridgeIndexerCatalog\Setup\UpgradeData\SetCategoryDefaultAttributes">
+        <arguments>
+            <argument name="childAttributes" xsi:type="array">
+                <item name="image" xsi:type="string">image</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Setup\UpgradeData\SetProductDefaultAttributes">
         <arguments>
             <argument name="productAttributes" xsi:type="array">
                 <item name="description" xsi:type="string">description</item>

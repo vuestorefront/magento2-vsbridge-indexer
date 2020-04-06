@@ -1,12 +1,8 @@
 <?php
-/**
- * @package  Divante\VsbridgeIndexerCatalog
- * @author Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
- */
 
-namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source;
+declare(strict_types=1);
+
+namespace Divante\VsbridgeIndexerCatalog\Model\Config\Source\Product;
 
 use Magento\Catalog\Model\ProductTypes\ConfigInterface;
 use Magento\Framework\Option\ArrayInterface;
@@ -22,7 +18,7 @@ class ProductType implements ArrayInterface
     private $config;
 
     /**
-     * @var
+     * @var array
      */
     private $types;
 
@@ -37,6 +33,8 @@ class ProductType implements ArrayInterface
     }
 
     /**
+     * @inheritDoc
+     *
      * @return array
      */
     public function toOptionArray()
@@ -54,9 +52,11 @@ class ProductType implements ArrayInterface
     }
 
     /**
+     * Retrieve Product Types
+     *
      * @return array
      */
-    private function getTypes()
+    private function getTypes(): array
     {
         if ($this->types === null) {
             $productTypes = $this->config->getAll();

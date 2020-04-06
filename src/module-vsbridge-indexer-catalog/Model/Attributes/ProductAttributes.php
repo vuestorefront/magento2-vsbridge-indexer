@@ -11,7 +11,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Attributes;
 use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 
 /**
- * Class ProductAttributes
+ * Class Attributes
  */
 class ProductAttributes
 {
@@ -35,7 +35,7 @@ class ProductAttributes
     private $catalogConfig;
 
     /**
-     * ProductAttributes constructor.
+     * Attributes constructor.
      *
      * @param CatalogConfigurationInterface $catalogConfiguration
      */

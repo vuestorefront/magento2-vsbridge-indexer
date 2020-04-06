@@ -1,15 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-/**
- * @package  Divante\VsbridgeIndexerCatalog
- * @author Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
- */
+declare(strict_types=1);
 
-namespace Divante\VsbridgeIndexerCatalog\Model\Product;
+namespace Divante\VsbridgeIndexerCatalog\Model\Category;
 
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\LoadAttributes;
+use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\LoadAttributes;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 
@@ -43,6 +38,8 @@ class GetAttributeCodesByIds
     }
 
     /**
+     * Load attribute codes by ids
+     *
      * @param string $attributeIds
      *
      * @return array
