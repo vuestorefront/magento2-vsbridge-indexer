@@ -54,7 +54,6 @@ class Inventory implements DataProviderInterface
 
         foreach ($inventoryData as $inventoryDataRow) {
             $productId = (int) $inventoryDataRow['product_id'];
-            unset($inventoryDataRow['product_id']);
             $indexData[$productId]['stock'] =
                 $this->inventoryProcessor->prepareInventoryData($storeId, $inventoryDataRow);
         }
