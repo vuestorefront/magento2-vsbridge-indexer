@@ -53,22 +53,22 @@ interface CatalogConfigurationInterface
     /**
      * @return bool
      */
-    public function useMagentoUrlKeys();
+    public function useMagentoUrlKeys(): bool;
 
     /**
      * @return bool
      */
-    public function useUrlKeyToGenerateSlug();
+    public function useUrlKeyToGenerateSlug(): bool;
 
     /**
      * @return bool
      */
-    public function useCatalogRules();
+    public function useCatalogRules(): bool;
 
     /**
      * @return bool
      */
-    public function syncTierPrices();
+    public function syncTierPrices(): bool;
 
     /**
      * @return bool
@@ -85,7 +85,7 @@ interface CatalogConfigurationInterface
      *
      * @return array
      */
-    public function getAllowedProductTypes($storeId);
+    public function getAllowedProductTypes($storeId): array;
 
     /**
      * @param int $storeId
@@ -100,29 +100,6 @@ interface CatalogConfigurationInterface
      * @return array
      */
     public function getAllowedChildAttributesToIndex(int $storeId): array;
-
-    /**
-     *
-     * @return array
-     * @throws \Exception
-     */
-    public function getAttributesUsedForSortBy();
-
-    /**
-     * @param int $storeId
-     *
-     * @return string
-     */
-    public function getProductListDefaultSortBy($storeId);
-
-    /**
-     * Retrieve Category Url Suffix
-     *
-     * @param int $storeId
-     *
-     * @return string
-     */
-    public function getCategoryUrlSuffix(int $storeId): string;
 
     /**
      * Retrieve configurable children batch size

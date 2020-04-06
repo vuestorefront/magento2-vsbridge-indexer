@@ -59,6 +59,7 @@ class LoadAttributes
     private function initAttributes()
     {
         if (null === $this->attributesById) {
+            $this->attributesById = [];
             $attributeCollection = $this->getAttributeCollection();
 
             foreach ($attributeCollection as $attribute) {

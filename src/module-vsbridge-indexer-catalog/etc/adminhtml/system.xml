@@ -32,22 +32,22 @@
                 </field>
                 <field id="allowed_product_types" translate="label comment" type="multiselect" sortOrder="101" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Types of products to export</label>
-                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ProductType</source_model>
+                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\Product\ProductType</source_model>
                     <comment>by default all product types will be sent to elastic.
                         If you changed configuration after running full reindex it might be required to re-create index.
                     </comment>
                 </field>
                 <field id="product_attributes" translate="label comment" type="multiselect" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Product attributes to export</label>
-                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ProductAttributes</source_model>
-                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\ProductAttributes</backend_model>
+                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\Product\Attributes</source_model>
+                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\Attributes</backend_model>
                     <can_be_empty>1</can_be_empty>
                     <comment>Select which product attributes should be exported. Some attributes will be always exported: name, sku, price, status, url_path, url_key, visibility.</comment>
                 </field>
                 <field id="child_attributes" translate="label comment" type="multiselect" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Configurable children attributes to export</label>
-                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\ConfigurableChildAttributes</source_model>
-                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\ProductAttributes</backend_model>
+                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\Product\ConfigurableChildAttributes</source_model>
+                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\Attributes</backend_model>
                     <can_be_empty>1</can_be_empty>
                     <comment>Select which product attributes should be exported for 'configurable_children'. Some attributes will be always exported: name, sku, price, status, url_key, visibility and attributes used for creating configurable children (like color, size, etc)</comment>
                 </field>
@@ -73,6 +73,26 @@
                     <label>Configurable Children Batch Size</label>
                     <validate>required-entry validate-digits</validate>
                     <comment>Set Batch Size for processing configurable children. For big numbers of configurable children we have to load attributes, prices, media gallery in smaller batches.</comment>
+                </field>
+            </group>
+            <group id="catalog_category_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1" >
+                <label>Category Settings</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
+                <field id="category_attributes" translate="label comment" type="multiselect" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category attributes to export</label>
+                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\Category\Attributes</source_model>
+                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\Attributes</backend_model>
+                    <can_be_empty>1</can_be_empty>
+                    <comment>Select which product attributes should be exported. Some attributes will be always exported: name, url_key, is_active, url_path.</comment>
+                </field>
+                <field id="child_attributes" translate="label comment" type="multiselect" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category children data attributes to export</label>
+                    <source_model>Divante\VsbridgeIndexerCatalog\Model\Config\Source\Category\Attributes</source_model>
+                    <backend_model>Divante\VsbridgeIndexerCatalog\Model\Config\Backend\Attributes</backend_model>
+                    <can_be_empty>1</can_be_empty>
+                    <comment>Select which product attributes should be exported for 'child_data'. Some attributes will be always exported: name, url_key, is_active, url_path.</comment>
                 </field>
             </group>
         </section>

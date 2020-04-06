@@ -11,7 +11,7 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\Children as CategoryChildrenResource;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryChildAttributes;
-use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CategoryConfigInterface;
 use Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
@@ -76,7 +76,7 @@ class AttributeData implements AttributeDataProviderInterface
     private $childrenProductCount = [];
 
     /**
-     * @var CatalogConfigurationInterface
+     * @var CategoryConfigInterface
      */
     private $settings;
 
@@ -92,7 +92,7 @@ class AttributeData implements AttributeDataProviderInterface
      * @param CategoryChildrenResource $childrenResource
      * @param ProductCountResourceModel $productCountResource
      * @param ApplyCategorySlugInterface $applyCategorySlug
-     * @param CatalogConfigurationInterface $configSettings
+     * @param CategoryConfigInterface $configSettings
      * @param CategoryChildAttributes $categoryChildAttributes
      * @param DataFilter $dataFilter
      */
@@ -101,7 +101,7 @@ class AttributeData implements AttributeDataProviderInterface
         CategoryChildrenResource $childrenResource,
         ProductCountResourceModel $productCountResource,
         ApplyCategorySlugInterface $applyCategorySlug,
-        CatalogConfigurationInterface $configSettings,
+        CategoryConfigInterface $configSettings,
         CategoryChildAttributes $categoryChildAttributes,
         DataFilter $dataFilter
     ) {
@@ -149,7 +149,7 @@ class AttributeData implements AttributeDataProviderInterface
                 $this->attributeResourceModel->loadAttributesData(
                     $storeId,
                     array_keys($groupedChildrenById),
-                    $this->childAttributes->getRequiredAttributes()
+                    $this->childAttributes->getRequiredAttributes($storeId)
                 );
 
             $this->childrenProductCount = $this->productCountResource->loadProductCount(
