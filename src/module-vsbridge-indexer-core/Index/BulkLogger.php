@@ -23,6 +23,16 @@ class BulkLogger implements BulkLoggerInterface
     private $logger;
 
     /**
+     * BulkLogger constructor.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * @param BulkResponseInterface $bulkResponse
      *
      * @return void

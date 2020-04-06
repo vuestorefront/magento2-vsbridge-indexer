@@ -92,7 +92,7 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             self::INPUT_ALL_STORES,
             null,
             InputOption::VALUE_NONE,
-            'Reindex all stores'
+            'Reindex all allowed stores (base on vuestorefront configuration)'
         );
 
         parent::configure();
@@ -173,9 +173,10 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         } elseif ($allStores) {
             $output->writeln("<info>Reindexing all stores...</info>");
             $returnValues = [];
+            $allowedStores = $this->getStoresAllowedToReindex();
 
             /** @var \Magento\Store\Api\Data\StoreInterface $store */
-            foreach ($this->getStoreManager()->getStores() as $store) {
+            foreach ($allowedStores as $store) {
                 $output->writeln("<info>Reindexing store " . $store->getName() . "...</info>");
                 $returnValues[] = $this->reindexStore($store, $output);
             }
