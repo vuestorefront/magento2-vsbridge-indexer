@@ -9,7 +9,7 @@
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
-use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
+use Divante\VsbridgeIndexerCore\Index\DataFilter;
 
 use Divante\VsbridgeIndexerCatalog\Api\LoadInventoryInterface;
 use Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Configurable\LoadChildrenRawAttributes;

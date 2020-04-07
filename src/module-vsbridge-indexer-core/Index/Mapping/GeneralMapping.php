@@ -11,7 +11,7 @@ namespace Divante\VsbridgeIndexerCore\Index\Mapping;
 use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
 
 /**
- * Class GeneralMapping
+ * Mapping for common fields for shared fields
  */
 class GeneralMapping
 {

@@ -9,7 +9,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\ArrayConverter\Product;
 
-use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
+use Divante\VsbridgeIndexerCore\Index\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\CustomOptionConverterInterface;
 
 /**

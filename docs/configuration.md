@@ -5,6 +5,11 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
    Enable to export data to elasticsearch. By default indexing is disable.
 
     ![](./images/config-general-enable.png) 
+
+1. ####General settings → Elasticsearch version
+    Select ES version depends on which ES you are using/is used by magento.
+    If you are using ES 5.x.x, choose Elasticsearch5, if you are using version 6.x.x or 7.x.x choose Elasticsearch6+.
+    By default Elasticsearch5 option is selected.  
  
 1. ####General settings → List of stores to reindex
  

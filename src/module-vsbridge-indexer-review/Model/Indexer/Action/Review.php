@@ -12,11 +12,12 @@ declare(strict_types = 1);
 namespace Divante\VsbridgeIndexerReview\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerReview\Model\ResourceModel\Review as ResourceModel;
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
 
 /**
  * Class Review
  */
-class Review
+class Review implements RebuildActionInterface
 {
     /**
      * @var ResourceModel
@@ -39,7 +40,7 @@ class Review
      *
      * @return \Traversable
      */
-    public function rebuild(int $storeId = 1, array $reviewIds = [])
+    public function rebuild(int $storeId, array $reviewIds): \Traversable
     {
         $lastReviewId = 0;
 

@@ -1,19 +1,15 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerTax
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerTax\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerTax\ResourceModel\Rules as RulesResourceModel;
 
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
+
 /**
  * Class TaxRule
  */
-class TaxRule
+class TaxRule implements RebuildActionInterface
 {
     /**
      * @var RulesResourceModel
@@ -29,11 +25,12 @@ class TaxRule
     }
 
     /**
+     * @param int $storeId
      * @param array $taxRuleIds
      *
      * @return \Traversable
      */
-    public function rebuild(array $taxRuleIds = [])
+    public function rebuild(int $storeId, array $taxRuleIds): \Traversable
     {
         $lastTaxRuleId = 0;
 

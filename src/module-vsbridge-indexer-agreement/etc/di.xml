@@ -1,15 +1,18 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <virtualType name="Divante\VsbridgeIndexerAgreement\Indexer\AgreementIndexerHandlerVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+
+    <virtualType name="Divante\VsbridgeIndexerAgreement\Model\Indexer\Agreement"
+                 type="Divante\VsbridgeIndexerCore\Indexer\Base">
         <arguments>
-            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
             <argument name="typeName" xsi:type="string">agreement</argument>
         </arguments>
     </virtualType>
-    <type name="Divante\VsbridgeIndexerAgreement\Model\Indexer\Agreement">
+
+    <type name="Divante\VsbridgeIndexerCore\Indexer\RebuildActionPool">
         <arguments>
-            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerAgreement\Indexer\AgreementIndexerHandlerVirtual</argument>
+            <argument name="actions" xsi:type="array">
+                <item name="agreement" xsi:type="string">Divante\VsbridgeIndexerAgreement\Model\Indexer\Action\Agreement</item>
+            </argument>
         </arguments>
     </type>
 
