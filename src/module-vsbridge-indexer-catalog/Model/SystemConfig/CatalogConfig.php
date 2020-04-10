@@ -94,7 +94,7 @@ class CatalogConfig implements CatalogConfigurationInterface
      */
     public function addParentSku(): bool
     {
-        return (bool) $this->getConfigParam('add_parent_sku');
+        return (bool) $this->getConfigParam(CatalogConfigurationInterface::ADD_PARENT_SKU);
     }
 
     /**

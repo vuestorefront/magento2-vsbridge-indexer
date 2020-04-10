@@ -1,16 +1,13 @@
 <?php
 /**
- * @package  Divante\VsbridgeIndexerCatalog
- * @author Marcin Dykas <mdykas@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
+ * Copyright Divante Sp. z o.o.
+ * See LICENSE_DIVANTE.txt for license details.
  */
-
 declare(strict_types=1);
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Product;
 
-use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
+use Magento\Framework\Exception\InputException;
 
 /**
  * Class ParentResolver
@@ -18,27 +15,66 @@ use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product;
 class ParentResolver
 {
     /**
-     * @var Product
+     * @var GetParentsByChildIdInterface[]
      */
-    private $productResource;
+    private $parentProviders = [];
+
+    /**
+     * @var array
+     */
+    private $parentSkus = [];
 
     /**
      * ParentResolver constructor.
      *
-     * @param Product $productResource
+     * @param array $handlers
+     *
+     * @throws InputException
      */
-    public function __construct(
-        Product $productResource
-    ) {
-        $this->productResource = $productResource;
+    public function __construct(array $handlers)
+    {
+        foreach ($handlers as $handler) {
+            if (!$handler instanceof GetParentsByChildIdInterface) {
+                throw new InputException(
+                    __(
+                        'Parent handler %1 doesn\'t implement GetParentsByChildIdInterface',
+                        get_class($handler)
+                    )
+                );
+            }
+        }
+
+        $this->parentProviders = $handlers;
     }
 
     /**
-     * @param array $parentIds
+     * @param array $childIds
+     *
+     * @return void
+     */
+    public function load(array $childIds)
+    {
+        $this->parentSkus = [];
+
+        foreach ($this->parentProviders as $type => $provider) {
+            $this->parentSkus[$type] = $provider->execute($childIds);
+        }
+    }
+
+    /**
+     * @param int $childId
+     *
      * @return array
      */
-    public function getParentProductsByIds(array $parentIds)
+    public function resolveParentSku(int $childId): array
     {
-        return $this->productResource->getSkusByIds($parentIds);
+        $fullSkuList = [];
+
+        foreach ($this->parentProviders as $type => $provider) {
+            $sku = $this->parentSkus[$type][$childId] ?? [];
+            $fullSkuList = array_merge($sku, $fullSkuList);
+        }
+
+        return $fullSkuList;
     }
 }

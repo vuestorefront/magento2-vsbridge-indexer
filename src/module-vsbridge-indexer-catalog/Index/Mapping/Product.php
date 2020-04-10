@@ -1,9 +1,7 @@
 <?php
 /**
- * @package  Divante\VsbridgeIndexerCatalog
- * @author Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
+ * Copyright Divante Sp. z o.o.
+ * See LICENSE_DIVANTE.txt for license details.
  */
 
 namespace Divante\VsbridgeIndexerCatalog\Index\Mapping;
@@ -82,11 +80,7 @@ class Product extends AbstractMapping implements MappingInterface
             $properties = array_merge($properties, $attributesMapping);
             $properties = array_merge($properties, $this->generalMapping->getCommonProperties());
 
-            $mapping = ['properties' => $properties];
-            $mappingObject = new \Magento\Framework\DataObject();
-            $mappingObject->setData($mapping);
-
-            $this->properties = $mappingObject->getData();
+            $this->properties = ['properties' => $properties];
         }
 
         return $this->properties;
@@ -138,6 +132,7 @@ class Product extends AbstractMapping implements MappingInterface
         ];
         $attributesMapping['final_price'] = ['type' => FieldInterface::TYPE_DOUBLE];
         $attributesMapping['regular_price'] = ['type' => FieldInterface::TYPE_DOUBLE];
+        $attributesMapping['parent_sku'] = ['type' => FieldInterface::TYPE_KEYWORD];
 
         return $attributesMapping;
     }
@@ -159,7 +154,6 @@ class Product extends AbstractMapping implements MappingInterface
     }
 
     /**
-     *
      * @return array
      */
     public function getAttributes()
