@@ -157,16 +157,12 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             $store = $this->getStoreManager()->getStore($storeId);
             $returnValue = false;
 
-            $allowedStores = $this->getStoresAllowedToReindex();
-
-            foreach ($allowedStores as $allowedStore) {
-                if ($store->getId() === $allowedStore->getId()) {
-                    $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
-                    $returnValue = $this->reindexStore($store, $output);
-                    $output->writeln("<info>Reindexing has completed!</info>");
-                } else {
-                    $output->writeln("<info>Store " . $store->getName() . " is not allowed.</info>");
-                }
+            if ($this->isAllowedToReindex($store)) {
+                $output->writeln("<info>Reindexing all VS indexes for store " . $store->getName() . "...</info>");
+                $returnValue = $this->reindexStore($store, $output);
+                $output->writeln("<info>Reindexing has completed!</info>");
+            } else {
+                $output->writeln("<info>Store " . $store->getName() . " is not allowed.</info>");
             }
 
             return $returnValue;
@@ -186,6 +182,27 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             // If failure returned in any store return failure now
             return in_array(Cli::RETURN_FAILURE, $returnValues) ? Cli::RETURN_FAILURE : Cli::RETURN_SUCCESS;
         }
+    }
+
+    /**
+     * Check if Store is allowed to reindex
+     *
+     * @param StoreInterface $store
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function isAllowedToReindex(\Magento\Store\Api\Data\StoreInterface $store): bool
+    {
+        $allowedStores = $this->getStoresAllowedToReindex();
+
+        foreach ($allowedStores as $allowedStore) {
+            if ($store->getId() === $allowedStore->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

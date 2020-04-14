@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## [1.15.1] (2020.04.14)
+
+### Fixed
+- Fix `vsbridge:reindex --store` option: check if store is allowed to reindex, show correct message.
+
 ## [1.15.0] (2020.04.06)
 
 ### Added
