@@ -1,8 +1,12 @@
 <?php
+/**
+ * Copyright Divante Sp. z o.o.
+ * See LICENSE_DIVANTE.txt for license details.
+ */
 
 declare(strict_types=1);
 
-namespace Divante\VsbridgeIndexerCatalog\Index\Mapping\Product;
+namespace Divante\VsbridgeDownloadable\Index\Mapping\Product;
 
 use Divante\VsbridgeIndexerCatalog\Index\Mapping\FieldMappingInterface;
 use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;

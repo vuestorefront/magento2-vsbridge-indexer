@@ -244,7 +244,6 @@
                 <item name="category" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\CategoryMapping</item>
                 <item name="custom_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\CustomOptionsMapping</item>
                 <item name="tier_prices" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\TierPricesMapping</item>
-                <item name="downloadable_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\DownloadableOptionsMapping</item>
                 <item name="attributes_meta" xsi:type="object">Divante\VsbridgeIndexerCatalog\Index\Mapping\Product\AttributesMetaMapping</item>
             </argument>
         </arguments>

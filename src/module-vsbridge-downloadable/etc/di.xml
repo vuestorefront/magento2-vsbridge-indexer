@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Divante\VsbridgeIndexerCatalog\Index\Mapping\Product">
+        <arguments>
+            <argument name="additionalMapping" xsi:type="array">
+                <item name="downloadable_options" xsi:type="object">Divante\VsbridgeDownloadable\Index\Mapping\Product\DownloadableOptionsMapping</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

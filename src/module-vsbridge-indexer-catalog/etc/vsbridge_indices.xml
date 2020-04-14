@@ -13,7 +13,6 @@
                 <data_provider name="inventory_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Inventory</data_provider>
                 <data_provider name="configurable_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData</data_provider>
                 <data_provider name="custom_options">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CustomOptions</data_provider>
-                <data_provider name="downloadable_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\DownloadableData</data_provider>
                 <data_provider name="attributes_meta">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\AttributesMetadata</data_provider>
                 <data_provider name="parent_data">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ParentSku</data_provider>
             </data_providers>

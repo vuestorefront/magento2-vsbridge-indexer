@@ -152,6 +152,7 @@ class Product extends AbstractMapping implements MappingInterface
 
         return $customProperties;
     }
+
     /**
      * @return array
      */
