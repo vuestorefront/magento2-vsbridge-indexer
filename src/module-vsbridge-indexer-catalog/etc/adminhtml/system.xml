@@ -74,6 +74,10 @@
                     <validate>required-entry validate-digits</validate>
                     <comment>Set Batch Size for processing configurable children. For big numbers of configurable children we have to load attributes, prices, media gallery in smaller batches.</comment>
                 </field>
+                <field id="add_parent_sku" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Add Parent Data</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="catalog_category_settings" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1" >
                 <label>Category Settings</label>

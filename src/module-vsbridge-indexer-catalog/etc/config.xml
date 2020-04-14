@@ -18,6 +18,7 @@
                 <export_attributes_metadata>0</export_attributes_metadata>
                 <add_swatches_to_configurable_options>0</add_swatches_to_configurable_options>
                 <configurable_children_batch_size>500</configurable_children_batch_size>
+                <add_parent_sku>0</add_parent_sku>
             </catalog_settings>
         </vsbridge_indexer_settings>
     </default>

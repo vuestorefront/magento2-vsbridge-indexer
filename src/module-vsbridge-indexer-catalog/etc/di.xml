@@ -263,6 +263,17 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Divante\VsbridgeIndexerCatalog\Model\Product\ParentResolver">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="configurable" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Type\Configurable\GetParentsByChildId</item>
+                <item name="grouped" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Type\Grouped\GetParentsByChildId</item>
+                <item name="bundle" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Type\Bundle\GetParentsByChildId</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand">
         <arguments>
             <argument name="excludeIndices" xsi:type="array">
