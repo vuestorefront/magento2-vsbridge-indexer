@@ -57,6 +57,14 @@ class IndicesSettings
     }
 
     /**
+     * @return bool
+     */
+    public function addDateToIndexName()
+    {
+        return (bool) $this->getConfigParam('add_date_to_index_name');
+    }
+
+    /**
      * @return int
      */
     public function getBatchIndexingSize()

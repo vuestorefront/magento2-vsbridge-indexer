@@ -2,8 +2,10 @@
 
 namespace Divante\VsbridgeIndexerCore\Index;
 
+use DateTime;
 use Divante\VsbridgeIndexerCore\Index\Indicies\Config as IndicesConfig;
 use Divante\VsbridgeIndexerCore\Config\IndicesSettings;
+use Exception;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -66,7 +68,7 @@ class IndexSettings
                         'filter' => ['lowercase'],
                     ],
                     'autocomplete_search' => [
-                        'tokenizer'=> 'lowercase'
+                        'tokenizer' => 'lowercase'
                     ]
                 ],
                 'tokenizer' => [
@@ -85,13 +87,19 @@ class IndexSettings
      * @param StoreInterface $store
      *
      * @return string
+     * @throws Exception
      */
     public function createIndexName(StoreInterface $store)
     {
         $name = $this->getIndexAlias($store);
-        $currentDate = new \DateTime();
 
-        return $name . '_' . $currentDate->getTimestamp();
+        if ($this->settingConfig->addDateToIndexName()) {
+            $currentDate = new DateTime();
+            $name = $name . '_' . $currentDate->getTimestamp();
+        }
+
+
+        return $name;
     }
 
     /**
@@ -126,7 +134,7 @@ class IndexSettings
             }
         }
 
-        return ('code' === $this->getIndexIdentifier()) ? $store->getCode() : (string) $store->getId();
+        return ('code' === $this->getIndexIdentifier()) ? $store->getCode() : (string)$store->getId();
     }
 
     /**

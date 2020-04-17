@@ -87,6 +87,10 @@
                     <label>Add Index Identifier to Default Store View</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="add_date_to_index_name" translate="label comment" type="select" sortOrder="250" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Add Date to Index Name</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="fields_limit" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>The maximum number of fields in an index</label>
                     <comment>min value: 1000</comment>
