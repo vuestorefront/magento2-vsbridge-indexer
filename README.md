@@ -27,7 +27,6 @@ If you won't do that, you will get error when running
 
 - Install with composer
 ```json
-composer config repositories.divante vcs https://github.com/DivanteLtd/magento2-vsbridge-indexer
 composer require divante/magento2-vsbridge-indexer
 ```
 
@@ -38,7 +37,7 @@ php bin/magento setup:upgrade
 ## Installation/Getting Started - MSI support
 - Install second module which will support MSI
 ```json
-composer require divante/magento2-vsbridge-indexer-msi:0.1.0
+composer require divante/magento2-vsbridge-indexer-msi
 ```
 Not fully supported, few fields are exported to ES.
 From inventory indexer:
