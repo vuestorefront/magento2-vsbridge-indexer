@@ -22,6 +22,7 @@ class StockMapping
     public function get()
     {
         return [
+            'product_id' => ['type' => FieldInterface::TYPE_LONG],
             'backorders' => ['type' => FieldInterface::TYPE_BOOLEAN],
             'enable_qty_increments' => ['type' => FieldInterface::TYPE_BOOLEAN],
             'is_decimal_divided' => ['type' => FieldInterface::TYPE_BOOLEAN],

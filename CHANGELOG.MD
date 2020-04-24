@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### [1.16.0] (2020.20.24)
+
+### Added
+- Add option to export `parent_sku` for products ([#84](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/84))
+- Add `extension_attributes.downloadable_product_links` for downloadable products ([#142](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/142))
+
 ## [1.15.1] (2020.04.14)
 
 ### Fixed
