@@ -5,8 +5,9 @@
  */
 namespace Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\Type\Grouped;
 
-use Magento\Framework\App\ResourceConnection;
+use Divante\VsbridgeIndexerCatalog\Model\ProductMetaData;
 use Divante\VsbridgeIndexerCatalog\Model\Product\GetParentsByChildIdInterface;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
 use Magento\GroupedProduct\Model\ResourceModel\Product\Link;
 
@@ -21,13 +22,22 @@ class GetParentsByChildId implements GetParentsByChildIdInterface
     private $resourceConnection;
 
     /**
+     * @var ProductMetaData
+     */
+    private $productMetaData;
+
+    /**
      * GetParentsByChildId constructor.
      *
+     * @param ProductMetaData $productMetaData
      * @param ResourceConnection $resourceConnection
      */
-    public function __construct(ResourceConnection $resourceConnection)
-    {
+    public function __construct(
+        ProductMetaData $productMetaData,
+        ResourceConnection $resourceConnection
+    ) {
         $this->resourceConnection = $resourceConnection;
+        $this->productMetaData = $productMetaData;
     }
 
     /**
@@ -87,9 +97,10 @@ class GetParentsByChildId implements GetParentsByChildIdInterface
      */
     private function getProductSkusByIds(array $productIds): array
     {
+        $linkField = $this->productMetaData->get()->getLinkField();
         $connection = $this->resourceConnection->getConnection();
-        $select = $connection->select()->from('catalog_product_entity', ['entity_id', 'sku'])
-            ->where('entity_id IN (?)', $productIds);
+        $select = $connection->select()->from('catalog_product_entity', [$linkField, 'sku'])
+            ->where(sprintf('%s IN (?)', $linkField), $productIds);
 
         return $connection->fetchPairs($select);
     }
