@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## [1.16.1] (2020.04.14)
+- Fix excluding attributes from category.  ([#267](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/267))
+
 ### [1.16.0] (2020.20.24)
 
 ### Added

@@ -71,12 +71,20 @@ class CategoryConfig implements CategoryConfigInterface
      */
     public function getAllowedAttributesToIndex(int $storeId): array
     {
+        $cacheKey = sprintf('allowed_attributes_%d', $storeId);
+
+        if (isset($this->settings[$cacheKey])) {
+            return $this->settings[$cacheKey];
+        }
+
         $attributes = (string)$this->getConfigParam(
             CategoryConfigInterface::CATEGORY_ATTRIBUTES,
             $storeId
         );
 
-        return $this->getAttributeCodesByIds->execute($attributes);
+        $this->settings[$cacheKey] = $this->getAttributeCodesByIds->execute($attributes);
+
+        return $this->settings[$cacheKey];
     }
 
     /**
@@ -88,10 +96,18 @@ class CategoryConfig implements CategoryConfigInterface
      */
     public function getAllowedChildAttributesToIndex(int $storeId): array
     {
+        $cacheKey = sprintf('child_allowed_attributes_%d', $storeId);
+
+        if (isset($this->settings[$cacheKey])) {
+            return $this->settings[$cacheKey];
+        }
+
         $attributes = (string)$this->getConfigParam(
             CategoryConfigInterface::CHILD_ATTRIBUTES,
             $storeId
         );
+
+        $this->settings[$cacheKey] = $this->getAttributeCodesByIds->execute($attributes);
 
         return $this->getAttributeCodesByIds->execute($attributes);
     }
