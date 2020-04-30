@@ -12,16 +12,6 @@ use Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CategoryConfigInterface;
 class CategoryChildAttributes
 {
     /**
-     * @const
-     */
-    const MINIMAL_ATTRIBUTE_SET = [
-        'name',
-        'is_active',
-        'url_path',
-        'url_key',
-    ];
-
-    /**
      * @var CategoryConfigInterface
      */
     private $config;
@@ -37,18 +27,18 @@ class CategoryChildAttributes
     }
 
     /**
-     * Retrieve Required children attributes for child category
+     * Retrieve required attributes for child category
      *
      * @param int $storeId
      *
      * @return array
      */
-    public function getRequiredAttributes(int $storeId)
+    public function getRequiredAttributes(int $storeId): array
     {
         $attributes = $this->config->getAllowedChildAttributesToIndex($storeId);
 
         if (!empty($attributes)) {
-            $attributes = array_merge($attributes, self::MINIMAL_ATTRIBUTE_SET);
+            $attributes = array_merge($attributes, CategoryAttributes::MINIMAL_ATTRIBUTE_SET);
 
             return array_unique($attributes);
         }
