@@ -80,7 +80,16 @@ class Product extends AbstractMapping implements MappingInterface
             $properties = array_merge($properties, $attributesMapping);
             $properties = array_merge($properties, $this->generalMapping->getCommonProperties());
 
-            $this->properties = ['properties' => $properties];
+            $mapping = ['properties' => $properties];
+            $mappingObject = new \Magento\Framework\DataObject();
+            $mappingObject->setData($mapping);
+
+            $this->eventManager->dispatch(
+                'elasticsearch_product_mapping_properties',
+                ['mapping' => $mappingObject]
+            );
+
+            $this->properties = $mappingObject->getData();
         }
 
         return $this->properties;
