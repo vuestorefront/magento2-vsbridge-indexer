@@ -64,6 +64,7 @@ class Product extends AbstractMapping implements MappingInterface
         array $staticFieldMapping,
         array $additionalMapping
     ) {
+        $this->eventManager = $eventManager;
         $this->stockMapping = $stockMapping;
         $this->generalMapping = $generalMapping;
         $this->resourceModel = $resourceModel;
