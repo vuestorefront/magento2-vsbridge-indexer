@@ -10,12 +10,18 @@ use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
 use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 use Divante\VsbridgeIndexerCore\Index\Mapping\GeneralMapping;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\LoadAttributes;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 
 /**
  * Class Product
  */
 class Product extends AbstractMapping implements MappingInterface
 {
+    /**
+     * @var EventManager
+     */
+    private $eventManager;
+
     /**
      * @var GeneralMapping
      */
@@ -51,6 +57,7 @@ class Product extends AbstractMapping implements MappingInterface
      * @param array $additionalMapping
      */
     public function __construct(
+        EventManager $eventManager,
         GeneralMapping $generalMapping,
         StockMapping $stockMapping,
         LoadAttributes $resourceModel,
