@@ -50,7 +50,7 @@ class StoreSelectModifier implements BaseSelectModifierInterface
 
         $rootId = Category::TREE_ROOT_ID;
         $rootCatIdExpr = $connection->quote(sprintf("%s/%s", $rootId, $store->getRootCategoryId()));
-        $catIdExpr = $connection->quote(sprintf("%s/%s%%", $rootId, $store->getRootCategoryId()));
+        $catIdExpr = $connection->quote(sprintf("%s/%s/%%", $rootId, $store->getRootCategoryId()));
         $whereCondition = sprintf("path = %s OR path like %s", $rootCatIdExpr, $catIdExpr);
 
         $select->where($whereCondition);
