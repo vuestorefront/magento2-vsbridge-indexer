@@ -74,7 +74,7 @@ class CmsContentFilter
         $templateFilter = $this->geTemplateFilter($type)->setStoreId($storeId);
 
         foreach ($indexData as &$cms) {
-            $cms['content'] = $this->contentProcessor->parse($templateFilter, $cms['content']);
+            $cms['content'] = $this->contentProcessor->parse($templateFilter, (string) $cms['content']);
         }
 
         $this->appEmulation->stopEnvironmentEmulation();
