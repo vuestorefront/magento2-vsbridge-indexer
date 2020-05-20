@@ -196,7 +196,7 @@ Module was tested on:
  -- Magento Commerce version 2.3.0. The bridge indexer cannot be installed on lower versions of Magento Enterprise.
  
  -- You can install module on Magento 2.3.* Commerce, but you still need `ES 5.*` to export data.
-  Module will work with library [elasticsearch/elastichserach](https://github.com/elastic/elasticsearch/) (`5.*`, `6.*`)
+  Module will work with library [elasticsearch/elastichsearch](https://github.com/elastic/elasticsearch/) (`5.*`, `6.*`)
    
 
 
