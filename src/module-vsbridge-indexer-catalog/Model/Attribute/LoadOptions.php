@@ -161,7 +161,8 @@ class LoadOptions
      */
     private function isVisualSwatch(Attribute $attribute)
     {
-        return $attribute->getData('swatch_input_type') === Swatch::SWATCH_INPUT_TYPE_VISUAL;
+        return $attribute->getData('swatch_input_type') === Swatch::SWATCH_INPUT_TYPE_VISUAL
+            || $attribute->getData('swatch_input_type') === Swatch::SWATCH_INPUT_TYPE_TEXT;
     }
 
     /**
