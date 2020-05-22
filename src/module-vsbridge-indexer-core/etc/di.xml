@@ -72,4 +72,10 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand">
+        <arguments>
+            <argument name="eventManager" xsi:type="object">Magento\Framework\Event\ManagerInterface\Proxy</argument>
+        </arguments>
+    </type>
 </config>

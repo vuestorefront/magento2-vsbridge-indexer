@@ -14,6 +14,7 @@ use Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface;
 use Divante\VsbridgeIndexerCore\Model\IndexerRegistry;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Indexer\Console\Command\AbstractIndexerCommand;
@@ -60,17 +61,25 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     private $excludeIndices = [];
 
     /**
+     * @var ManagerInterface
+     */
+    private $eventManager;
+
+    /**
      * RebuildEsIndexCommand constructor.
      *
-     * @param ObjectManagerFactory $objectManagerFactory
-     * @param array $excludeIndices
+     * @param  ObjectManagerFactory  $objectManagerFactory
+     * @param  ManagerInterface  $eventManager
+     * @param  array  $excludeIndices
      */
     public function __construct(
         ObjectManagerFactory $objectManagerFactory,
+        ManagerInterface $eventManager, // Proxy
         array $excludeIndices = []
     ) {
         $this->excludeIndices = $excludeIndices;
         parent::__construct($objectManagerFactory);
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -152,6 +161,10 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
      */
     private function reindex(OutputInterface $output, $storeId, $allStores)
     {
+        $this->eventManager->dispatch('vsbridge_indexer_reindex_before', [
+            'storeId' => $storeId,
+            'allStores' => $allStores,
+        ]);
 
         if ($storeId) {
             $store = $this->getStoreManager()->getStore($storeId);
@@ -182,6 +195,11 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             // If failure returned in any store return failure now
             return in_array(Cli::RETURN_FAILURE, $returnValues) ? Cli::RETURN_FAILURE : Cli::RETURN_SUCCESS;
         }
+
+        $this->eventManager->dispatch('vsbridge_indexer_reindex_after', [
+            'storeId' => $storeId,
+            'allStores' => $allStores,
+        ]);
     }
 
     /**
