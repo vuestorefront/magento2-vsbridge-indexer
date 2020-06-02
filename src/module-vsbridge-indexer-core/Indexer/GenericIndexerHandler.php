@@ -239,11 +239,14 @@ class GenericIndexerHandler
     /**
      * @param StoreInterface $store
      *
-     * @return IndexInterface
+     * @return IndexInterface|null
      */
     public function createIndex(StoreInterface $store)
     {
-        return $this->getIndexOperation($store->getId())->createIndex($this->indexIdentifier, $store);
+        try {
+            return $this->getIndexOperation($store->getId())->createIndex($this->indexIdentifier, $store);
+        } catch (ConnectionDisabledException $exception) {
+        }
     }
 
     /**
