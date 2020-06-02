@@ -16,6 +16,7 @@ use Divante\VsbridgeIndexerCore\Api\Client\ConfigurationInterface;
 use Divante\VsbridgeIndexerCore\Api\Client\ConfigurationInterfaceFactory;
 use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
 use Divante\VsbridgeIndexerCore\System\GeneralConfigInterface;
+use PHPUnit\Runner\Exception;
 
 /**
  * Class ClientProvider
