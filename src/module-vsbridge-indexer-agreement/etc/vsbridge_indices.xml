@@ -1,0 +1,6 @@
+<indices xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Divante_VsbridgeIndexerCore:etc/vsbridge_indices.xsd">
+    <index identifier="vue_storefront_catalog">
+        <type name="agreement" mapping="Divante\VsbridgeIndexerAgreement\Index\Mapping\Agreement" />
+    </index>
+</indices>

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- Add support for agreements ([#286](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/286))
+
 ## [1.17.0] (2020.05.20)
 
 ### Added

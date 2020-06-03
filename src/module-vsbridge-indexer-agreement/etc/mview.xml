@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
+    <view id="vsbridge_agreement_indexer" class="Divante\VsbridgeIndexerAgreement\Model\Indexer\Agreement" group="indexer">
+        <subscriptions>
+            <table name="checkout_agreement" entity_column="agreement_id"/>
+        </subscriptions>
+    </view>
+</config>

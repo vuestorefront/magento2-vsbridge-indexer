@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="Divante\VsbridgeIndexerAgreement\Indexer\AgreementIndexerHandlerVirtual"
+                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+        <arguments>
+            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
+            <argument name="typeName" xsi:type="string">agreement</argument>
+        </arguments>
+    </virtualType>
+    <type name="Divante\VsbridgeIndexerAgreement\Model\Indexer\Agreement">
+        <arguments>
+            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerAgreement\Indexer\AgreementIndexerHandlerVirtual</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CheckoutAgreements\Model\Agreement">
+        <plugin name="update_agreement_data_in_elastic" type="Divante\VsbridgeIndexerAgreement\Plugin\Indexer\Agreement\Save\UpdateAgreement"/>
+    </type>
+</config>
