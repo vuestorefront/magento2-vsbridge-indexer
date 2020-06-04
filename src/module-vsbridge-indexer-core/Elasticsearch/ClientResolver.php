@@ -7,7 +7,7 @@
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerCore\Client;
+namespace Divante\VsbridgeIndexerCore\Elasticsearch;
 
 use Divante\VsbridgeIndexerCore\Api\Client\BuilderInterface as ClientBuilder;
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
@@ -18,9 +18,9 @@ use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
 use Divante\VsbridgeIndexerCore\System\GeneralConfigInterface;
 
 /**
- * Class ClientProvider
+ * Class ClientResolver
  */
-class ClientProvider implements ClientProviderInterface
+class ClientResolver
 {
     /**
      * @var ClientInterface[]
@@ -48,7 +48,7 @@ class ClientProvider implements ClientProviderInterface
     private $clientFactory;
 
     /**
-     * ClientProvider constructor.
+     * ClientResolver constructor.
      *
      * @param GeneralConfigInterface $config
      * @param ClientBuilder $clientBuilder
@@ -79,7 +79,7 @@ class ClientProvider implements ClientProviderInterface
         if (!isset($this->clients[$storeId])) {
             /** @var ConfigurationInterface $configuration */
             $configuration = $this->clientConfigurationFactory->create(['storeId' => $storeId]);
-            $esClient = $this->clientBuilder->build($configuration->getOptions());
+            $esClient = $this->clientBuilder->build($configuration->getOptions($storeId));
             $this->clients[$storeId] = $this->clientFactory->create(['client' => $esClient]);
         }
 

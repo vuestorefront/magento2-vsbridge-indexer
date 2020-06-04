@@ -20,9 +20,6 @@
     <preference for="Divante\VsbridgeIndexerCore\Api\ConvertValueInterface" type="Divante\VsbridgeIndexerCore\Indexer\ConvertValue"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexInterface" type="Divante\VsbridgeIndexerCore\Index\Index"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexOperationInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperations"/>
-    <preference for="Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperationProvider"/>
-
-    <preference for="Divante\VsbridgeIndexerCore\Client\ClientProviderInterface" type="Divante\VsbridgeIndexerCore\Client\ClientProvider"/>
     <preference for="Divante\VsbridgeIndexerCore\System\GeneralConfigInterface" type="Divante\VsbridgeIndexerCore\System\GeneralConfig"/>
     <preference for="Divante\VsbridgeIndexerCore\Cache\ConfigInterface" type="Divante\VsbridgeIndexerCore\Cache\Config"/>
 
