@@ -1,10 +1,6 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCatalog
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Divante\VsbridgeIndexerCatalog\Index\Mapping;
 
@@ -41,7 +37,7 @@ class Category extends AbstractMapping implements MappingInterface
     /**
      * @var LoadAttributes
      */
-    private $resourceModel;
+    private $loadAttributes;
 
     /**
      * @var array
@@ -71,13 +67,15 @@ class Category extends AbstractMapping implements MappingInterface
     ) {
         $this->eventManager = $eventManager;
         $this->generalMapping = $generalMapping;
-        $this->resourceModel = $resourceModel;
+        $this->loadAttributes = $resourceModel;
         $this->childAttributes = $categoryChildAttributes;
         parent::__construct($staticFieldMapping);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
+     *
+     * @return array
      */
     public function getMappingProperties()
     {
@@ -110,6 +108,8 @@ class Category extends AbstractMapping implements MappingInterface
     }
 
     /**
+     * Get All attributes mapping
+     *
      * @return array
      */
     private function getAllAttributesMapping()
@@ -134,6 +134,8 @@ class Category extends AbstractMapping implements MappingInterface
     }
 
     /**
+     * Get Children Data Mapping
+     *
      * @param array $allAttributesMapping
      * @param array $commonProperties
      *
@@ -141,26 +143,19 @@ class Category extends AbstractMapping implements MappingInterface
      */
     private function getChildrenDataMapping(array $allAttributesMapping, array $commonProperties)
     {
-        $childMapping = [];
-
-        foreach ($this->childAttributes->getRequiredFields() as $field) {
-            if (isset($allAttributesMapping[$field])) {
-                $childMapping[$field] = $allAttributesMapping[$field];
-            }
-        }
-
-        $childMapping = array_merge($commonProperties, $childMapping);
+        $childMapping = array_merge($commonProperties, $allAttributesMapping);
         unset($childMapping['created_at'], $childMapping['updated_at']);
 
         return $childMapping;
     }
 
     /**
+     * Load Category attributes
      *
      * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
-        return $this->resourceModel->execute();
+        return $this->loadAttributes->execute();
     }
 }

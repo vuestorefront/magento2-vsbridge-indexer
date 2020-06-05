@@ -10,8 +10,9 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\Children as CategoryChildrenResource;
 use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
+use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryChildAttributes;
-use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
+use Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CategoryConfigInterface;
 use Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
@@ -46,6 +47,11 @@ class AttributeData implements AttributeDataProviderInterface
     private $childAttributes;
 
     /**
+     * @var CategoryAttributes
+     */
+    private $categoryAttributes;
+
+    /**
      * @var AttributeDataProvider
      */
     private $attributeResourceModel;
@@ -76,7 +82,7 @@ class AttributeData implements AttributeDataProviderInterface
     private $childrenProductCount = [];
 
     /**
-     * @var CatalogConfigurationInterface
+     * @var CategoryConfigInterface
      */
     private $settings;
 
@@ -92,7 +98,8 @@ class AttributeData implements AttributeDataProviderInterface
      * @param CategoryChildrenResource $childrenResource
      * @param ProductCountResourceModel $productCountResource
      * @param ApplyCategorySlugInterface $applyCategorySlug
-     * @param CatalogConfigurationInterface $configSettings
+     * @param CategoryConfigInterface $configSettings
+     * @param CategoryAttributes $categoryAttributes
      * @param CategoryChildAttributes $categoryChildAttributes
      * @param DataFilter $dataFilter
      */
@@ -101,7 +108,8 @@ class AttributeData implements AttributeDataProviderInterface
         CategoryChildrenResource $childrenResource,
         ProductCountResourceModel $productCountResource,
         ApplyCategorySlugInterface $applyCategorySlug,
-        CatalogConfigurationInterface $configSettings,
+        CategoryConfigInterface $configSettings,
+        CategoryAttributes $categoryAttributes,
         CategoryChildAttributes $categoryChildAttributes,
         DataFilter $dataFilter
     ) {
@@ -111,6 +119,7 @@ class AttributeData implements AttributeDataProviderInterface
         $this->attributeResourceModel = $attributeResource;
         $this->childrenResourceModel = $childrenResource;
         $this->dataFilter = $dataFilter;
+        $this->categoryAttributes = $categoryAttributes;
         $this->childAttributes = $categoryChildAttributes;
     }
 
@@ -128,13 +137,18 @@ class AttributeData implements AttributeDataProviderInterface
          */
 
         $categoryIds = array_keys($indexData);
-        $attributes = $this->attributeResourceModel->loadAttributesData($storeId, $categoryIds);
+        $attributes = $this->attributeResourceModel->loadAttributesData(
+            $storeId,
+            $categoryIds,
+            $this->categoryAttributes->getRequiredAttributes($storeId)
+        );
         $productCount = $this->productCountResource->loadProductCount($categoryIds);
 
         foreach ($attributes as $entityId => $attributesData) {
             $categoryData = array_merge($indexData[$entityId], $attributesData);
             $categoryData = $this->prepareParentCategory($categoryData, $storeId);
-            $categoryData = $this->addSortOptions($categoryData, $storeId);
+            $categoryData = $this->addDefaultSortByOption($categoryData, $storeId);
+            $categoryData = $this->addAvailableSortByOption($categoryData, $storeId);
             $categoryData['product_count'] = $productCount[$entityId];
 
             $indexData[$entityId] = $categoryData;
@@ -149,7 +163,7 @@ class AttributeData implements AttributeDataProviderInterface
                 $this->attributeResourceModel->loadAttributesData(
                     $storeId,
                     array_keys($groupedChildrenById),
-                    $this->childAttributes->getRequiredAttributes()
+                    $this->childAttributes->getRequiredAttributes($storeId)
                 );
 
             $this->childrenProductCount = $this->productCountResource->loadProductCount(
@@ -278,19 +292,42 @@ class AttributeData implements AttributeDataProviderInterface
 
     /**
      * @param array $category
+     * @param $storeId
+     *
+     * @return array
+     */
+    private function addAvailableSortByOption(array $category, $storeId): array
+    {
+        if (!$this->categoryAttributes->canAddAvailableSortBy($storeId)) {
+            return $category;
+        }
+
+        if (isset($category['available_sort_by'])) {
+            return $category;
+        }
+
+        $category['available_sort_by'] = $this->settings->getAttributesUsedForSortBy();
+
+        return $category;
+    }
+
+    /**
+     * @param array $category
      * @param int $storeId
      *
      * @return array
      */
-    private function addSortOptions(array $category, $storeId)
+    private function addDefaultSortByOption(array $category, $storeId): array
     {
-        if (!isset($category['available_sort_by'])) {
-            $category['available_sort_by'] = $this->settings->getAttributesUsedForSortBy();
+        if (!$this->categoryAttributes->canAddDefaultSortBy($storeId)) {
+            return $category;
         }
 
-        if (!isset($category['default_sort_by'])) {
-            $category['default_sort_by'] = $this->settings->getProductListDefaultSortBy($storeId);
+        if (isset($category['default_sort_by'])) {
+            return $category;
         }
+
+        $category['default_sort_by'] = $this->settings->getProductListDefaultSortBy($storeId);
 
         return $category;
     }

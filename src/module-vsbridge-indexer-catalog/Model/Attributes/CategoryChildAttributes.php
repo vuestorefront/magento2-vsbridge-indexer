@@ -1,12 +1,10 @@
 <?php
-/**
- * @package  Divante\VsbridgeIndexerCatalog
- * @author Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Attributes;
+
+use Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CategoryConfigInterface;
 
 /**
  * Class CategoryChildrenAttributes
@@ -14,41 +12,37 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Attributes;
 class CategoryChildAttributes
 {
     /**
-     * @var array
+     * @var CategoryConfigInterface
      */
-    private $requiredAttributes = [
-        'name',
-        'is_active',
-        'url_path',
-        'url_key',
-    ];
+    private $config;
 
     /**
-     * Static category fields
-     * @var array
+     * CategoryChildAttributes constructor.
+     *
+     * @param CategoryConfigInterface $categoryConfig
      */
-    private $staticAttributes = [
-        'id',
-        'slug',
-        'parent_id',
-        'path',
-        'position',
-        'level',
-    ];
-
-    /**
-     * @return array
-     */
-    public function getRequiredAttributes()
+    public function __construct(CategoryConfigInterface $categoryConfig)
     {
-        return $this->requiredAttributes;
+        $this->config = $categoryConfig;
     }
 
     /**
+     * Retrieve required attributes for child category
+     *
+     * @param int $storeId
+     *
      * @return array
      */
-    public function getRequiredFields()
+    public function getRequiredAttributes(int $storeId): array
     {
-        return array_merge($this->requiredAttributes, $this->staticAttributes);
+        $attributes = $this->config->getAllowedChildAttributesToIndex($storeId);
+
+        if (!empty($attributes)) {
+            $attributes = array_merge($attributes, CategoryAttributes::MINIMAL_ATTRIBUTE_SET);
+
+            return array_unique($attributes);
+        }
+
+        return $attributes;
     }
 }

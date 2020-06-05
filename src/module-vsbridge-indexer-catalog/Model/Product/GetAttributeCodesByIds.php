@@ -29,11 +29,10 @@ class GetAttributeCodesByIds
     private $logger;
 
     /**
-     * Settings constructor.
+     * GetAttributeCodesByIds constructor.
      *
-     * @param ScopeConfigInterface $scopeConfig
      * @param LoadAttributes $loadAttributes
-     * @param ConfigResource $configResource
+     * @param LoggerInterface $logger
      */
     public function __construct(
         LoadAttributes $loadAttributes,

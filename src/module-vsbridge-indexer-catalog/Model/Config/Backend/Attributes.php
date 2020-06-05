@@ -13,9 +13,9 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Config\Backend;
 use Magento\Framework\App\Config\Value;
 
 /**
- * Class ProductAttributes
+ * Class Attributes
  */
-class ProductAttributes extends Value
+class Attributes extends Value
 {
     /**
      * @inheritdoc

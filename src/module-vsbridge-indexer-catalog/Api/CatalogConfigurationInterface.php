@@ -46,29 +46,41 @@ interface CatalogConfigurationInterface
     const EXPORT_ATTRIBUTES_METADATA = 'export_attributes_metadata';
 
     /**
-     * @const int
+     * @const string
      */
     const CONFIGURABLE_CHILDREN_BATCH_SIZE = 'configurable_children_batch_size';
 
     /**
-     * @return bool
+     * @const string
      */
-    public function useMagentoUrlKeys();
+    const ADD_PARENT_SKU = 'add_parent_sku';
 
     /**
      * @return bool
      */
-    public function useUrlKeyToGenerateSlug();
+    public function useMagentoUrlKeys(): bool;
 
     /**
      * @return bool
      */
-    public function useCatalogRules();
+    public function useUrlKeyToGenerateSlug(): bool;
 
     /**
      * @return bool
      */
-    public function syncTierPrices();
+    public function useCatalogRules(): bool;
+
+    /**
+     * @return bool
+     */
+    public function syncTierPrices(): bool;
+
+    /**
+     * Add Parent SKU
+     *
+     * @return bool
+     */
+    public function addParentSku(): bool;
 
     /**
      * @return bool
@@ -85,7 +97,7 @@ interface CatalogConfigurationInterface
      *
      * @return array
      */
-    public function getAllowedProductTypes($storeId);
+    public function getAllowedProductTypes($storeId): array;
 
     /**
      * @param int $storeId
@@ -100,29 +112,6 @@ interface CatalogConfigurationInterface
      * @return array
      */
     public function getAllowedChildAttributesToIndex(int $storeId): array;
-
-    /**
-     *
-     * @return array
-     * @throws \Exception
-     */
-    public function getAttributesUsedForSortBy();
-
-    /**
-     * @param int $storeId
-     *
-     * @return string
-     */
-    public function getProductListDefaultSortBy($storeId);
-
-    /**
-     * Retrieve Category Url Suffix
-     *
-     * @param int $storeId
-     *
-     * @return string
-     */
-    public function getCategoryUrlSuffix(int $storeId): string;
 
     /**
      * Retrieve configurable children batch size

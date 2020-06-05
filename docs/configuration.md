@@ -125,7 +125,13 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
     ![](./images/config-attributes.png)
 
  * Some attributes are always exported: price, sku, name, visibility, status, url_path, url_key
+ 
+ 1. #### Category Settings
+    **Category attributes to export**  → choose category attributes for export. By Default all attributes are exported.
+    
+    **Category children data attributes to export**  → choose attributes for export for sub categories. Some attributes will be always exported: name, url_key, is_active, url_path. 
 
+    ![](./images/config-category.png)
 
 After updating the configuration, you can run the indexation.
 It is also worth query ElasticSearch using CURL, to be sure that the communication works.

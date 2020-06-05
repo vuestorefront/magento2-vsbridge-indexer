@@ -2,7 +2,61 @@
 
 ## Unreleased
 
+### Added
+- Add support for agreements ([#286](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/286))
+
+## [1.17.0] (2020.05.20)
+
+### Added
+- Add ability to use a text swatch attribute ([#278](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/278))
+```
+{
+  "options": [
+    {
+      "swatch": {
+        "type": 0,
+        "value": "XL"
+      },
+      "label": "Extra large",
+      "value": "5749",
+      "sort_order": 1
+    }
+  ]
+}
+```
+
+### Fixed
+- Fixed expression to select subcategories   ([#271](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/271))
+- Fix parsing cms page content ([#276](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/276))
+
+## [1.16.1] (2020.04.14)
+- Fix excluding attributes from category.  ([#267](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/267))
+
+### [1.16.0] (2020.20.24)
+
+### Added
+- Add option to export `parent_sku` for products ([#84](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/84))
+- Add `extension_attributes.downloadable_product_links` for downloadable products ([#142](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/142))
+
+## [1.15.1] (2020.04.14)
+
+### Fixed
+- Fix `vsbridge:reindex --store` option: check if store is allowed to reindex, show correct message.
+
+## [1.15.0] (2020.04.06)
+
+### Added
+ Manage exported attributes for categories. Customize indexed attributes for `category` and `category.child_data`.
+
+## [1.14.1] (2020.04.06)
+
+### Fixed
+- Fix BulkLogger
+- Fix `vsbridge:reindex --all` option: reindex only allowed stores.
+
 ## [1.14.0] (2020.04.02)
+
+### Added
 - Add option to set up configurable children batch size.
 
 ## [1.13.0] (2020.04.02)
@@ -51,7 +105,7 @@ Options values are collected from exported attributes - so make sure attribute i
 - url_key~~
 
 
-** By default only part of attributes will be exported, like: description, image, small_image, thumbnail, 
+** By default only part of attributes will be exported, like: description, image, small_image, thumbnail,
 media_gallery, media_title, meta_description, special_price, special_from_date, special_to_date, tax_class_id.
 
 ```json
@@ -89,7 +143,7 @@ media_gallery, media_title, meta_description, special_price, special_from_date, 
 ```
 
 
-** For configurable_children attributes used to create configurable products are also always exported 
+** For configurable_children attributes used to create configurable products are also always exported
 plus attributes set in configuration (by default: image, small_image, thumbnail, media_gallery, special_price, special_from_date, special_to_date)
 
 ** You can customize attributes exported for product and product.configurable_children.
@@ -222,13 +276,13 @@ Product configurable option values
       }
     }
   ]
-``` 
-- Add new command `vsbridge:index` to run indexer for one product, cms block, etc. 
+```
+- Add new command `vsbridge:index` to run indexer for one product, cms block, etc.
 `bin/magento vsbridge:index vsbridge_product_indexer default 1`
 vsbridge_product_indexer -> indexer code
 default -> store code
 1 -> entity id (in this particular example - product id)
-Useful for testing. 
+Useful for testing.
 
 ## [1.5.2] (2019.10.24)
 
@@ -245,7 +299,7 @@ Useful for testing.
 ## [1.5.0] (2019.10.18)
 
 ### Changed/Improved
--  Change method `AbstractEavAttributes:canReindex` to public ([#136](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/136)) 
+-  Change method `AbstractEavAttributes:canReindex` to public ([#136](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/136))
 
 ### Added
 - Add support for aliases ([#3](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/3)).
@@ -271,7 +325,7 @@ Useful for testing.
 - Skip exporting configurable products without "configurable_options".
 
 ### Added
-- Export ratings for reviews. 
+- Export ratings for reviews.
 
 ## [1.2.0] (2019.08.05)
 
@@ -294,21 +348,21 @@ Useful for testing.
 - Changed ElasticSearch password to be obscured, encrypted, and considered sensitive (will dump to `env.php` instead of `config.php`) - [@rain2o](https://github.com/rain2o) ([#69](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/69))
 - Fix exporting values for multiselect option arrays as integers (instead of strings)
 - Fix getting stock_status value for products
-- Magento Commerce - fix getting configurable_children 
+- Magento Commerce - fix getting configurable_children
 
 ### Changed/Improved
 - Change mapping for "category.name" field in product type
 - Remove dependency from catalog_product_price and cataloginventory_stock indexer. On product save multiple request has been send to ES
-- Change "Use Short Catalog Urls" setting option to "Use Catalog Url Keys" 
+- Change "Use Short Catalog Urls" setting option to "Use Catalog Url Keys"
 - Add option to generate product/category slug base on Magento Url Key and ID. By default slug (and url_key) field is generated base on NAME and ID.
 
 ### Added
 - Adding support for video data. Small change will be needed in VSF #19
 - Add support for "product_count" in category. When products are reassign to category, category data is not updated automatically in ES.
-There is not need really, VSF only has to know if `product_count > 0`, so if you already had products assign to categories (before running ` bin/magento indexer:reindex vsbridge_category_indexer`) 
+There is not need really, VSF only has to know if `product_count > 0`, so if you already had products assign to categories (before running ` bin/magento indexer:reindex vsbridge_category_indexer`)
 category will be visible in menu sidebar.
-- Add support for reviews. Reviews are exported without ratings (VSF does not support ratings for now)  
-- Add support for custom options. 
+- Add support for reviews. Reviews are exported without ratings (VSF does not support ratings for now)
+- Add support for custom options.
 - Add option to enable/disable exporting data to ES.
 - Add ProductCategory indexer to partially update product data in ES (category, category_ids fields). Trigger after changing products positions in category.
 - Add the ability to choose between Store ID and Store Code to be used at the end of index names.
@@ -354,7 +408,7 @@ First version
 ## March 2019
 
 ### Added
-- Adding 'url_path' for products. 
+- Adding 'url_path' for products.
 You have to delete existing index from Elasticsearch and run full reindexation.
 You need to get correct mapping for new product field.
 - Add support for "available_sort_by" and "default_sort_by" default values.
