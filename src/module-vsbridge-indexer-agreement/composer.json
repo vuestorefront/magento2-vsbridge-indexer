@@ -1,0 +1,21 @@
+{
+    "name": "divante/module-vsbridge-indexer-agreement",
+    "type": "magento2-module",
+    "authors":[
+        {
+            "name":"Kamil",
+            "email":"kpaluch@divante.pl"
+        }
+    ],
+    "require": {
+        "elasticsearch/elasticsearch": "~5.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Divante\\VsbridgeIndexerCore\\": ""
+        }
+    }
+}

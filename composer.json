@@ -34,6 +34,7 @@
   },
   "autoload": {
     "files": [
+      "src/module-vsbridge-indexer-agreement/registration.php",
       "src/module-vsbridge-indexer-core/registration.php",
       "src/module-vsbridge-indexer-catalog/registration.php",
       "src/module-vsbridge-indexer-cms/registration.php",
@@ -42,6 +43,7 @@
       "src/module-vsbridge-downloadable/registration.php"
     ],
     "psr-4": {
+      "Divante\\VsbridgeIndexerAgreement\\": "src/module-vsbridge-indexer-agreement",
       "Divante\\VsbridgeIndexerCore\\": "src/module-vsbridge-indexer-core",
       "Divante\\VsbridgeIndexerCatalog\\": "src/module-vsbridge-indexer-catalog",
       "Divante\\VsbridgeIndexerCms\\": "src/module-vsbridge-indexer-cms",
