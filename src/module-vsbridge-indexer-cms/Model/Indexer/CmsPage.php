@@ -11,6 +11,7 @@ namespace Divante\VsbridgeIndexerCms\Model\Indexer;
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCms\Model\Indexer\Action\CmsPage as CmsPageAction;
 use Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler;
+use Divante\VsbridgeIndexerCore\Cache\Processor as CacheProcessor;
 
 /**
  * Class CmsPage
@@ -33,13 +34,20 @@ class CmsPage implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
     private $storeManager;
 
     /**
+     * @var CacheProcessor
+     */
+    private $cacheProcessor;
+
+    /**
      * CmsBlock constructor.
      *
+     * @param CacheProcessor $cacheProcessor
      * @param GenericIndexerHandler $indexerHandler
      * @param StoreManager $storeManager
      * @param CmsPageAction $action
      */
     public function __construct(
+        CacheProcessor $cacheProcessor,
         GenericIndexerHandler $indexerHandler,
         StoreManager $storeManager,
         CmsPageAction $action
@@ -47,6 +55,7 @@ class CmsPage implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         $this->indexHandler = $indexerHandler;
         $this->storeManager = $storeManager;
         $this->cmsPageAction = $action;
+        $this->cacheProcessor = $cacheProcessor;
     }
 
     /**
@@ -59,6 +68,7 @@ class CmsPage implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         foreach ($stores as $store) {
             $this->indexHandler->saveIndex($this->cmsPageAction->rebuild($store->getId(), $ids), $store);
             $this->indexHandler->cleanUpByTransactionKey($store, $ids);
+            $this->cacheProcessor->cleanCacheByTags($store->getId(), ['cmsPage']);
         }
     }
 
@@ -72,6 +82,7 @@ class CmsPage implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
         foreach ($stores as $store) {
             $this->indexHandler->createIndex($store);
             $this->indexHandler->saveIndex($this->cmsPageAction->rebuild($store->getId()), $store);
+            $this->cacheProcessor->cleanCacheByTags($store->getId(), ['cmsPage']);
         }
     }
 
