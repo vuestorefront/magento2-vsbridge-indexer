@@ -3,6 +3,7 @@
     <module name="Divante_VsbridgeIndexerCatalog" setup_version="1.2.0">
         <sequence>
             <module name="Divante_VsbridgeIndexerCore"/>
+            <module name="Magento_Catalog" />
         </sequence>
     </module>
 </config>
