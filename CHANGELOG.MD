@@ -2,8 +2,14 @@
 
 ## Unreleased
 
+## [1.18.0] (2020.06.09)
+
 ### Added
 - Add support for agreements ([#286](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/286))
+- Added events to reindex command ([#280](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/280))
+
+###
+- Fix module installation on fresh Magento.
 
 ## [1.17.0] (2020.05.20)
 
