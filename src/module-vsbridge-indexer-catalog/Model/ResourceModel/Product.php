@@ -136,6 +136,7 @@ class Product
         $columns = [
             'entity_id',
             'attribute_set_id',
+            'created_at',
             'updated_at',
             'type_id',
             'sku',
