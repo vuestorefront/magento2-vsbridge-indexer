@@ -69,6 +69,7 @@
             <argument name="commands" xsi:type="array">
                 <item name="index_single_entity" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\SingleEntityIndexCommand</item>
                 <item name="rebuild" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand</item>
+		<item name="reset" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\ResetEsIndexCommand</item>
             </argument>
         </arguments>
     </type>
