@@ -68,6 +68,7 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
                     $indexer->getState()
                         ->setStatus(\Magento\Framework\Indexer\StateInterface::STATUS_INVALID)
                         ->save();
+		    $output->writeln("\n" . $indexer->getTitle() . "\n");
                 } catch (LocalizedException $e) {
                     //catch exception
                     $output->writeln("<error>" . $e->getMessage() . "</error>");
