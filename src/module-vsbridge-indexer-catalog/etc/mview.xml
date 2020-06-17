@@ -13,6 +13,7 @@
             <table name="catalog_product_index_price" entity_column="entity_id"/>
             <table name="catalog_product_website" entity_column="product_id" />
             <table name="catalog_category_product" entity_column="product_id" />
+            <table name="catalog_product_entity" entity_column="entity_id" />
             <table name="cataloginventory_stock_status" entity_column="product_id" />
         </subscriptions>
     </view>
