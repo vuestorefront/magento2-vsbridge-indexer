@@ -11,6 +11,7 @@ namespace Divante\VsbridgeIndexerCms\Model\Indexer;
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCms\Model\Indexer\Action\CmsBlock as CmsBlockAction;
 use Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler;
+use Divante\VsbridgeIndexerCore\Cache\Processor as CacheProcessor;
 
 /**
  * Class CmsBlock
@@ -33,8 +34,14 @@ class CmsBlock implements \Magento\Framework\Indexer\ActionInterface, \Magento\F
     private $storeManager;
 
     /**
+     * @var CacheProcessor
+     */
+    private $cacheProcessor;
+
+    /**
      * CmsBlock constructor.
      *
+     * @param CacheProcessor $cacheProcessor
      * @param GenericIndexerHandler $indexerHandler
      * @param StoreManager $storeManager
      * @param CmsBlockAction $action
@@ -42,11 +49,13 @@ class CmsBlock implements \Magento\Framework\Indexer\ActionInterface, \Magento\F
     public function __construct(
         GenericIndexerHandler $indexerHandler,
         StoreManager $storeManager,
-        CmsBlockAction $action
+        CmsBlockAction $action,
+        CacheProcessor $cacheProcessor
     ) {
         $this->indexHandler = $indexerHandler;
         $this->cmsBlockAction = $action;
         $this->storeManager = $storeManager;
+        $this->cacheProcessor = $cacheProcessor;
     }
 
     /**
@@ -59,6 +68,7 @@ class CmsBlock implements \Magento\Framework\Indexer\ActionInterface, \Magento\F
         foreach ($stores as $store) {
             $this->indexHandler->saveIndex($this->cmsBlockAction->rebuild($store->getId(), $ids), $store);
             $this->indexHandler->cleanUpByTransactionKey($store, $ids);
+            $this->cacheProcessor->cleanCacheByTags($store->getId(), ['cmsBlock']);
         }
     }
 
@@ -72,6 +82,7 @@ class CmsBlock implements \Magento\Framework\Indexer\ActionInterface, \Magento\F
         foreach ($stores as $store) {
             $this->indexHandler->createIndex($store);
             $this->indexHandler->saveIndex($this->cmsBlockAction->rebuild($store->getId()), $store);
+            $this->cacheProcessor->cleanCacheByTags($store->getId(), ['cmsBlock']);
         }
     }
 
