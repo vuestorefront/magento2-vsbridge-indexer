@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- Added new command `vsbridge:reset`. Resets vsbridge indexer status to invalid ([301](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/301))
+
 ## [1.18.0] (2020.06.09)
 
 ### Added
