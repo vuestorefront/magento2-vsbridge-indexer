@@ -1,37 +1,32 @@
 <?php
 /**
- * @package  Divante\VsbridgeIndexerCore
- * @author Nagaraja Kharvi <nagrgk@gmail.com>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
+ * Copyright Divante Sp. z o.o.
+ * See LICENSE_DIVANTE.txt for license details.
  */
 
 namespace Divante\VsbridgeIndexerCore\Console\Command;
 
 use Magento\Framework\App\ObjectManagerFactory;
-use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Indexer\Console\Command\AbstractIndexerCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Class IndexerReindexCommand
+ * Class ResetEsIndexCommand
  */
 class ResetEsIndexCommand extends AbstractIndexerCommand
 {
+    const VS_INDEXER_PREFIX = 'vsbridge_';
+
     /**
-     * RebuildEsIndexCommand constructor.
+     * ResetEsIndexCommand constructor.
      *
      * @param  ObjectManagerFactory  $objectManagerFactory
-     * @param  ManagerInterface  $eventManager
-     * @param  array  $excludeIndices
      */
-    public function __construct(
-        ObjectManagerFactory $objectManagerFactory,
-        ManagerInterface $eventManager
-    ) {
+    public function __construct(ObjectManagerFactory $objectManagerFactory)
+    {
         parent::__construct($objectManagerFactory);
     }
 
@@ -40,8 +35,8 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
      */
     protected function configure()
     {
-        $this->setName('vsbridge:resetindex')
-            ->setDescription('Reset indexer.');
+        $this->setName('vsbridge:reset')
+            ->setDescription('Resets vsbridge indices status to invalid');
 
         parent::configure();
     }
@@ -51,32 +46,25 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        //invalidate all indexes
-        $invalidIndices = $this->getInvalidIndices();
+        $this->invalidateIndices($output);
     }
 
     /**
-     * @return array
+     * @param OutputInterface $output
      */
-    private function getInvalidIndices()
+    private function invalidateIndices(OutputInterface $output)
     {
-        $invalid = [];
-
         foreach ($this->getIndexers() as $indexer) {
-            if ($indexer->isWorking()) {
-                try {
-                    $indexer->getState()
-                        ->setStatus(\Magento\Framework\Indexer\StateInterface::STATUS_INVALID)
-                        ->save();
-		    $output->writeln("\n" . $indexer->getTitle() . "\n");
-                } catch (LocalizedException $e) {
-                    //catch exception
-                    $output->writeln("<error>" . $e->getMessage() . "</error>");
-                }
+            try {
+                $indexer->getState()
+                    ->setStatus(\Magento\Framework\Indexer\StateInterface::STATUS_INVALID)
+                    ->save();
+                $output->writeln($indexer->getTitle() . ' indexer has been invalidated.');
+            } catch (LocalizedException $e) {
+                //catch exception
+                $output->writeln("<error>" . $e->getMessage() . "</error>");
             }
         }
-
-        return $invalid;
     }
 
     /**
@@ -91,7 +79,7 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
         foreach ($indexers as $indexer) {
             $indexId = $indexer->getId();
 
-            if (substr($indexId, 0, 9) === 'vsbridge_') {
+            if (substr($indexId, 0, 9) === self::VS_INDEXER_PREFIX) {
                 $vsbridgeIndexers[] = $indexer;
             }
         }
@@ -99,4 +87,3 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
         return $vsbridgeIndexers;
     }
 }
-
