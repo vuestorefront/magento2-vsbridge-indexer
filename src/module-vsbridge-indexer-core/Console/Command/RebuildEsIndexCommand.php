@@ -121,7 +121,7 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
 
         if (!empty($invalidIndices)) {
             $message = 'Some indices has invalid status: '. implode(', ', $invalidIndices) . '. ';
-            $message .= 'Please change indices status to VALID manually or php bin/magento vsbridge:resetindex.';
+            $message .= 'Please change indices status to VALID manually or use php bin/magento vsbridge:resetindex.';
             $output->writeln("<info>WARNING: Indexation can't be executed. $message</info>");
             return;
         }

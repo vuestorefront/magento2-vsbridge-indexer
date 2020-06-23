@@ -1,15 +1,13 @@
 <?php
+
 /**
- * @package  Divante\VsbridgeIndexerCore
- * @author Nagaraja Kharvi <nagrgk@gmail.com>
- * @copyright 2019 Divante Sp. z o.o.
- * @license See LICENSE_DIVANTE.txt for license details.
+ * Copyright Divante Sp. z o.o.
+ * See LICENSE_DIVANTE.txt for license details.
  */
 
 namespace Divante\VsbridgeIndexerCore\Console\Command;
 
 use Magento\Framework\App\ObjectManagerFactory;
-use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Indexer\Console\Command\AbstractIndexerCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,20 +15,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Class IndexerReindexCommand
+ * Class ResetEsIndexCommand
  */
-class ResetEsIndexCommand extends AbstractIndexerCommand
-{
+class ResetEsIndexCommand extends AbstractIndexerCommand {
+
+    const VSINDEX_PREFIX = 'vsbridge_';
+
     /**
-     * RebuildEsIndexCommand constructor.
+     * ResetEsIndexCommand constructor.
      *
      * @param  ObjectManagerFactory  $objectManagerFactory
-     * @param  ManagerInterface  $eventManager
      * @param  array  $excludeIndices
      */
     public function __construct(
-        ObjectManagerFactory $objectManagerFactory,
-        ManagerInterface $eventManager
+            ObjectManagerFactory $objectManagerFactory
     ) {
         parent::__construct($objectManagerFactory);
     }
@@ -38,10 +36,9 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
     /**
      * @inheritdoc
      */
-    protected function configure()
-    {
+    protected function configure() {
         $this->setName('vsbridge:resetindex')
-            ->setDescription('Reset indexer.');
+                ->setDescription('Reset indexer.');
 
         parent::configure();
     }
@@ -49,41 +46,36 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
     /**
      * @inheritdoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    protected function execute(InputInterface $input, OutputInterface $output) {
         //invalidate all indexes
-        $invalidIndices = $this->getInvalidIndices();
+        $this->getInvalidIndices();
     }
 
     /**
      * @return array
      */
-    private function getInvalidIndices()
-    {
-        $invalid = [];
-
+    private function getInvalidIndices() {
         foreach ($this->getIndexers() as $indexer) {
             if ($indexer->isWorking()) {
                 try {
                     $indexer->getState()
-                        ->setStatus(\Magento\Framework\Indexer\StateInterface::STATUS_INVALID)
-                        ->save();
-		    $output->writeln("\n" . $indexer->getTitle() . "\n");
+                            ->setStatus(\Magento\Framework\Indexer\StateInterface::STATUS_INVALID)
+                            ->save();
+                    $output->writeln($indexer->getTitle() . ' indexer has been invalidated.');
                 } catch (LocalizedException $e) {
-                    //catch exception
-                    $output->writeln("<error>" . $e->getMessage() . "</error>");
+                    $output->writeln($e->getMessage());
+                } catch (\Exception $e) {
+                    $output->writeln($indexer->getTitle() . ' indexer process unknown error:');
+                    $output->writeln($e->getMessage());
                 }
             }
         }
-
-        return $invalid;
     }
 
     /**
      * @return IndexerInterface[]
      */
-    private function getIndexers()
-    {
+    private function getIndexers() {
         /** @var IndexerInterface[] */
         $indexers = $this->getAllIndexers();
         $vsbridgeIndexers = [];
@@ -91,12 +83,12 @@ class ResetEsIndexCommand extends AbstractIndexerCommand
         foreach ($indexers as $indexer) {
             $indexId = $indexer->getId();
 
-            if (substr($indexId, 0, 9) === 'vsbridge_') {
+            if (substr($indexId, 0, 9) === self::VSINDEX_PREFIX) {
                 $vsbridgeIndexers[] = $indexer;
             }
         }
 
         return $vsbridgeIndexers;
     }
-}
 
+}
