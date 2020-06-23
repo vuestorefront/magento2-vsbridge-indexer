@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+## [1.19.0] (2020.06.23)
+
 ### Added
-- Added new command `vsbridge:reset`. Resets vsbridge indexer status to invalid ([301](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/301))
+- Added new command `vsbridge:reset`. Resets vsbridge indexer status to invalid ([303](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/303))
+- Export 'created_at' field for products ([299](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/299))
+
+### Fixed
+- Trigger does not work in cascade deleting ([296](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/296))
+
 
 ## [1.18.0] (2020.06.09)
 
