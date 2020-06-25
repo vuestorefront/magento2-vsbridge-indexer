@@ -27,7 +27,7 @@ class StoreManager
     private $generalSettings;
 
     /**
-     * @var
+     * @var array|null
      */
     private $loadedStores = null;
 
@@ -46,37 +46,33 @@ class StoreManager
     }
 
     /**
-     * @param null $storeId
+     * @param int|null $storeId
      *
      * @return array|\Magento\Store\Api\Data\StoreInterface[]
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getStores($storeId = null)
     {
-        if (null === $this->loadedStores) {
-            $allowStores = $this->generalSettings->getStoresToIndex();
-            $stores = [];
-
-            if (null === $storeId) {
-                $allStores = $this->storeManager->getStores();
-
-                foreach ($allStores as $store) {
-                    if (in_array($store->getId(), $allowStores)) {
-                        $stores[] = $store;
-                    }
-                }
-            } else {
-                $store = $this->storeManager->getStore($storeId);
-
-                if (in_array($store->getId(), $allowStores)) {
-                    $stores = [$store];
-                }
-            }
-
-            $this->loadedStores = $stores;
+        if ($this->loadedStores) {
+            return $this->loadedStores;
         }
 
-        return $this->loadedStores;
+        $allowedStoreIds = $this->generalSettings->getStoresToIndex();
+        $allowedStores = [];
+
+        if (null === $storeId) {
+            $stores = $this->storeManager->getStores();
+        } else {
+            $stores = [$this->storeManager->getStore($storeId)];
+        }
+
+        foreach ($stores as $store) {
+            if (in_array($store->getId(), $allowedStoreIds)) {
+                $allowedStores[] = $store;
+            }
+        }
+
+        return $this->loadedStores = $allowedStores;
     }
 
     /**

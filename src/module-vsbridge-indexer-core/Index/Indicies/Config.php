@@ -92,7 +92,7 @@ class Config
         $types = [];
 
         foreach ($indexConfigData['types'] as $typeName => $typeConfigData) {
-            $dataProviders = [];
+            $dataProviders = ['transaction_key' => $this->transactionKey];
 
             foreach ($typeConfigData['data_providers'] as $dataProviderName => $dataProviderClass) {
                 $dataProviders[$dataProviderName] =
@@ -105,7 +105,6 @@ class Config
                 $mapping = $this->mappingProviderProcessorFactory->get($typeConfigData['mapping'][0]);
             }
 
-            $dataProviders['transaction_key'] = $this->transactionKey;
             $types[$typeName] = $this->typeFactory->create(
                 [
                     'name' => $typeName,

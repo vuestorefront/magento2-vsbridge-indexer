@@ -35,7 +35,11 @@ class BulkRequest implements BulkRequestInterface
     }
 
     /**
-     * @inheritdoc
+     * @param string $index
+     * @param string $type
+     * @param $docId
+     *
+     * @return $this
      */
     private function deleteDocument($index, $type, $docId)
     {

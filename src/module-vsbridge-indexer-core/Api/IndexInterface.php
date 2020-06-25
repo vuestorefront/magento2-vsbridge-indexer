@@ -21,7 +21,7 @@ interface IndexInterface
     /**
      * @return string
      */
-    public function getIdentifier();
+    public function getAlias();
 
     /**
      * @return boolean

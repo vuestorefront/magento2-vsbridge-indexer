@@ -10,7 +10,6 @@ namespace Divante\VsbridgeIndexerCore\Console\Command;
 
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
-use Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface;
 use Divante\VsbridgeIndexerCore\Model\IndexerRegistry;
 use Magento\Framework\App\ObjectManagerFactory;
 use Magento\Framework\Console\Cli;
@@ -233,10 +232,8 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
      */
     private function reindexStore(StoreInterface $store, OutputInterface $output)
     {
-        $indexOperations = $this->getIndexOperationProvider()->getOperationByStore($store->getId());
-
         $this->getIndexerStoreManager()->override([$store]);
-        $index = $indexOperations->createIndex(self::INDEX_IDENTIFIER, $store);
+        $index = $this->getIndexOperations()->createIndex(self::INDEX_IDENTIFIER, $store);
         $this->getIndexerRegistry()->setFullReIndexationIsInProgress();
 
         $returnValue = Cli::RETURN_FAILURE;
@@ -259,10 +256,10 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
             }
         }
 
-        $indexOperations->switchIndexer($index->getName(), $index->getIdentifier());
+        $this->getIndexOperations()->switchIndexer($store->getId(), $index->getName(), $index->getAlias());
 
         $output->writeln(
-            sprintf('<info>Index name: %s, index alias: %s</info>', $index->getName(), $index->getIdentifier())
+            sprintf('<info>Index name: %s, index alias: %s</info>', $index->getName(), $index->getAlias())
         );
 
         return $returnValue;
@@ -334,12 +331,12 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
     }
 
     /**
-     * @return IndexOperationProviderInterface
+     * @return IndexOperationInterface
      */
-    private function getIndexOperationProvider()
+    private function getIndexOperations()
     {
         if (null === $this->indexOperations) {
-            $this->indexOperations = $this->getObjectManager()->get(IndexOperationProviderInterface::class);
+            $this->indexOperations = $this->getObjectManager()->get(IndexOperationInterface::class);
         }
 
         return $this->indexOperations;

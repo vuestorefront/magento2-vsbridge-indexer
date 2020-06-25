@@ -9,7 +9,6 @@
 namespace Divante\VsbridgeIndexerCore\Index;
 
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
-use Divante\VsbridgeIndexerCore\Api\BulkResponseInterface;
 use Divante\VsbridgeIndexerCore\Api\BulkResponseInterfaceFactory as BulkResponseFactory;
 use Divante\VsbridgeIndexerCore\Api\BulkRequestInterface;
 use Divante\VsbridgeIndexerCore\Api\BulkRequestInterfaceFactory as BulkRequestFactory;
@@ -18,6 +17,7 @@ use Divante\VsbridgeIndexerCore\Api\IndexInterfaceFactory as IndexFactory;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 use Divante\VsbridgeIndexerCore\Api\Index\TypeInterface;
 use Divante\VsbridgeIndexerCore\Api\MappingInterface;
+use Divante\VsbridgeIndexerCore\Elasticsearch\ClientResolver;
 use Magento\Store\Api\Data\StoreInterface;
 
 /**
@@ -26,9 +26,9 @@ use Magento\Store\Api\Data\StoreInterface;
 class IndexOperations implements IndexOperationInterface
 {
     /**
-     * @var ClientInterface
+     * @var ClientResolver
      */
-    private $client;
+    private $clientResolver;
 
     /**
      * @var IndexFactory
@@ -63,20 +63,20 @@ class IndexOperations implements IndexOperationInterface
     /**
      * IndexOperations constructor.
      *
-     * @param ClientInterface $client
+     * @param ClientResolver $clientResolver
      * @param BulkResponseFactory $bulkResponseFactory
      * @param BulkRequestFactory $bulkRequestFactory
      * @param IndexSettings $indexSettings
      * @param IndexFactory $indexFactory
      */
     public function __construct(
-        ClientInterface $client,
+        ClientResolver $clientResolver,
         BulkResponseFactory $bulkResponseFactory,
         BulkRequestFactory $bulkRequestFactory,
         IndexSettings $indexSettings,
         IndexFactory $indexFactory
     ) {
-        $this->client = $client;
+        $this->clientResolver = $clientResolver;
         $this->indexFactory = $indexFactory;
         $this->indexSettings = $indexSettings;
         $this->bulkResponseFactory = $bulkResponseFactory;
@@ -86,14 +86,14 @@ class IndexOperations implements IndexOperationInterface
     /**
      * @inheritdoc
      */
-    public function executeBulk(BulkRequestInterface $bulk)
+    public function executeBulk($storeId, BulkRequestInterface $bulk)
     {
         if ($bulk->isEmpty()) {
             throw new \LogicException('Can not execute empty bulk.');
         }
 
         $bulkParams = ['body' => $bulk->getOperations()];
-        $rawBulkResponse = $this->client->bulk($bulkParams);
+        $rawBulkResponse = $this->resolveClient($storeId)->bulk($bulkParams);
 
         return $this->bulkResponseFactory->create(
             ['rawResponse' => $rawBulkResponse]
@@ -103,20 +103,20 @@ class IndexOperations implements IndexOperationInterface
     /**
      * @inheritdoc
      */
-    public function deleteByQuery(array $params)
+    public function deleteByQuery($storeId, array $params)
     {
-        $this->client->deleteByQuery($params);
+        $this->resolveClient($storeId)->deleteByQuery($params);
     }
 
     /**
      * @inheritdoc
      */
-    public function indexExists($indexName)
+    public function indexExists($storeId, $indexName)
     {
         $exists = true;
 
         if (!isset($this->indicesByIdentifier[$indexName])) {
-            $exists = $this->client->indexExists($indexName);
+            $exists = $this->resolveClient($storeId)->indexExists($indexName);
         }
 
         return $exists;
@@ -127,10 +127,10 @@ class IndexOperations implements IndexOperationInterface
      */
     public function getIndexByName($indexIdentifier, StoreInterface $store)
     {
-        $indexAlias = $this->indexSettings->getIndexAlias($store);
+        $indexAlias = $this->getIndexAlias($store);
 
         if (!isset($this->indicesByIdentifier[$indexAlias])) {
-            if (!$this->indexExists($indexAlias)) {
+            if (!$this->indexExists($store->getId(), $indexAlias)) {
                 throw new \LogicException(
                     "{$indexIdentifier} index does not exist yet."
                 );
@@ -156,7 +156,8 @@ class IndexOperations implements IndexOperationInterface
     public function createIndex($indexIdentifier, StoreInterface $store)
     {
         $index = $this->initIndex($indexIdentifier, $store, false);
-        $this->client->createIndex(
+
+        $this->resolveClient($store->getId())->createIndex(
             $index->getName(),
             $this->indexSettings->getEsConfig()
         );
@@ -166,7 +167,7 @@ class IndexOperations implements IndexOperationInterface
             $mapping = $type->getMapping();
 
             if ($mapping instanceof MappingInterface) {
-                $this->client->putMapping(
+                $this->resolveClient($store->getId())->putMapping(
                     $index->getName(),
                     $type->getName(),
                     $mapping->getMappingProperties()
@@ -180,15 +181,15 @@ class IndexOperations implements IndexOperationInterface
     /**
      * @inheritdoc
      */
-    public function refreshIndex(IndexInterface $index)
+    public function refreshIndex($storeId, IndexInterface $index)
     {
-        $this->client->refreshIndex($index->getName());
+        $this->resolveClient($storeId)->refreshIndex($index->getName());
     }
 
     /**
      * @inheritdoc
      */
-    public function switchIndexer(string $indexName, string $indexAlias)
+    public function switchIndexer($storeId, string $indexName, string $indexAlias)
     {
         $aliasActions = [
             [
@@ -200,7 +201,7 @@ class IndexOperations implements IndexOperationInterface
         ];
 
         $deletedIndices = [];
-        $oldIndices = $this->client->getIndicesNameByAlias($indexAlias);
+        $oldIndices = $this->resolveClient($storeId)->getIndicesNameByAlias($indexAlias);
 
         foreach ($oldIndices as $oldIndexName) {
             if ($oldIndexName != $indexName) {
@@ -214,10 +215,10 @@ class IndexOperations implements IndexOperationInterface
             }
         }
 
-        $this->client->updateAliases($aliasActions);
+        $this->resolveClient($storeId)->updateAliases($aliasActions);
 
         foreach ($deletedIndices as $deletedIndex) {
-            $this->client->deleteIndex($deletedIndex);
+            $this->resolveClient($storeId)->deleteIndex($deletedIndex);
         }
     }
 
@@ -236,29 +237,25 @@ class IndexOperations implements IndexOperationInterface
             throw new \LogicException('No configuration found');
         }
 
+        $indexAlias = $this->getIndexAlias($store);
         $indexName = $this->indexSettings->createIndexName($store);
-        $indexAlias = $this->indexSettings->getIndexAlias($store);
 
         if ($existingIndex) {
             $indexName = $indexAlias;
         }
 
         $config = $this->indicesConfiguration[$indexIdentifier];
-        $types = $config['types'];
 
         /** @var Index $index */
         $index = $this->indexFactory->create(
             [
                 'name' => $indexName,
-                'newIndex' => !$existingIndex,
-                'identifier' => $indexAlias,
-                'types' => $types,
+                'alias' => $indexAlias,
+                'types' => $config['types'],
             ]
         );
 
-        $this->indicesByIdentifier[$indexAlias] = $index;
-
-        return $this->indicesByIdentifier[$indexAlias];
+        return $this->indicesByIdentifier[$indexAlias] = $index;
     }
 
     /**
@@ -287,5 +284,15 @@ class IndexOperations implements IndexOperationInterface
         }
 
         return $this->indicesConfiguration;
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return ClientInterface
+     */
+    private function resolveClient($storeId): ClientInterface
+    {
+        return $this->clientResolver->getClient($storeId);
     }
 }
