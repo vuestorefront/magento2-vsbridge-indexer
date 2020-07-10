@@ -88,4 +88,20 @@ interface IndexOperationInterface
      * @return int
      */
     public function getBatchIndexingSize();
+
+    /**
+     * @param int $storeId
+     * @param string $indexName
+     *
+     * @return void
+     */
+    public function optimizeEsIndexing($storeId, string $indexName);
+
+    /**
+     * @param int $storeId
+     * @param string $indexName
+     *
+     * @return void
+     */
+    public function cleanAfterOptimizeEsIndexing($storeId, string $indexName);
 }

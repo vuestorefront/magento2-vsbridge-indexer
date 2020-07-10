@@ -25,12 +25,36 @@ interface ClientInterface
 
     /**
      * @param string $indexName
+     * @param int|string $value
+     *
+     * @return void
+     */
+    public function changeRefreshInterval(string $indexName, $value): void;
+
+    /**
+     * @param string $indexName
+     * @param int $value
+     *
+     * @return void
+     */
+    public function changeNumberOfReplicas(string $indexName, int $value): void;
+
+    /**
+     * @param string $indexName
      * @param array  $indexSettings
      *
      * @return void
      * @throws ConnectionDisabledException
      */
     public function createIndex(string $indexName, array $indexSettings);
+
+
+    /**
+     * Retrieve information about cluster health
+     *
+     * @return array
+     */
+    public function getClustersHealth(): array;
 
     /**
      * Retrieve the list of all index having a specified alias.
@@ -40,6 +64,22 @@ interface ClientInterface
      * @return string[]
      */
     public function getIndicesNameByAlias(string $indexAlias): array;
+
+    /**
+     * Retrieve information about index settings
+     *
+     * @param string $indexName
+     *
+     * @return array
+     */
+    public function getIndexSettings(string $indexName): array;
+
+    /**
+     * Retrieve max queue size for master node
+     *
+     * @return int
+     */
+    public function getMasterMaxQueueSize(): int;
 
     /**
      * @param array $aliasActions
