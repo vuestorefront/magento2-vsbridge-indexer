@@ -22,32 +22,28 @@ class PrepareConfigurableProduct
     {
         $configurableChildren = $productDTO['configurable_children'];
         $areChildInStock = 0;
-        $finalPrice = $childPrice = [];
-        $hasPrice = $this->hasPrice($productDTO);
+        $specialPrice = $finalPrice = $childPrice = [];
 
         foreach ($configurableChildren as $child) {
             if (!empty($child['stock']['is_in_stock'])) {
                 $areChildInStock = 1;
             }
 
+            if (isset($child['special_price'])) {
+                $specialPrice[] = $child['special_price'];
+            }
+
             if (isset($child['price'])) {
                 $childPrice[] = $child['price'];
-                $finalPrice[] = $child['final_price'] ?? $child['final_price'] ?? $child['price'];
+                $finalPrice[] = $child['final_price'] ?? $child['price'];
             }
         }
 
-        if (!empty($childPrice)) {
-            $finalPrice = min($finalPrice);
+        $productDTO['final_price'] = !empty($finalPrice) ? min($finalPrice): null;
+        $productDTO['special_price'] = !empty($specialPrice) ? min($specialPrice) : null;
+        $productDTO['price'] = !empty($childPrice) ? min($childPrice): null;
+        $productDTO['regular_price'] = $productDTO['price'];
 
-            if (!$hasPrice) {
-                $minPrice = min($childPrice);
-                $productDTO['price'] = $minPrice;
-                $productDTO['regular_price'] = $minPrice;
-                $productDTO['final_price'] = $finalPrice;
-            } else {
-                $productDTO['final_price'] = min($finalPrice, $productDTO['final_price']);
-            }
-        }
 
         if (empty($productDTO['stock']['is_in_stock']) || !$areChildInStock) {
             $productDTO['stock']['is_in_stock'] = false;
@@ -55,30 +51,5 @@ class PrepareConfigurableProduct
         }
 
         return $productDTO;
-    }
-
-    /**
-     * @param array $product
-     *
-     * @return bool
-     */
-    private function hasPrice(array $product): bool
-    {
-        $priceFields = [
-            'price',
-            'final_price',
-        ];
-
-        foreach ($priceFields as $field) {
-            if (!isset($product[$field])) {
-                return false;
-            }
-
-            if (0 === (int) $product[$field]) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
