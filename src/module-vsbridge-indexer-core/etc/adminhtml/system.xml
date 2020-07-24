@@ -121,6 +121,49 @@
                     <comment>in seconds</comment>
                 </field>
             </group>
+
+            <group id="optimization_settings" translate="label" type="text" sortOrder="350" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Optimization Settings</label>
+                <depends>
+                    <field id="vsbridge_indexer_settings/general_settings/enable">1</field>
+                </depends>
+                <field id="cluster_health" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Check cluster health</label>
+                    <comment>Set yes if you want to check before sending operation to update if status is green</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="max_bulk_queue_requirement" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Check max bulk queue</label>
+                    <comment>Set yes if you want to check before sending operation to update if pending tasks + batch indexer size are lower than max bulk queue size master node</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="number_of_replicas" translate="label comment" type="select" sortOrder="150" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Change number of replicas</label>
+                    <comment>Set yes if you want to set number_of_replicas=0 during indexing</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="number_of_replicas_value" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Default number of replicas</label>
+                    <comment>It's value which is set after indexing</comment>
+                    <validate>required-entry validate-digits</validate>
+                    <depends>
+                        <field id="number_of_replicas">1</field>
+                    </depends>
+                </field>
+                <field id="refresh_interval" translate="label comment" type="select" sortOrder="250" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Change refresh interval</label>
+                    <comment>Set yes if you want to set refresh_interval=-1 during indexing</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="refresh_interval_value" translate="label comment" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Default value of refresh interval</label>
+                    <comment>It's value which is set after indexing. Enter a value in seconds</comment>
+                    <validate>required-entry validate-digits</validate>
+                    <depends>
+                        <field id="refresh_interval">1</field>
+                    </depends>
+                </field>
+            </group>
         </section>
     </system>
 </config>

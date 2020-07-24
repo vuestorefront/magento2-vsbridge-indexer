@@ -28,6 +28,7 @@
             <argument name="name" xsi:type="string">vsbridgeIndexerLogger</argument>
             <argument name="handlers"  xsi:type="array">
                 <item name="info" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\Handler\Info</item>
+                <item name="error" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\Handler\Error</item>
             </argument>
         </arguments>
     </type>

@@ -34,6 +34,14 @@
                 <invalidate_cache_key>aeSu7aip</invalidate_cache_key>
                 <connection_timeout>10</connection_timeout>
             </redis_cache_settings>
+            <optimization_settings>
+                <cluster_health>0</cluster_health>
+                <max_bulk_queue_requirement>0</max_bulk_queue_requirement>
+                <number_of_replicas>1</number_of_replicas>
+                <number_of_replicas_value>1</number_of_replicas_value>
+                <refresh_interval>1</refresh_interval>
+                <refresh_interval_value>1</refresh_interval_value>
+            </optimization_settings>
         </vsbridge_indexer_settings>
     </default>
 </config>

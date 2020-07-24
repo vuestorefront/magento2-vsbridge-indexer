@@ -35,6 +35,28 @@ class Client implements ClientInterface
     }
 
     /**
+     * @param string $indexName
+     * @param int|string $value
+     *
+     * @return void
+     */
+    public function changeRefreshInterval(string $indexName, $value): void
+    {
+        $this->client->indices()->putSettings(['index' => $indexName, 'body' => ['refresh_interval' => $value]]);
+    }
+
+    /**
+     * @param string $indexName
+     * @param int $value
+     *
+     * @return void
+     */
+    public function changeNumberOfReplicas(string $indexName, int $value): void
+    {
+        $this->client->indices()->putSettings(['index' => $indexName, 'body' => ['number_of_replicas' => $value]]);
+    }
+
+    /**
      * @param $indexName
      * @param array $indexSettings
      */
@@ -46,6 +68,17 @@ class Client implements ClientInterface
                 'body'  => $indexSettings,
             ]
         );
+    }
+
+
+    /**
+     * Retrieve information about cluster health
+     *
+     * @return array
+     */
+    public function getClustersHealth(): array
+    {
+        return $this->client->cat()->health();
     }
 
     /**
@@ -63,6 +96,26 @@ class Client implements ClientInterface
         }
 
         return array_keys($indices);
+    }
+
+    /**
+     * @param string $indexName
+     *
+     * @return array
+     */
+    public function getIndexSettings(string $indexName): array
+    {
+        return $this->client->indices()->getSettings(['index' => $indexName]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getMasterMaxQueueSize(): int
+    {
+        $master = $this->client->cat()->master();
+        $masterNode = $this->client->nodes()->info(['node_id' => $master[0]['id']]);
+        return $masterNode['nodes'][$master[0]['id']]['thread_pool']['search']['max_queue_size'] ?? 0;
     }
 
     /**
