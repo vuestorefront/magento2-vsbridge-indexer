@@ -1,8 +1,13 @@
 # Changelog
 
 ## Unreleased
+
+### Added
 - Add optimization settings. You can now enable checking ES health before indexing and setting number_of_replicas=0
 and refresh_interval=-1 during indexing ([#308](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/308))
+
+### Fixed
+- change default Index Alias Prefix to "vue_storefront_catalog"
 
 ## [1.19.0] (2020.06.23)
 
