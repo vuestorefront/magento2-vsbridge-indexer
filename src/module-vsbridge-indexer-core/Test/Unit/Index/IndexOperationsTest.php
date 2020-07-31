@@ -1,6 +1,7 @@
 <?php
 
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
+use Divante\VsbridgeIndexerCore\Config\OptimizationSettings;
 use Divante\VsbridgeIndexerCore\Index\IndexOperations;
 use Divante\VsbridgeIndexerCore\Index\IndexSettings;
 use Divante\VsbridgeIndexerCore\Api\BulkResponseInterfaceFactory as BulkResponseFactory;
@@ -54,6 +55,9 @@ class IndexOperationsTest extends TestCase
     /** @var PHPUnit_Framework_MockObject_MockObject  */
     private $clientMock;
 
+    /** @var OptimizationSettings|PHPUnit_Framework_MockObject_MockObject */
+    private $optimizationSettingsMock;
+
     /** @var array[][]  */
     private $indicesXmlConfiguration  = [
         'vue' => [
@@ -92,12 +96,17 @@ class IndexOperationsTest extends TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
+        $this->optimizationSettingsMock = $this->getMockBuilder(OptimizationSettings::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->indexOperations = new IndexOperations(
             $this->clientResolverMock,
             $this->bulkResponseFactoryMock,
             $this->bulkRequestFactoryMock,
             $this->esIndexSettingsMock,
-            $this->indexFactoryMock
+            $this->indexFactoryMock,
+            $this->optimizationSettingsMock
         );
     }
 
