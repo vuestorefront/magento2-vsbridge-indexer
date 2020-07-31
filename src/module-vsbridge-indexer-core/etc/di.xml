@@ -19,9 +19,6 @@
     <preference for="Divante\VsbridgeIndexerCore\Api\ConvertValueInterface" type="Divante\VsbridgeIndexerCore\Indexer\ConvertValue"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexInterface" type="Divante\VsbridgeIndexerCore\Index\Index"/>
     <preference for="Divante\VsbridgeIndexerCore\Api\IndexOperationInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperations"/>
-    <preference for="Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface" type="Divante\VsbridgeIndexerCore\Index\IndexOperationProvider"/>
-
-    <preference for="Divante\VsbridgeIndexerCore\Client\ClientProviderInterface" type="Divante\VsbridgeIndexerCore\Client\ClientProvider"/>
     <preference for="Divante\VsbridgeIndexerCore\System\GeneralConfigInterface" type="Divante\VsbridgeIndexerCore\System\GeneralConfig"/>
     <preference for="Divante\VsbridgeIndexerCore\Cache\ConfigInterface" type="Divante\VsbridgeIndexerCore\Cache\Config"/>
 
@@ -30,6 +27,7 @@
             <argument name="name" xsi:type="string">vsbridgeIndexerLogger</argument>
             <argument name="handlers"  xsi:type="array">
                 <item name="info" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\Handler\Info</item>
+                <item name="error" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\Handler\Error</item>
             </argument>
         </arguments>
     </type>
@@ -68,6 +66,7 @@
             <argument name="commands" xsi:type="array">
                 <item name="index_single_entity" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\SingleEntityIndexCommand</item>
                 <item name="rebuild" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand</item>
+                <item name="reset" xsi:type="object">Divante\VsbridgeIndexerCore\Console\Command\ResetEsIndexCommand</item>
             </argument>
         </arguments>
     </type>

@@ -1,10 +1,4 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCore
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerCore\Index;
 
@@ -24,7 +18,6 @@ class Index implements IndexInterface
      * @var string
      */
     private $name;
-
 
     /**
      * Type mapping.
@@ -46,29 +39,21 @@ class Index implements IndexInterface
     private $identifier;
 
     /**
-     * @var bool
-     */
-    private $newIndex = false;
-
-    /**
      * Index constructor.
      *
-     * @param string $name Index name
-     * @param string $newIndex
+     * @param string $name
      * @param string $identifier
-     * @param DataProviderInterface[] $dataProviders index data providers
-     * @param MappingInterface|null mapping
+     * @param array $dataProviders
+     * @param MappingInterface|null $mapping
      */
     public function __construct(
         string $name,
-        bool $newIndex,
         string $identifier,
         array $dataProviders,
         MappingInterface $mapping = null
     ) {
-        $this->name = $name;
-        $this->newIndex = $newIndex;
         $this->identifier = $identifier;
+        $this->name = $name;
         $this->mapping = $mapping;
         $this->dataProviders = $dataProviders;
     }
@@ -78,7 +63,7 @@ class Index implements IndexInterface
      */
     public function isNew()
     {
-        return $this->newIndex;
+        return $this->identifier !== $this->name;
     }
 
     /**

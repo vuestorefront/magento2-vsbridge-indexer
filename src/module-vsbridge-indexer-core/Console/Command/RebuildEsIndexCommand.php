@@ -102,6 +102,15 @@ class RebuildEsIndexCommand extends AbstractIndexerCommand
         $storeId = $input->getOption(self::INPUT_STORE);
         $allStores = $input->getOption(self::INPUT_ALL_STORES);
 
+        $invalidIndices = $this->getInvalidIndices();
+
+        if (!empty($invalidIndices)) {
+            $message = 'Some indices has invalid status: '. implode(', ', $invalidIndices) . '. ';
+            $message .= 'Please change indices status to VALID manually or use bin/magento vsbridge:reset command.';
+            $output->writeln("<info>WARNING: Indexation can't be executed. $message</info>");
+            return;
+        }
+
         if (!$storeId && !$allStores) {
             $output->writeln(
                 "<comment>Not enough information provided, nothing has been reindexed. Try using --help for more information.</comment>"

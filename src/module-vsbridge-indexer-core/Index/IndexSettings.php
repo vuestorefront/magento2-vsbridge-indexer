@@ -4,6 +4,7 @@ namespace Divante\VsbridgeIndexerCore\Index;
 
 use Divante\VsbridgeIndexerCore\Index\Indicies\Config as IndicesConfig;
 use Divante\VsbridgeIndexerCore\Config\IndicesSettings;
+use Magento\Framework\Intl\DateTimeFactory;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -25,7 +26,12 @@ class IndexSettings
     /**
      * @var IndicesSettings
      */
-    private $settingConfig;
+    private $configuration;
+
+    /**
+     * @var DateTimeFactory
+     */
+    private $dateTimeFactory;
 
     /**
      * IndexSettings constructor.
@@ -33,15 +39,26 @@ class IndexSettings
      * @param StoreManagerInterface $storeManager
      * @param IndicesConfig $config
      * @param IndicesSettings $settingsConfig
+     * @param DateTimeFactory $dateTimeFactory
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         IndicesConfig $config,
-        IndicesSettings $settingsConfig
+        IndicesSettings $settingsConfig,
+        DateTimeFactory $dateTimeFactory
     ) {
         $this->indicesConfig = $config;
-        $this->settingConfig = $settingsConfig;
+        $this->configuration = $settingsConfig;
         $this->storeManager = $storeManager;
+        $this->dateTimeFactory = $dateTimeFactory;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBatchIndexingSize()
+    {
+        return $this->configuration->getBatchIndexingSize();
     }
 
     /**
@@ -60,7 +77,7 @@ class IndexSettings
         return [
             'settings' => [
                 'index.blocks.read_only_allow_delete' => false,
-                'index.mapping.total_fields.limit' => $this->settingConfig->getFieldsLimit(),
+                'index.mapping.total_fields.limit' => $this->configuration->getFieldsLimit(),
                 'analysis' => [
                     'analyzer' => [
                         'autocomplete' => [
@@ -93,7 +110,7 @@ class IndexSettings
     public function createIndexName(StoreInterface $store, string $indexIdentifier)
     {
         $name = $this->getIndexAlias($store, $indexIdentifier);
-        $currentDate = new \DateTime();
+        $currentDate = $this->dateTimeFactory->create();
 
         return $name . '_' . $currentDate->getTimestamp();
     }
@@ -106,7 +123,7 @@ class IndexSettings
      */
     public function getIndexAlias(StoreInterface $store, string $indexIdentifier)
     {
-        $indexNamePrefix = $this->getIndexNamePrefix();
+        $indexNamePrefix = $this->configuration->getIndexNamePrefix();
         $storeIdentifier = $this->getStoreIdentifier($store);
 
         if ($storeIdentifier) {
@@ -123,7 +140,7 @@ class IndexSettings
      */
     private function getStoreIdentifier(StoreInterface $store)
     {
-        if (!$this->settingConfig->addIdentifierToDefaultStoreView()) {
+        if (!$this->configuration->addIdentifierToDefaultStoreView()) {
             $defaultStoreView = $this->storeManager->getDefaultStoreView();
 
             if ($defaultStoreView->getId() === $store->getId()) {
@@ -131,30 +148,8 @@ class IndexSettings
             }
         }
 
-        return ('code' === $this->getIndexIdentifier()) ? $store->getCode() : (string) $store->getId();
-    }
+        $indexIdentifier = $this->configuration->getIndexIdentifier();
 
-    /**
-     * @return string
-     */
-    public function getIndexNamePrefix()
-    {
-        return $this->settingConfig->getIndexNamePrefix();
-    }
-
-    /**
-     * @return string
-     */
-    public function getIndexIdentifier()
-    {
-        return $this->settingConfig->getIndexIdentifier();
-    }
-
-    /**
-     * @return int
-     */
-    public function getBatchIndexingSize()
-    {
-        return $this->settingConfig->getBatchIndexingSize();
+        return ('code' === $indexIdentifier) ? $store->getCode() : (string) $store->getId();
     }
 }
