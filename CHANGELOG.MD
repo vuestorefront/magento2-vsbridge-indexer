@@ -2,8 +2,38 @@
 
 ## Unreleased
 
+
+## [1.20.0] (2020.07.29)
+
+### Added
+- Add optimization settings. You can now enable checking ES health before indexing and setting number_of_replicas=0
+and refresh_interval=-1 during indexing ([#308](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/308))
+
+### Fixed
+- Fix exporting price, special price for configurable products ([#312](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/312))
+- Fix exporting attribute values for products, categories ([313](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/313))
+
+### Changed / Improved
+- change default Index Alias Prefix to "vue_storefront_catalog" ([318](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/318))
+
+## [1.19.0] (2020.06.23)
+
+### Added
+- Added new command `vsbridge:reset`. Resets vsbridge indexer status to invalid ([303](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/303))
+- Export 'created_at' field for products ([299](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/299))
+
+### Fixed
+- Trigger does not work in cascade deleting ([296](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/296))
+
+
+## [1.18.0] (2020.06.09)
+
 ### Added
 - Add support for agreements ([#286](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/286))
+- Added events to reindex command ([#280](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/280))
+
+###
+- Fix module installation on fresh Magento.
 
 ## [1.17.0] (2020.05.20)
 

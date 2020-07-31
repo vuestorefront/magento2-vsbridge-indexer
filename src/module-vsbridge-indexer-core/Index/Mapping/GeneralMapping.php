@@ -15,7 +15,6 @@ use Divante\VsbridgeIndexerCore\Api\Mapping\FieldInterface;
  */
 class GeneralMapping
 {
-
     /**
      * @var array
      */

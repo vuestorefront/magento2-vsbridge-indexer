@@ -1,15 +1,8 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCore
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerCore\Elasticsearch;
 
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
-use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
 
 /**
  * Class Client
@@ -33,19 +26,44 @@ class Client implements ClientInterface
     }
 
     /**
-     * @inheritdoc
+     * @param array $bulkParams
+     *
+     * @return array
      */
     public function bulk(array $bulkParams)
     {
-        return $this->getClient()->bulk($bulkParams);
+        return $this->client->bulk($bulkParams);
     }
 
     /**
-     * @inheritdoc
+     * @param string $indexName
+     * @param int|string $value
+     *
+     * @return void
      */
-    public function createIndex($indexName, array $indexSettings)
+    public function changeRefreshInterval(string $indexName, $value): void
     {
-        $this->getClient()->indices()->create(
+        $this->client->indices()->putSettings(['index' => $indexName, 'body' => ['refresh_interval' => $value]]);
+    }
+
+    /**
+     * @param string $indexName
+     * @param int $value
+     *
+     * @return void
+     */
+    public function changeNumberOfReplicas(string $indexName, int $value): void
+    {
+        $this->client->indices()->putSettings(['index' => $indexName, 'body' => ['number_of_replicas' => $value]]);
+    }
+
+    /**
+     * @param $indexName
+     * @param array $indexSettings
+     */
+    public function createIndex(string $indexName, array $indexSettings)
+    {
+        $this->client->indices()->create(
             [
                 'index' => $indexName,
                 'body'  => $indexSettings,
@@ -53,58 +71,98 @@ class Client implements ClientInterface
         );
     }
 
+
     /**
-     * @inheritdoc
+     * Retrieve information about cluster health
+     *
+     * @return array
+     */
+    public function getClustersHealth(): array
+    {
+        return $this->client->cat()->health();
+    }
+
+    /**
+     * @param string $indexAlias
+     *
+     * @return array
      */
     public function getIndicesNameByAlias(string $indexAlias): array
     {
         $indices = [];
 
         try {
-            $indices = $this->getClient()->indices()->getMapping(['index' => $indexAlias]);
+            $indices = $this->client->indices()->getMapping(['index' => $indexAlias]);
         } catch (\Elasticsearch\Common\Exceptions\Missing404Exception $e) {
         }
 
         return array_keys($indices);
     }
+
     /**
-     * @inheritdoc
+     * @param string $indexName
+     *
+     * @return array
+     */
+    public function getIndexSettings(string $indexName): array
+    {
+        return $this->client->indices()->getSettings(['index' => $indexName]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getMasterMaxQueueSize(): int
+    {
+        $master = $this->client->cat()->master();
+        $masterNode = $this->client->nodes()->info(['node_id' => $master[0]['id']]);
+        return $masterNode['nodes'][$master[0]['id']]['thread_pool']['search']['max_queue_size'] ?? 0;
+    }
+
+    /**
+     * @param array $aliasActions
      */
     public function updateAliases(array $aliasActions)
     {
-        $this->getClient()->indices()->updateAliases(['body' => ['actions' => $aliasActions]]);
+        $this->client->indices()->updateAliases(['body' => ['actions' => $aliasActions]]);
     }
 
     /**
-     * @inheritdoc
+     * @param string $indexName
      */
-    public function refreshIndex($indexName)
+    public function refreshIndex(string $indexName)
     {
-        $this->getClient()->indices()->refresh(['index' => $indexName]);
+        $this->client->indices()->refresh(['index' => $indexName]);
     }
 
     /**
-     * @inheritdoc
+     * @param string $indexName
+     *
+     * @return bool
      */
-    public function indexExists($indexName)
+    public function indexExists(string $indexName)
     {
-        return $this->getClient()->indices()->exists(['index' => $indexName]);
+        return $this->client->indices()->exists(['index' => $indexName]);
     }
 
     /**
-     * @inheritdoc
+     * @param string $indexName
+     *
+     * @return array
      */
-    public function deleteIndex($indexName)
+    public function deleteIndex(string $indexName)
     {
-        return $this->getClient()->indices()->delete(['index' => $indexName]);
+        return $this->client->indices()->delete(['index' => $indexName]);
     }
 
     /**
-     * @inheritdoc
+     * @param string $indexName
+     * @param string $type
+     * @param array $mapping
      */
-    public function putMapping($indexName, $type, array $mapping)
+    public function putMapping(string $indexName, string $type, array $mapping)
     {
-        $this->getClient()->indices()->putMapping(
+        $this->client->indices()->putMapping(
             [
                 'include_type_name' => false,
                 'index' => $indexName,
@@ -114,19 +172,10 @@ class Client implements ClientInterface
     }
 
     /**
-     * @inheritdoc
+     * @param array $params
      */
     public function deleteByQuery(array $params)
     {
-        $this->getClient()->deleteByQuery($params);
-    }
-
-    /**
-     * @return \Elasticsearch\Client
-     * @throws ConnectionDisabledException
-     */
-    private function getClient()
-    {
-        return $this->client;
+        $this->client->deleteByQuery($params);
     }
 }

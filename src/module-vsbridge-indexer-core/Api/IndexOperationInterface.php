@@ -16,25 +16,28 @@ use Magento\Store\Api\Data\StoreInterface;
 interface IndexOperationInterface
 {
     /**
+     * @param int $storeId
      * @param BulkRequestInterface $bulk
      *
      * @return BulkResponseInterface
      */
-    public function executeBulk(BulkRequestInterface $bulk);
+    public function executeBulk($storeId, BulkRequestInterface $bulk);
 
     /**
+     * @param int $storeId
      * @param array $params
      *
      * @return void
      */
-    public function deleteByQuery(array $params);
+    public function deleteByQuery($storeId, array $params);
 
     /**
+     * @param int $storeId
      * @param string $indexName
      *
      * @return bool
      */
-    public function indexExists($indexName);
+    public function indexExists($storeId, $indexName);
 
     /**
      * @param string $indexIdentifier
@@ -61,19 +64,21 @@ interface IndexOperationInterface
     public function createIndex($indexIdentifier, StoreInterface $store);
 
     /**
+     * @param int $storeId
      * @param IndexInterface $index
      *
      * @return void
      */
-    public function refreshIndex(IndexInterface $index);
+    public function refreshIndex($storeId, IndexInterface $index);
 
     /**
+     * @param int $storeId
      * @param string $indexName
      * @param string $indexAlias
      *
      * @return void
      */
-    public function switchIndexer(string $indexName, string $indexAlias);
+    public function switchIndexer($storeId, string $indexName, string $indexAlias);
 
     /**
      * @return BulkRequestInterface
@@ -84,4 +89,20 @@ interface IndexOperationInterface
      * @return int
      */
     public function getBatchIndexingSize();
+
+    /**
+     * @param int $storeId
+     * @param string $indexName
+     *
+     * @return void
+     */
+    public function optimizeEsIndexing($storeId, string $indexName);
+
+    /**
+     * @param int $storeId
+     * @param string $indexName
+     *
+     * @return void
+     */
+    public function cleanAfterOptimizeEsIndexing($storeId, string $indexName);
 }

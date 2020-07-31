@@ -98,6 +98,22 @@ Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront 
     
     ![](./images/config-cache.png) 
 
+1. ####Optimization Settings
+
+    **Check cluster health** → by default this option is disabled. Used to check cluster health before indexing.
+    
+    **Check max bulk queue** → by default this option is disabled. Used to check if pending tasks + batch indexer size (VueStorefrontIndexer indices setting) are lower than max bulk queue size master node.
+    
+    **Change number of replicas** → by default this option is disabled. Used to set number_of_replicas=0 during indexing.
+    
+    **Default number of replicas** → number of replicas which is set after indexing.
+    
+    **Change refresh interval** → by default this option is disabled. Used to set refresh_interval=-1 during indexing.
+    
+    **Default value of refresh interval** → value of refresh interval which is set after indexing.
+    
+    ![](./images/optimization-settings.png)
+
 1. ####Catalog Settings
     
     **Use Catalog Url Keys** → by default this option is disabled. Use Magento Url Key attribute for url_key and slug field (for products and categories). Url Keys have to be unique

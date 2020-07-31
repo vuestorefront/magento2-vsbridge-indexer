@@ -13,39 +13,38 @@ namespace Divante\VsbridgeIndexerCore\Api\Client;
  */
 interface ConfigurationInterface
 {
+    /**
+     * @return string
+     */
+    public function getHost(int $storeId);
 
     /**
      * @return string
      */
-    public function getHost();
+    public function getPort(int $storeId);
 
     /**
      * @return string
      */
-    public function getPort();
-
-    /**
-     * @return string
-     */
-    public function getScheme();
+    public function getScheme(int $storeId);
 
     /**
      * @return bool
      */
-    public function isHttpAuthEnabled();
+    public function isHttpAuthEnabled(int $storeId);
 
     /**
      * @return string
      */
-    public function getHttpAuthUser();
+    public function getHttpAuthUser(int $storeId);
 
     /**
      * @return string
      */
-    public function getHttpAuthPassword();
+    public function getHttpAuthPassword(int $storeId);
 
     /**
      * @return array
      */
-    public function getOptions();
+    public function getOptions(int $storeId);
 }

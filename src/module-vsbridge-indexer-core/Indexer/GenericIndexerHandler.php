@@ -9,11 +9,14 @@
 namespace Divante\VsbridgeIndexerCore\Indexer;
 
 use Divante\VsbridgeIndexerCore\Api\BulkLoggerInterface;
+use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexInterface;
-use Divante\VsbridgeIndexerCore\Api\Index\IndexOperationProviderInterface;
 use Divante\VsbridgeIndexerCore\Api\Indexer\TransactionKeyInterface;
 use Divante\VsbridgeIndexerCore\Api\IndexOperationInterface;
 use Divante\VsbridgeIndexerCore\Exception\ConnectionDisabledException;
+use Divante\VsbridgeIndexerCore\Exception\ConnectionUnhealthyException;
+use Divante\VsbridgeIndexerCore\Logger\IndexerLogger;
+use Divante\VsbridgeIndexerCore\Model\IndexerRegistry;
 use Exception;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Store\Api\Data\StoreInterface;
@@ -32,14 +35,19 @@ class GenericIndexerHandler
     private $batch;
 
     /**
-     * @var IndexOperationProviderInterface
+     * @var IndexOperationInterface
      */
-    private $indexOperationProvider;
+    private $indexOperations;
 
     /**
      * @var string
      */
     private $indexIdentifier;
+
+    /**
+     * @var IndexerLogger
+     */
+    private $indexerLogger;
 
     /**
      * @var int|string
@@ -55,23 +63,26 @@ class GenericIndexerHandler
      * GenericIndexerHandler constructor.
      *
      * @param BulkLoggerInterface $bulkLogger
-     * @param IndexOperationProviderInterface $indexOperationProvider
+     * @param IndexOperationInterface $indexOperationProvider
+     * @param IndexerLogger $indexerLogger
      * @param Batch $batch
      * @param TransactionKeyInterface $transactionKey
      * @param string $indexIdentifier
      */
     public function __construct(
         BulkLoggerInterface $bulkLogger,
-        IndexOperationProviderInterface $indexOperationProvider,
+        IndexOperationInterface $indexOperationProvider,
+        IndexerLogger $indexerLogger,
         Batch $batch,
         TransactionKeyInterface $transactionKey,
         string $indexIdentifier
     ) {
         $this->bulkLogger = $bulkLogger;
         $this->batch = $batch;
-        $this->indexOperationProvider = $indexOperationProvider;
+        $this->indexOperations = $indexOperationProvider;
         $this->indexIdentifier = $indexIdentifier;
-        $this->transactionKey = $transactionKey;
+        $this->indexerLogger = $indexerLogger;
+        $this->transactionKey = $transactionKey->load();
     }
 
     /**
@@ -82,11 +93,13 @@ class GenericIndexerHandler
      * @param array $requireDataProvides
      *
      * @return $this
+     * @throws ConnectionUnhealthyException
      */
     public function updateIndex(Traversable $documents, StoreInterface $store, array $requireDataProvides)
     {
         try {
             $index = $this->getIndex($store);
+            $storeId = (int)$store->getId();
             $dataProviders = [];
 
             foreach ($index->getDataProviders() as $name => $dataProvider) {
@@ -99,30 +112,36 @@ class GenericIndexerHandler
                 return $this;
             }
 
-            $storeId = (int)$store->getId();
+            $batchSize = $this->indexOperations->getBatchIndexingSize();
 
-            foreach ($this->batch->getItems($documents, $this->getBatchSize($storeId)) as $docs) {
-                /** @var \Divante\VsbridgeIndexerCore\Api\DataProviderInterface $datasource */
+            foreach ($this->batch->getItems($documents, $batchSize) as $docs) {
+                /** @var DataProviderInterface $datasource */
                 foreach ($dataProviders as $datasource) {
                     if (!empty($docs)) {
                         $docs = $datasource->addData($docs, $storeId);
                     }
                 }
 
-                $bulkRequest = $this->getIndexOperation($store->getId())->createBulk()->updateDocuments(
+                $bulkRequest = $this->indexOperations->createBulk()->updateDocuments(
                     $index->getName(),
                     $index->getType(),
                     $docs
                 );
 
-                $response = $this->getIndexOperation($store->getId())->executeBulk($bulkRequest);
+                $this->indexOperations->optimizeEsIndexing($storeId, $index->getName());
+                $response = $this->indexOperations->executeBulk($storeId, $bulkRequest);
+                $this->indexOperations->cleanAfterOptimizeEsIndexing($storeId, $index->getName());
                 $this->bulkLogger->log($response);
                 $docs = null;
             }
 
-            $this->getIndexOperation($store->getId())->refreshIndex($index);
+            $this->indexOperations->refreshIndex($store->getId(), $index);
         } catch (ConnectionDisabledException $exception) {
             // do nothing, ES indexer disabled in configuration
+        } catch (ConnectionUnhealthyException $exception) {
+            $this->indexerLogger->error($exception->getMessage());
+            $this->indexOperations->cleanAfterOptimizeEsIndexing($storeId, $index->getName());
+            throw $exception;
         }
     }
 
@@ -133,14 +152,16 @@ class GenericIndexerHandler
      * @param StoreInterface $store
      *
      * @return void
+     * @throws ConnectionUnhealthyException
      */
     public function saveIndex(Traversable $documents, StoreInterface $store)
     {
         try {
             $index = $this->getIndex($store);
             $storeId = (int)$store->getId();
+            $batchSize = $this->indexOperations->getBatchIndexingSize();
 
-            foreach ($this->batch->getItems($documents, $this->getBatchSize($storeId)) as $docs) {
+            foreach ($this->batch->getItems($documents, $batchSize) as $docs) {
                 foreach ($index->getDataProviders() as $dataProvider) {
                     if (!empty($docs)) {
                         $docs = $dataProvider->addData($docs, $storeId);
@@ -148,13 +169,15 @@ class GenericIndexerHandler
                 }
 
                 if (!empty($docs)) {
-                    $bulkRequest = $this->getIndexOperation($store->getId())->createBulk()->addDocuments(
+                    $bulkRequest = $this->indexOperations->createBulk()->addDocuments(
                         $index->getName(),
                         $index->getType(),
                         $docs
                     );
 
-                    $response = $this->getIndexOperation($store->getId())->executeBulk($bulkRequest);
+                    $this->indexOperations->optimizeEsIndexing($storeId, $index->getName());
+                    $response = $this->indexOperations->executeBulk($storeId, $bulkRequest);
+                    $this->indexOperations->cleanAfterOptimizeEsIndexing($storeId, $index->getName());
                     $this->bulkLogger->log($response);
                 }
 
@@ -162,12 +185,16 @@ class GenericIndexerHandler
             }
 
             if ($index->isNew()) {
-                $this->getIndexOperation($store->getId())->switchIndexer($index->getName(), $index->getIdentifier());
+                $this->indexOperations->switchIndexer($store->getId(), $index->getName(), $index->getIdentifier());
             }
 
-            $this->getIndexOperation($store->getId())->refreshIndex($index);
+            $this->indexOperations->refreshIndex($store->getId(), $index);
         } catch (ConnectionDisabledException $exception) {
             // do nothing, ES indexer disabled in configuration
+        } catch (ConnectionUnhealthyException $exception) {
+            $this->indexerLogger->error($exception->getMessage());
+            $this->indexOperations->cleanAfterOptimizeEsIndexing($storeId, $index->getName());
+            throw $exception;
         }
     }
 
@@ -182,11 +209,11 @@ class GenericIndexerHandler
     public function cleanUpByTransactionKey(StoreInterface $store, array $docIds = null)
     {
         try {
-            $indexAlias = $this->getIndexOperation($store->getId())->getIndexAlias($this->indexIdentifier, $store);
+            $indexAlias = $this->indexOperations->getIndexAlias($this->indexIdentifier, $store);
 
-            if ($this->getIndexOperation($store->getId())->indexExists($indexAlias)) {
-                $index = $this->getIndexOperation($store->getId())->getIndexByName($this->indexIdentifier, $store);
-                $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey->load()]]];
+            if ($this->indexOperations->indexExists($store->getId(), $indexAlias)) {
+                $index = $this->indexOperations->getIndexByName($this->indexIdentifier, $store);
+                $transactionKeyQuery = ['must_not' => ['term' => ['tsk' => $this->transactionKey]]];
                 $query = ['query' => ['bool' => $transactionKeyQuery]];
 
                 if ($docIds) {
@@ -199,23 +226,11 @@ class GenericIndexerHandler
                     'body' => $query,
                 ];
 
-                $this->getIndexOperation($store->getId())->deleteByQuery($query);
+                $this->indexOperations->deleteByQuery($store->getId(), $query);
             }
         } catch (ConnectionDisabledException $exception) {
             // do nothing, ES indexer disabled in configuration
         }
-    }
-
-    /**
-     * Get batch size
-     *
-     * @param int $storeId
-     *
-     * @return int
-     */
-    private function getBatchSize(int $storeId): int
-    {
-        return $this->getIndexOperation($storeId)->getBatchIndexingSize();
     }
 
     /**
@@ -228,9 +243,9 @@ class GenericIndexerHandler
     private function getIndex(StoreInterface $store)
     {
         try {
-            $index = $this->getIndexOperation($store->getId())->getIndexByName($this->indexIdentifier, $store);
+            $index = $this->indexOperations->getIndexByName($this->indexIdentifier, $store);
         } catch (Exception $e) {
-            $index = $this->getIndexOperation($store->getId())->createIndex($this->indexIdentifier, $store);
+            $index = $this->indexOperations->createIndex($this->indexIdentifier, $store);
         }
 
         return $index;
@@ -244,21 +259,9 @@ class GenericIndexerHandler
     public function createIndex(StoreInterface $store)
     {
         try {
-            return $this->getIndexOperation($store->getId())->createIndex($this->indexIdentifier, $store);
+            return $this->indexOperations->createIndex($this->indexIdentifier, $store);
         } catch (ConnectionDisabledException $exception) {
         }
-    }
-
-    /**
-     * Get Index operations
-     *
-     * @param int $storeId
-     *
-     * @return IndexOperationInterface
-     */
-    private function getIndexOperation(int $storeId): IndexOperationInterface
-    {
-        return $this->indexOperationProvider->getOperationByStore($storeId);
     }
 
     /**

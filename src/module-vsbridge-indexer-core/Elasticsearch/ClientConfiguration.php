@@ -25,36 +25,27 @@ class ClientConfiguration implements ClientConfigurationInterface
     private $scopeConfig;
 
     /**
-     * @var int
-     */
-    private $storeId = null;
-
-    /**
      * ClientConfiguration constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
-     * @param int $storeId
      */
-    public function __construct(
-        int $storeId,
-        ScopeConfigInterface $scopeConfig
-    ) {
+    public function __construct(ScopeConfigInterface $scopeConfig)
+    {
         $this->scopeConfig = $scopeConfig;
-        $this->storeId = $storeId;
     }
 
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(int $storeId)
     {
         $options = [
-            'host' => $this->getHost(),
-            'port' => $this->getPort(),
-            'scheme' => $this->getScheme(),
-            'enable_http_auth' => $this->isHttpAuthEnabled(),
-            'auth_user' => $this->getHttpAuthUser(),
-            'auth_pwd' => $this->getHttpAuthPassword(),
+            'host' => $this->getHost($storeId),
+            'port' => $this->getPort($storeId),
+            'scheme' => $this->getScheme($storeId),
+            'enable_http_auth' => $this->isHttpAuthEnabled($storeId),
+            'auth_user' => $this->getHttpAuthUser($storeId),
+            'auth_pwd' => $this->getHttpAuthPassword($storeId),
         ];
 
         return $options;
@@ -63,59 +54,59 @@ class ClientConfiguration implements ClientConfigurationInterface
     /**
      * @return string
      */
-    public function getHost()
+    public function getHost(int $storeId)
     {
-        return (string)$this->getConfigParam('host');
+        return (string)$this->getConfigParam('host', $storeId);
     }
 
     /**
      * @return string
      */
-    public function getPort()
+    public function getPort(int $storeId)
     {
-        return (string)$this->getConfigParam('port');
+        return (string)$this->getConfigParam('port', $storeId);
     }
 
     /**
      * @return string
      */
-    public function getScheme()
+    public function getScheme(int $storeId)
     {
-        return (bool)$this->isHttpsModeEnabled() ? 'https' : 'http';
+        return (bool)$this->isHttpsModeEnabled($storeId) ? 'https' : 'http';
     }
 
     /**
      * @return bool
      */
-    public function isHttpsModeEnabled()
+    public function isHttpsModeEnabled(int $storeId)
     {
-        return (bool)$this->getConfigParam('enable_https_mode');
+        return (bool)$this->getConfigParam('enable_https_mode', $storeId);
     }
 
     /**
      * @return bool
      */
-    public function isHttpAuthEnabled()
+    public function isHttpAuthEnabled(int $storeId)
     {
-        $authEnabled = (bool)$this->getConfigParam('enable_http_auth');
+        $authEnabled = (bool)$this->getConfigParam('enable_http_auth', $storeId);
 
-        return $authEnabled && !empty($this->getHttpAuthUser()) && !empty($this->getHttpAuthPassword());
+        return $authEnabled && !empty($this->getHttpAuthUser($storeId)) && !empty($this->getHttpAuthPassword($storeId));
     }
 
     /**
      * @return string
      */
-    public function getHttpAuthUser()
+    public function getHttpAuthUser(int $storeId)
     {
-        return (string)$this->getConfigParam('auth_user');
+        return (string)$this->getConfigParam('auth_user', $storeId);
     }
 
     /**
      * @return string
      */
-    public function getHttpAuthPassword()
+    public function getHttpAuthPassword(int $storeId)
     {
-        return (string)$this->getConfigParam('auth_pwd');
+        return (string)$this->getConfigParam('auth_pwd', $storeId);
     }
 
     /**
@@ -123,10 +114,10 @@ class ClientConfiguration implements ClientConfigurationInterface
      *
      * @return string|null
      */
-    private function getConfigParam(string $configField)
+    private function getConfigParam(string $configField, $storeId)
     {
         $path = self::ES_CLIENT_CONFIG_XML_PREFIX . '/' . $configField;
 
-        return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $this->storeId);
+        return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
 }

@@ -27,12 +27,36 @@ interface ClientInterface
 
     /**
      * @param string $indexName
+     * @param int|string $value
+     *
+     * @return void
+     */
+    public function changeRefreshInterval(string $indexName, $value): void;
+
+    /**
+     * @param string $indexName
+     * @param int $value
+     *
+     * @return void
+     */
+    public function changeNumberOfReplicas(string $indexName, int $value): void;
+
+    /**
+     * @param string $indexName
      * @param array  $indexSettings
      *
      * @return void
      * @throws ConnectionDisabledException
      */
-    public function createIndex($indexName, array $indexSettings);
+    public function createIndex(string $indexName, array $indexSettings);
+
+
+    /**
+     * Retrieve information about cluster health
+     *
+     * @return array
+     */
+    public function getClustersHealth(): array;
 
     /**
      * Retrieve the list of all index having a specified alias.
@@ -42,6 +66,22 @@ interface ClientInterface
      * @return string[]
      */
     public function getIndicesNameByAlias(string $indexAlias): array;
+
+    /**
+     * Retrieve information about index settings
+     *
+     * @param string $indexName
+     *
+     * @return array
+     */
+    public function getIndexSettings(string $indexName): array;
+
+    /**
+     * Retrieve max queue size for master node
+     *
+     * @return int
+     */
+    public function getMasterMaxQueueSize(): int;
 
     /**
      * @param array $aliasActions
@@ -56,7 +96,7 @@ interface ClientInterface
      * @return void
      * @throws ConnectionDisabledException
      */
-    public function refreshIndex($indexName);
+    public function refreshIndex(string $indexName);
 
     /**
      * @param string $indexName
@@ -64,7 +104,7 @@ interface ClientInterface
      * @return bool
      * @throws ConnectionDisabledException
      */
-    public function indexExists($indexName);
+    public function indexExists(string $indexName);
 
     /**
      * @param string $indexName
@@ -72,7 +112,7 @@ interface ClientInterface
      * @return array
      * @throws ConnectionDisabledException
      */
-    public function deleteIndex($indexName);
+    public function deleteIndex(string $indexName);
 
     /**
      * @param string $indexName
@@ -81,7 +121,7 @@ interface ClientInterface
      *
      * @throws ConnectionDisabledException
      */
-    public function putMapping($indexName, $type, array $mapping);
+    public function putMapping(string $indexName, string $type, array $mapping);
 
     /**
      * @param array $params
