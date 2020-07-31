@@ -2,6 +2,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\Test\Model\Attributes;
 
+use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\Attributes\CategoryChildAttributes;
 use Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CategoryConfigInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
@@ -47,7 +48,7 @@ class CategoryChildAttributesTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetChildrenRequiredAttributes(int $storeId, array $selectedAttributes)
     {
-        $attributes = CategoryChildAttributes::MINIMAL_ATTRIBUTE_SET;
+        $attributes = CategoryAttributes::MINIMAL_ATTRIBUTE_SET;
 
         $this->catalogConfigMock->expects($this->once())
             ->method('getAllowedChildAttributesToIndex')
