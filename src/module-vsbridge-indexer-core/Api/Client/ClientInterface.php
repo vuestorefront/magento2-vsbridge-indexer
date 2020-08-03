@@ -29,7 +29,7 @@ interface ClientInterface
      *
      * @return void
      */
-    public function changeRefreshInterval(string $indexName, $value): void;
+    public function changeRefreshInterval(string $indexName, $value);
 
     /**
      * @param string $indexName
@@ -37,7 +37,7 @@ interface ClientInterface
      *
      * @return void
      */
-    public function changeNumberOfReplicas(string $indexName, int $value): void;
+    public function changeNumberOfReplicas(string $indexName, int $value);
 
     /**
      * @param string $indexName
