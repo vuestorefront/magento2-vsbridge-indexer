@@ -72,7 +72,6 @@ class Bundle
         $this->productMetaData = $productMetaData;
         $this->storeManager = $storeManager;
         $this->catalogHelper = $catalogHelper;
-        parent::__construct($productMetaData, $resourceModel);
     }
 
     /**
@@ -151,9 +150,11 @@ class Bundle
     /**
      * Append Selection
      *
+     * @param int $storeId
+     *
      * @return void
      */
-    private function initSelection($storeId)
+    private function initSelection(int $storeId)
     {
         $bundleSelections = $this->getBundleSelections($storeId);
         $simpleIds = array_column($bundleSelections, 'product_id');
@@ -196,7 +197,7 @@ class Bundle
         );
         $productIdColumn = 'parent_product_id';
 
-        if (!$this->catalogHelper->isPriceGlobal() && $storeId) {
+        if (!$this->catalogHelper->isPriceGlobal()) {
             $websiteId = $this->storeManager->getStore($storeId)
                 ->getWebsiteId();
             $priceType = $connection->getCheckSql(
