@@ -135,7 +135,9 @@ class Category
         $categoryCollection->setStoreId($storeId);
         $categoryCollection->setStore($storeId);
         $categoryCollection->addFieldToFilter('entity_id', ['in' => $loadCategoryIds]);
-        $categoryCollection->joinAttribute('name', 'catalog_category/name', 'entity_id');
+
+        $linkField = $this->categoryMetaData->get()->getLinkField();
+        $categoryCollection->joinAttribute('name', 'catalog_category/name', $linkField);
 
         $select = $categoryCollection->getSelect();
 
