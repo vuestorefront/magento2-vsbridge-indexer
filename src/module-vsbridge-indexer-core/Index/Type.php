@@ -72,6 +72,7 @@ class Type implements TypeInterface
      */
     public function getDataProviders()
     {
+        ksort($this->dataProviders);
         return $this->dataProviders;
     }
 
