@@ -9,7 +9,7 @@ declare(strict_types = 1);
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerReview\ResourceModel;
+namespace Divante\VsbridgeIndexerReview\Model\ResourceModel;
 
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;

@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace Divante\VsbridgeIndexerReview\Model\Indexer\DataProvider;
 
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
-use Divante\VsbridgeIndexerReview\ResourceModel\Rating as RatingResourceModel;
+use Divante\VsbridgeIndexerReview\Model\ResourceModel\Rating as RatingResourceModel;
 
 /**
  * Class Ratings

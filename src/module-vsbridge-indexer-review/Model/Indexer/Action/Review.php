@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace Divante\VsbridgeIndexerReview\Model\Indexer\Action;
 
-use Divante\VsbridgeIndexerReview\ResourceModel\Review as ResourceModel;
+use Divante\VsbridgeIndexerReview\Model\ResourceModel\Review as ResourceModel;
 
 /**
  * Class Review

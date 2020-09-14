@@ -9,7 +9,7 @@ declare(strict_types = 1);
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerReview\ResourceModel;
+namespace Divante\VsbridgeIndexerReview\Model\ResourceModel;
 
 use Magento\Framework\App\ResourceConnection;
 
@@ -30,14 +30,17 @@ class Rating
     private $ratingTitlesByStore;
 
     /**
+     * @var int
+     */
+    private $entityId;
+
+    /**
      * Rating constructor.
      *
-     * @param Review $reviewResourceModel
      * @param ResourceConnection $resourceConnection
      */
-    public function __construct(
-        ResourceConnection $resourceConnection
-    ) {
+    public function __construct(ResourceConnection $resourceConnection)
+    {
         $this->resource = $resourceConnection;
     }
 
