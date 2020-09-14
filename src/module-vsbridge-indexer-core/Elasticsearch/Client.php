@@ -40,7 +40,7 @@ class Client implements ClientInterface
      *
      * @return void
      */
-    public function changeRefreshInterval(string $indexName, $value): void
+    public function changeRefreshInterval(string $indexName, $value)
     {
         $this->client->indices()->putSettings(['index' => $indexName, 'body' => ['refresh_interval' => $value]]);
     }
@@ -51,7 +51,7 @@ class Client implements ClientInterface
      *
      * @return void
      */
-    public function changeNumberOfReplicas(string $indexName, int $value): void
+    public function changeNumberOfReplicas(string $indexName, int $value)
     {
         $this->client->indices()->putSettings(['index' => $indexName, 'body' => ['number_of_replicas' => $value]]);
     }

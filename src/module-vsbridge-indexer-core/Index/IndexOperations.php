@@ -356,7 +356,7 @@ class IndexOperations implements IndexOperationInterface
      * @return void
      * @throws ConnectionUnhealthyException
      */
-    private function checkMaxBulkQueueRequirement(array $clusterHealth, $storeId): void
+    private function checkMaxBulkQueueRequirement(array $clusterHealth, $storeId)
     {
         if ($this->optimizationSettings->checkMaxBulkQueueRequirement()) {
             $masterMaxQueueSize = $this->resolveClient($storeId)->getMasterMaxQueueSize();
