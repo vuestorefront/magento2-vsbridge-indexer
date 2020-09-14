@@ -9,10 +9,9 @@ declare(strict_types = 1);
  * @license See LICENSE_DIVANTE.txt for license details.
  */
 
-namespace Divante\VsbridgeIndexerReview\ResourceModel;
+namespace Divante\VsbridgeIndexerReview\Model\ResourceModel;
 
 use Magento\Framework\App\ResourceConnection;
-use Divante\VsbridgeIndexerReview\ResourceModel\Review as ReviewResourceModel;
 
 /**
  * Class Rating
@@ -31,22 +30,18 @@ class Rating
     private $ratingTitlesByStore;
 
     /**
-     * @var Review
+     * @var int
      */
-    private $reviewResourceModel;
+    private $entityId;
 
     /**
      * Rating constructor.
      *
-     * @param Review $reviewResourceModel
      * @param ResourceConnection $resourceConnection
      */
-    public function __construct(
-        ReviewResourceModel $reviewResourceModel,
-        ResourceConnection $resourceConnection
-    ) {
+    public function __construct(ResourceConnection $resourceConnection)
+    {
         $this->resource = $resourceConnection;
-        $this->reviewResourceModel = $reviewResourceModel;
     }
 
     /**
@@ -95,7 +90,7 @@ class Rating
             $connection = $this->getConnection();
             $table = $this->resource->getTableName('rating');
             $select = $connection->select()->from($table, ['rating_id']);
-            $select->where('entity_id = ?', $this->reviewResourceModel->getEntityId());
+            $select->where('entity_id = ?', $this->getEntityId());
             $codeExpr = $connection->getIfNullSql('title.value', "{$table}.rating_code");
             $select->joinLeft(
                 ['title' => $this->resource->getTableName('rating_title')],
@@ -107,6 +102,28 @@ class Rating
         }
 
         return $this->ratingTitlesByStore[$storeId];
+    }
+
+    /**
+     * @return int
+     */
+    public function getEntityId(): int
+    {
+        if (null === $this->entityId) {
+            $connection = $this->getConnection();
+            $select = $connection->select()
+                ->from($this->resource->getTableName('rating_entity'), ['entity_id'])
+                ->where('entity_code = :entity_code');
+
+            $entityId = $connection->fetchOne(
+                $select,
+                [':entity_code' => \Magento\Review\Model\Rating::ENTITY_PRODUCT_CODE]
+            );
+
+            $this->entityId = (int) $entityId;
+        }
+
+        return $this->entityId;
     }
 
     /**
