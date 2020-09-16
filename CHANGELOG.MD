@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [1.21.0] (2020.09.16)
+
 ### Fixed
 - If price scope is set to per Website, check for bundle selection price per website, falling back to global if none found. - [@rain2o](https://github.com/rain2o)
 - Fix getting correct category name in product type - Magento Commerce
