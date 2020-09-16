@@ -187,7 +187,10 @@ Note: If a docker with ElasticSearch is disabled, Indexer will display error: "N
 
 *Update on Schedule* mode observes changes in corresponding tables, and probably will be more relevant in most cases. It is the default mode in any bigger stores.
      
+     
+     
 ### Compatibility
+--- Tested with ES: 5.6.11, 6.8.0, 7.6.2
 
 -- Vue Storefront >= 1.4.4
 Module was tested on:

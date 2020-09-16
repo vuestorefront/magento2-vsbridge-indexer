@@ -1,0 +1,5 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Divante_VsbridgeIndexerCore:etc/vsbridge.xsd">
+    <type identifier="cms_block" mapping="Divante\VsbridgeIndexerCms\Index\Mapping\CmsBlock" />
+    <type identifier="cms_page" mapping="Divante\VsbridgeIndexerCms\Index\Mapping\CmsPage" />
+</config>

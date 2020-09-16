@@ -1,19 +1,14 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCatalog
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product as ResourceModel;
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
 
 /**
  * Class Product
  */
-class Product
+class Product implements RebuildActionInterface
 {
     /**
      * @var ResourceModel
@@ -38,7 +33,7 @@ class Product
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function rebuild($storeId = 1, array $productIds = [])
+    public function rebuild(int $storeId, array $productIds) : \Traversable
     {
         $lastProductId = 0;
 
@@ -48,7 +43,7 @@ class Product
         }
 
         do {
-            $products = $this->resourceModel->getProducts($storeId, $productIds, $lastProductId);
+            $products = $this->resourceModel->getProducts($storeId, $productIds, $lastProductId, 10);
 
             /** @var array $product */
             foreach ($products as $product) {

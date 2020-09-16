@@ -13,12 +13,18 @@ namespace Divante\VsbridgeIndexerCore\Api;
  */
 interface IndexInterface
 {
+    const DUMMY_INDEX_TYPE = '_doc';
+
     /**
+     * Retrieve Index Name
+     *
      * @return string
      */
     public function getName();
 
     /**
+     * Retrieve Index Alias
+     *
      * @return string
      */
     public function getAlias();

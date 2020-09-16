@@ -1,29 +1,39 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Divante\VsbridgeIndexerCms\Api\ContentProcessorInterface" type="Divante\VsbridgeIndexerCms\Model\ContentProcessor"/>
-    <virtualType name="Divante\VsbridgeIndexerCms\Indexer\CmsBlockIndexerHandlerVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+
+    <virtualType name="Divante\VsbridgeIndexerCms\Model\Indexer\CmsBlock"
+                 type="Divante\VsbridgeIndexerCore\Indexer\Base">
         <arguments>
-            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
             <argument name="typeName" xsi:type="string">cms_block</argument>
         </arguments>
     </virtualType>
-    <type name="Divante\VsbridgeIndexerCms\Model\Indexer\CmsBlock">
+    <virtualType name="Divante\VsbridgeIndexerCms\Model\Indexer\CmsPage"
+                 type="Divante\VsbridgeIndexerCore\Indexer\Base">
         <arguments>
-            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCms\Indexer\CmsBlockIndexerHandlerVirtual</argument>
-        </arguments>
-    </type>
-
-    <virtualType name="Divante\VsbridgeIndexerCms\Indexer\CmsPageIndexerHandlerVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
-        <arguments>
-            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
             <argument name="typeName" xsi:type="string">cms_page</argument>
         </arguments>
     </virtualType>
-    <type name="Divante\VsbridgeIndexerCms\Model\Indexer\CmsPage">
+
+    <type name="Divante\VsbridgeIndexerCore\Indexer\RebuildActionPool">
         <arguments>
-            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCms\Indexer\CmsPageIndexerHandlerVirtual</argument>
+            <argument name="actions" xsi:type="array">
+                <item name="cms_page" xsi:type="string">Divante\VsbridgeIndexerCms\Model\Indexer\Action\CmsPage</item>
+                <item name="cms_block" xsi:type="string">Divante\VsbridgeIndexerCms\Model\Indexer\Action\CmsBlock</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Divante\VsbridgeIndexerCore\Index\DataProviderResolver">
+        <arguments>
+            <argument name="dataProviders" xsi:type="array">
+                <item name="cms_page" xsi:type="array">
+                    <item name="content" xsi:type="object">Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\Page\ContentData</item>
+                </item>
+                <item name="cms_block" xsi:type="array">
+                    <item name="content" xsi:type="object">Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\Page\ContentData</item>
+                </item>
+            </argument>
         </arguments>
     </type>
 
@@ -32,5 +42,17 @@
     </type>
     <type name="Magento\Cms\Model\Block">
         <plugin name="update_block_data_in_elastic" type="Divante\VsbridgeIndexerCms\Plugin\Indexer\Block\Save\UpdateCmsBlock"/>
+    </type>
+
+    <virtualType name="WidgetEmulateFilterProvider" type="Magento\Cms\Model\Template\FilterProvider">
+        <arguments>
+            <argument name="pageFilter" xsi:type="string">Magento\Widget\Model\Template\FilterEmulate</argument>
+            <argument name="blockFilter" xsi:type="string">Magento\Widget\Model\Template\FilterEmulate</argument>
+        </arguments>
+    </virtualType>
+    <type name="Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\CmsContentFilter">
+        <arguments>
+            <argument name="filterProvider" xsi:type="object">WidgetEmulateFilterProvider</argument>
+        </arguments>
     </type>
 </config>

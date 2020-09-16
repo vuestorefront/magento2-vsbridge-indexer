@@ -9,11 +9,12 @@
 namespace Divante\VsbridgeIndexerCms\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCms\Model\ResourceModel\CmsBlock as CmsBlockResource;
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
 
 /**
  * Class CmsBlock
  */
-class CmsBlock
+class CmsBlock implements RebuildActionInterface
 {
     /**
      * @var CmsBlockResource
@@ -37,7 +38,7 @@ class CmsBlock
      *
      * @return \Traversable
      */
-    public function rebuild($storeId = 1, array $blockIds = [])
+    public function rebuild(int $storeId, array $blockIds): \Traversable
     {
         $lastBlockId = 0;
 

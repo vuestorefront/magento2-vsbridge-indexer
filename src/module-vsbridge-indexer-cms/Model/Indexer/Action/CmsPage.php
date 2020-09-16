@@ -9,11 +9,12 @@
 namespace Divante\VsbridgeIndexerCms\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCms\Model\ResourceModel\CmsPage as CmsPageResource;
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
 
 /**
  * Class CmsPage
  */
-class CmsPage
+class CmsPage implements RebuildActionInterface
 {
     /**
      * @var CmsPageResource
@@ -36,7 +37,7 @@ class CmsPage
      *
      * @return \Traversable
      */
-    public function rebuild($storeId = 1, array $pageIds = [])
+    public function rebuild(int $storeId, array $pageIds): \Traversable
     {
         $lastPageId = 0;
 
@@ -46,7 +47,7 @@ class CmsPage
             foreach ($cmsPages as $pageData) {
                 $lastPageId = (int)$pageData['page_id'];
                 $pageData['id'] = $lastPageId;
-                $pageData['content'] = $pageData['content'];
+                $pageData['content'] = (string) $pageData['content'];
                 $pageData['active'] = (bool)$pageData['is_active'];
 
                 if (isset($pageData['sort_order'])) {

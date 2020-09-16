@@ -31,24 +31,15 @@ class Type implements TypeInterface
     private $mapping;
 
     /**
-     * Type dataProviders.
-     *
-     * @var
-     */
-    private $dataProviders;
-
-    /**
      * Type constructor.
      *
      * @param $name
      * @param MappingInterface|null $mapping
-     * @param array $dataProviders
      */
-    public function __construct($name, MappingInterface $mapping = null, array $dataProviders)
+    public function __construct($name, MappingInterface $mapping = null)
     {
         $this->name = $name;
         $this->mapping = $mapping;
-        $this->dataProviders = $dataProviders;
     }
 
     /**
@@ -65,25 +56,5 @@ class Type implements TypeInterface
     public function getMapping()
     {
         return $this->mapping;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDataProviders()
-    {
-        return $this->dataProviders;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDataProvider(string $name)
-    {
-        if (!isset($this->dataProviders[$name])) {
-            throw new \Exception("DataProvider $name does not exists.");
-        }
-
-        return $this->dataProviders[$name];
     }
 }

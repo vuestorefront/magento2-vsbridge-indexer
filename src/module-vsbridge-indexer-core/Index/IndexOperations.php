@@ -1,10 +1,4 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCore
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerCore\Index;
 
@@ -20,6 +14,8 @@ use Divante\VsbridgeIndexerCore\Api\MappingInterface;
 use Divante\VsbridgeIndexerCore\Config\OptimizationSettings;
 use Divante\VsbridgeIndexerCore\Elasticsearch\ClientResolver;
 use Divante\VsbridgeIndexerCore\Exception\ConnectionUnhealthyException;
+use Divante\VsbridgeIndexerCore\Exception\ConfigurationNotFoundException;
+use Divante\VsbridgeIndexerCore\Exception\IndexNotExistException;
 use Magento\Store\Api\Data\StoreInterface;
 
 /**
@@ -145,27 +141,17 @@ class IndexOperations implements IndexOperationInterface
      */
     public function getIndexByName($indexIdentifier, StoreInterface $store)
     {
-        $indexAlias = $this->getIndexAlias($store);
+        $indexAlias = $this->indexSettings->getIndexAlias($indexIdentifier, $store);
 
         if (!isset($this->indicesByIdentifier[$indexAlias])) {
             if (!$this->indexExists($store->getId(), $indexAlias)) {
-                throw new \LogicException(
-                    "{$indexIdentifier} index does not exist yet."
-                );
+                throw new IndexNotExistException($indexIdentifier);
             }
 
             $this->initIndex($indexIdentifier, $store, true);
         }
 
         return $this->indicesByIdentifier[$indexAlias];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIndexAlias(StoreInterface $store)
-    {
-        return $this->indexSettings->getIndexAlias($store);
     }
 
     /**
@@ -194,6 +180,14 @@ class IndexOperations implements IndexOperationInterface
         }
 
         return $index;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIndexAlias($indexIdentifier, StoreInterface $store)
+    {
+        return $this->indexSettings->getIndexAlias($indexIdentifier, $store);
     }
 
     /**
@@ -252,11 +246,11 @@ class IndexOperations implements IndexOperationInterface
         $this->getIndicesConfiguration();
 
         if (!isset($this->indicesConfiguration[$indexIdentifier])) {
-            throw new \LogicException('No configuration found');
+            throw new ConfigurationNotFoundException();
         }
 
-        $indexAlias = $this->getIndexAlias($store);
-        $indexName = $this->indexSettings->createIndexName($store);
+        $indexName = $this->indexSettings->createIndexName($indexIdentifier, $store);
+        $indexAlias = $this->indexSettings->getIndexAlias($indexIdentifier, $store);
 
         if ($existingIndex) {
             $indexName = $indexAlias;
@@ -298,7 +292,7 @@ class IndexOperations implements IndexOperationInterface
     private function getIndicesConfiguration()
     {
         if (null === $this->indicesConfiguration) {
-            $this->indicesConfiguration = $this->indexSettings->getIndicesConfig();
+            $this->indicesConfiguration = $this->indexSettings->getConfig();
         }
 
         return $this->indicesConfiguration;
