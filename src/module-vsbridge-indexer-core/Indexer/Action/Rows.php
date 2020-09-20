@@ -21,7 +21,7 @@ class Rows extends AbstractAction
 
         foreach ($stores as $store) {
             $this->getIndexerHandler()->saveIndex($this->rebuild((int) $store->getId(), $ids), $store);
-            $this->getIndexerHandler()->cleanUpByTransactionKey($store);
+            $this->getIndexerHandler()->cleanUpByTransactionKey($store, $ids);
         }
     }
 }
