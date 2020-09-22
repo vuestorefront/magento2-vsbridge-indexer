@@ -144,7 +144,7 @@ class Configurable
      * @return array
      * @throws \Exception
      */
-    public function getProductConfigurableAttributes(array $product)
+    public function getProductConfigurableAttributes(array $product, $storeId)
     {
         if ($product['type_id'] != ConfigurableType::TYPE_CODE) {
             return [];
@@ -156,7 +156,7 @@ class Configurable
             return [];
         }
 
-        $attributes = $this->getConfigurableAttributeFullInfo();
+        $attributes = $this->getConfigurableAttributeFullInfo($storeId);
         $data = [];
 
         foreach ($attributeIds as $attributeId) {
@@ -237,9 +237,9 @@ class Configurable
      * @return array
      * @throws \Exception
      */
-    public function getConfigurableAttributeCodes()
+    public function getConfigurableAttributeCodes($storeId)
     {
-        $attributes = $this->getConfigurableAttributeFullInfo();
+        $attributes = $this->getConfigurableAttributeFullInfo($storeId);
 
         return array_column($attributes, 'attribute_code');
     }
@@ -251,7 +251,7 @@ class Configurable
      * @return array
      * @throws \Exception
      */
-    private function getConfigurableAttributeFullInfo()
+    private function getConfigurableAttributeFullInfo($storeId)
     {
         if (null === $this->configurableAttributesInfo) {
             // build list of all configurable attribute codes for the current collection
@@ -267,7 +267,7 @@ class Configurable
                         $this->configurableAttributesInfo[$attributeId] = [
                             'attribute_id' => (int)$attributeId,
                             'attribute_code' => $attributeModel->getAttributeCode(),
-                            'label' => $attributeModel->getStoreLabel(),
+                            'label' => $attributeModel->getStoreLabel($storeId),
                         ];
                     }
                 }
