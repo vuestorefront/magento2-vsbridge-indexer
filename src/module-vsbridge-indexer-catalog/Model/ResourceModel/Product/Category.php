@@ -82,10 +82,12 @@ class Category
 
         $storeCategoryName = $this->loadCategoryNames(array_unique($categoryIds), $storeId);
 
-        foreach ($categoryData as &$categoryDataRow) {
-            $categoryDataRow['name'] = '';
-            if (isset($storeCategoryName[(int) $categoryDataRow['category_id']])) {
-                $categoryDataRow['name'] = $storeCategoryName[(int) $categoryDataRow['category_id']];
+        foreach ($categoryData as $index => $categoryDataRow) {
+            $categoryId = (int) $categoryDataRow['category_id'];
+            $categoryData[$index]['name'] = '';
+
+            if (isset($storeCategoryName[$categoryId])) {
+                $categoryData[$index]['name'] = $storeCategoryName[$categoryId];
             }
         }
 

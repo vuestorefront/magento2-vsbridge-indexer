@@ -40,8 +40,8 @@ class ProductLinksData implements DataProviderInterface
         $this->resourceModel->clear();
         $this->resourceModel->setProducts($indexData);
 
-        foreach ($indexData as &$productDTO) {
-            $productDTO['product_links'] = $this->resourceModel->getLinkedProduct($productDTO);
+        foreach ($indexData as $productId => $productDTO) {
+            $indexData[$productId]['product_links'] = $this->resourceModel->getLinkedProduct($productDTO);
         }
 
         $this->resourceModel->clear();
