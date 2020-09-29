@@ -112,8 +112,6 @@ class CustomOptionConverter implements CustomOptionConverterInterface
     {
         $option = $this->unsetFields($option);
 
-        $option = $this->dataFilter->execute($option, $this->fieldsToDelete);
-
         if ('drop_down' === $option['type']) {
             $option['type'] = 'select';
         }

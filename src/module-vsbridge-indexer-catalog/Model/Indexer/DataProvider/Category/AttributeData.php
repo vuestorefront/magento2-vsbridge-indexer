@@ -16,7 +16,6 @@ use Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\AttributeDataProvider;
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category\ProductCount as ProductCountResourceModel;
 use Divante\VsbridgeIndexerCatalog\Api\DataProvider\Category\AttributeDataProviderInterface;
-use Divante\VsbridgeIndexerCore\Index\DataFilter;
 
 /**
  * Class AttributeData
@@ -67,11 +66,6 @@ class AttributeData implements AttributeDataProviderInterface
     private $productCountResource;
 
     /**
-     * @var \Divante\VsbridgeIndexerCore\Index\DataFilter
-     */
-    private $dataFilter;
-
-    /**
      * @var array
      */
     private $childrenRowAttributes = [];
@@ -101,7 +95,6 @@ class AttributeData implements AttributeDataProviderInterface
      * @param CategoryConfigInterface $configSettings
      * @param CategoryAttributes $categoryAttributes
      * @param CategoryChildAttributes $categoryChildAttributes
-     * @param DataFilter $dataFilter
      */
     public function __construct(
         AttributeDataProvider $attributeResource,
@@ -110,15 +103,13 @@ class AttributeData implements AttributeDataProviderInterface
         ApplyCategorySlugInterface $applyCategorySlug,
         CategoryConfigInterface $configSettings,
         CategoryAttributes $categoryAttributes,
-        CategoryChildAttributes $categoryChildAttributes,
-        DataFilter $dataFilter
+        CategoryChildAttributes $categoryChildAttributes
     ) {
         $this->settings = $configSettings;
         $this->applyCategorySlug = $applyCategorySlug;
         $this->productCountResource = $productCountResource;
         $this->attributeResourceModel = $attributeResource;
         $this->childrenResourceModel = $childrenResource;
-        $this->dataFilter = $dataFilter;
         $this->categoryAttributes = $categoryAttributes;
         $this->childAttributes = $categoryChildAttributes;
     }
@@ -285,7 +276,9 @@ class AttributeData implements AttributeDataProviderInterface
         }
 
         $categoryDTO = array_diff_key($categoryDTO, array_flip($this->fieldsToRemove));
-        $categoryDTO = $this->filterData($categoryDTO);
+        $categoryDTO['parent_id'] = (int) $categoryDTO['parent_id'];
+        $categoryDTO['position'] = (int) $categoryDTO['position'];
+        $categoryDTO['level'] = (int) $categoryDTO['level'];
 
         return $categoryDTO;
     }
@@ -340,23 +333,5 @@ class AttributeData implements AttributeDataProviderInterface
     private function addSlug(array $categoryDTO)
     {
         return $this->applyCategorySlug->execute($categoryDTO);
-    }
-
-    /**
-     * @param array $categoryData
-     *
-     * @return array
-     */
-    private function filterData(array $categoryData)
-    {
-        return $this->getDataFilter()->execute($categoryData);
-    }
-
-    /**
-     * @return DataFilter
-     */
-    private function getDataFilter()
-    {
-        return $this->dataFilter;
     }
 }

@@ -83,24 +83,6 @@
         <plugin name="updateMviewSubscriptions" type="Divante\VsbridgeIndexerCatalog\Plugin\Mview\ViewPlugin"/>
     </type>
 
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\CategoryDataFilterVirtual"
-                 type="Divante\VsbridgeIndexerCore\Index\DataFilter">
-        <arguments>
-            <argument name="integerProperties" xsi:type="array">
-                <item name="0" xsi:type="string">level</item>
-                <item name="1" xsi:type="string">id</item>
-                <item name="2" xsi:type="string">parent_id</item>
-                <item name="3" xsi:type="string">position</item>
-                <item name="4" xsi:type="string">children_count</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category\AttributeData">
-        <arguments>
-            <argument name="dataFilter" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\CategoryDataFilterVirtual</argument>
-        </arguments>
-    </type>
-
     <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\CustomOptionsDataFilterVirtual"
                  type="Divante\VsbridgeIndexerCore\Index\DataFilter">
         <arguments>
