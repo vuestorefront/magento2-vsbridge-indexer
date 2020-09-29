@@ -113,66 +113,6 @@ class GenericIndexerHandler
     }
 
     /**
-     * Partial document update in ES
-     *
-     * @param Traversable $documents
-     * @param StoreInterface $store
-     * @param array $requireDataProvides
-     *
-     * @return $this
-     * @throws ConnectionUnhealthyException
-     */
-    public function updateIndex(Traversable $documents, StoreInterface $store, array $requireDataProvides)
-    {
-        try {
-            $index = $this->getIndex($store);
-            $type = $index->getType($this->typeName);
-            $storeId = (int)$store->getId();
-            $dataProviders = [];
-
-            foreach ($this->getDataProviders() as $name => $dataProvider) {
-                if (in_array($name, $requireDataProvides)) {
-                    $dataProviders[] = $dataProvider;
-                }
-            }
-
-            if (empty($dataProviders)) {
-                return $this;
-            }
-
-            $batchSize = $this->indexOperations->getBatchIndexingSize();
-
-            foreach ($this->batch->getItems($documents, $batchSize) as $docs) {
-                foreach ($dataProviders as $datasource) {
-                    if (!empty($docs)) {
-                        $docs = $datasource->addData($docs, $storeId);
-                    }
-                }
-
-                $bulkRequest = $this->indexOperations->createBulk()->updateDocuments(
-                    $index->getName(),
-                    $this->typeName,
-                    $docs
-                );
-
-                $this->indexOperations->optimizeEsIndexing($storeId, $index->getName());
-                $response = $this->indexOperations->executeBulk($storeId, $bulkRequest);
-                $this->indexOperations->cleanAfterOptimizeEsIndexing($storeId, $index->getName());
-                $this->bulkLogger->log($response);
-                $docs = null;
-            }
-
-            $this->indexOperations->refreshIndex($store->getId(), $index);
-        } catch (ConnectionDisabledException $exception) {
-            // do nothing, ES indexer disabled in configuration
-        } catch (ConnectionUnhealthyException $exception) {
-            $this->indexerLogger->error($exception->getMessage());
-            $this->indexOperations->cleanAfterOptimizeEsIndexing($storeId, $index->getName());
-            throw $exception;
-        }
-    }
-
-    /**
      * Save documents in ES
      *
      * @param Traversable $documents

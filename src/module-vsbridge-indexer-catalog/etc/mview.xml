@@ -18,10 +18,6 @@
         </subscriptions>
     </view>
 
-    <!--"By schedule" vsbridge_product_indexer will be used -->
-    <view id="vsbridge_product_category" class="Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategory" group="indexer">
-    </view>
-
     <view id="vsbridge_category_indexer" class="Divante\VsbridgeIndexerCatalog\Model\Indexer\Category" group="indexer">
         <subscriptions>
             <table name="catalog_category_entity" entity_column="entity_id" />
