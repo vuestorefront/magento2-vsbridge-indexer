@@ -77,7 +77,7 @@ class CustomOptionConverter implements CustomOptionConverterInterface
      */
     private function prepareValue(array $option): array
     {
-        $option = $this->unsetFields($option);
+        $option = $this->filterData($option);
         unset($option['option_id']);
 
         return $option;
@@ -88,9 +88,13 @@ class CustomOptionConverter implements CustomOptionConverterInterface
      *
      * @return array
      */
-    private function unsetFields(array $option): array
+    private function filterData(array $option): array
     {
         $option = $this->dataFilter->execute($option, $this->fieldsToDelete);
+        $option['sort_order'] = (int) $option['sort_order'];
+        $option['option_id'] = (int) $option['sort_order'];
+        $option['option_type_id'] = (int) $option['sort_order'];
+        $option['price'] = (float) $option['price'];
 
         if (isset($option['sku']) !== true) {
             unset($option['sku']);
@@ -110,7 +114,7 @@ class CustomOptionConverter implements CustomOptionConverterInterface
      */
     private function prepareOption(array $option): array
     {
-        $option = $this->unsetFields($option);
+        $option = $this->filterData($option);
 
         if ('drop_down' === $option['type']) {
             $option['type'] = 'select';

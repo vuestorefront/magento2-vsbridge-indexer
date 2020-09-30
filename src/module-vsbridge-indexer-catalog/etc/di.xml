@@ -83,24 +83,6 @@
         <plugin name="updateMviewSubscriptions" type="Divante\VsbridgeIndexerCatalog\Plugin\Mview\ViewPlugin"/>
     </type>
 
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\CustomOptionsDataFilterVirtual"
-                 type="Divante\VsbridgeIndexerCore\Index\DataFilter">
-        <arguments>
-            <argument name="integerProperties" xsi:type="array">
-                <item name="1" xsi:type="string">sort_order</item>
-                <item name="2" xsi:type="string">option_id</item>
-                <item name="3" xsi:type="string">option_type_id</item>
-            </argument>
-            <argument name="floatProperties" xsi:type="array">
-                <item name="0" xsi:type="string">price</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\CustomOptionConverter">
-        <arguments>
-            <argument name="dataFilter" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\CustomOptionsDataFilterVirtual</argument>
-        </arguments>
-    </type>
 
     <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\BaseSelectModifierInterface"
                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeWithWebsiteModifier" />
