@@ -69,6 +69,10 @@ class ConvertValue implements ConvertValueInterface
                 return $this->castMapping[$type];
             }
 
+            if (strstr($field, 'is_') || strstr($field, 'has_')) {
+                return 'bool';
+            }
+
             return null;
         }
 

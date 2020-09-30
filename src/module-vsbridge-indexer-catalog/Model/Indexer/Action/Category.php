@@ -45,10 +45,9 @@ class Category implements RebuildActionInterface
 
             foreach ($categories as $category) {
                 $lastCategoryId = $category['entity_id'];
-                $categoryData['id'] = (int)$category['entity_id'];
-                $categoryData = $category;
+                $category['id'] = (int)$category['entity_id'];
 
-                yield $lastCategoryId => $categoryData;
+                yield $lastCategoryId => $category;
             }
         } while (!empty($categories));
     }

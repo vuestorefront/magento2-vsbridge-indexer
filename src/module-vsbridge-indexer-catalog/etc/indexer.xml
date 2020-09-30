@@ -19,9 +19,4 @@
         <title translate="true">Vsbridge Attributes Indexer</title>
         <description translate="true">Update Product Attributes Meta Data in Elastic</description>
     </indexer>
-    <indexer id="vsbridge_product_category" view_id="vsbridge_product_category"
-             class="Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategory">
-        <title translate="true">Vsbridge Product Category Indexer</title>
-        <description translate="true">Partial Product update - update category, category_ids fields in ES</description>
-    </indexer>
 </config>
