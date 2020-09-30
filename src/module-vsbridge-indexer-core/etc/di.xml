@@ -64,22 +64,6 @@
         </arguments>
     </type>
 
-    <type name="Divante\VsbridgeIndexerCore\Index\IndexOperationProvider">
-        <arguments>
-            <argument name="operations" xsi:type="array">
-                <item name="elasticsearch5" xsi:type="string">Divante\VsbridgeIndexerCore\Api\IndexOperationInterface</item>
-            </argument>
-        </arguments>
-    </type>
-
-    <type name="Divante\VsbridgeIndexerCore\Indexer\IndexerHandlerFactory">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="elasticsearch5" xsi:type="string">Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler</item>
-            </argument>
-        </arguments>
-    </type>
-
     <type name="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
         <arguments>
             <argument name="logger" xsi:type="object">Divante\VsbridgeIndexerCore\Logger\IndexerLogger</argument>
