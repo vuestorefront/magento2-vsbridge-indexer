@@ -60,7 +60,7 @@ class CustomOptionConverter implements CustomOptionConverterInterface
             $optionValue = $this->prepareValue($optionValue);
             $options[$optionId]['values'][] = $optionValue;
         }
-
+        
         foreach ($options as $option) {
             $productId = $option['product_id'];
             $option = $this->prepareOption($option);
@@ -114,6 +114,7 @@ class CustomOptionConverter implements CustomOptionConverterInterface
      */
     private function prepareOption(array $option): array
     {
+        $option['is_require'] = (boolean)$option['is_require'];
         $option = $this->filterData($option);
 
         if ('drop_down' === $option['type']) {
