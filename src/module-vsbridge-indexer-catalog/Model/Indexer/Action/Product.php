@@ -43,7 +43,7 @@ class Product implements RebuildActionInterface
         }
 
         do {
-            $products = $this->resourceModel->getProducts($storeId, $productIds, $lastProductId, 10);
+            $products = $this->resourceModel->getProducts($storeId, $productIds, $lastProductId);
 
             /** @var array $product */
             foreach ($products as $product) {
