@@ -33,4 +33,15 @@
     <type name="Magento\Cms\Model\Block">
         <plugin name="update_block_data_in_elastic" type="Divante\VsbridgeIndexerCms\Plugin\Indexer\Block\Save\UpdateCmsBlock"/>
     </type>
+    <virtualType name="WidgetEmulateFilterProvider" type="Magento\Cms\Model\Template\FilterProvider">
+        <arguments>
+            <argument name="pageFilter" xsi:type="string">Magento\Widget\Model\Template\FilterEmulate</argument>
+            <argument name="blockFilter" xsi:type="string">Magento\Widget\Model\Template\FilterEmulate</argument>
+        </arguments>
+    </virtualType>
+    <type name="Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\CmsContentFilter">
+        <arguments>
+            <argument name="filterProvider" xsi:type="object">WidgetEmulateFilterProvider</argument>
+        </arguments>
+    </type>
 </config>
