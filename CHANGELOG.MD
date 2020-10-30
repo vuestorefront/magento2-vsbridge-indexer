@@ -1,6 +1,13 @@
 # Changelog
 
 ## Unreleased
+...
+
+## [1.22.0] (2020.10.30)
+
+### Fixed
+- Fix error "Invalid template file..." when reindexing cms blocks/pages by cron. ([#191](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/351))
+- Fix providing label for the configurable_options field. Field is now using the label assigned for the currently active (reindex) store. ([#339](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/352))
 
 ## [2.0]
 

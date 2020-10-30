@@ -186,6 +186,14 @@ php bin/magento vsbridge:reindex --store=1
 
 Note: If a docker with ElasticSearch is disabled, Indexer will display error: "No alive nodes found in your cluster".
 
+### Single Entity Indexing:
+You can use single entity indexing while debugging or triggering an update for the index for a single entity.
+```php
+php bin/magento vsbridge:index <index> <storeId> <entityId>
+```
+You must provide an index-name, a store ID and an entity ID.
+If you need a list off all available index-names, you can use `php bin/magento indexer:status`. All the relevant indexes are prefixed with `vsbridge_`
+
 #### Update on Save Mode
 
 *Update on Save* mode works for the following operations:

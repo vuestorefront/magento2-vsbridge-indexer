@@ -152,7 +152,7 @@ class ConfigurableData implements DataProviderInterface
         }
 
         $stockRowData = $this->loadInventory->execute($allChildren, $storeId);
-        $configurableAttributeCodes = $this->configurableResource->getConfigurableAttributeCodes();
+        $configurableAttributeCodes = $this->configurableResource->getConfigurableAttributeCodes($storeId);
 
         $allChildren = $this->childrenAttributeProcessor
             ->execute($storeId, $allChildren, $configurableAttributeCodes);
@@ -203,7 +203,7 @@ class ConfigurableData implements DataProviderInterface
     {
         $configurableChildren = $productDTO['configurable_children'];
         $productAttributeOptions =
-            $this->configurableResource->getProductConfigurableAttributes($productDTO);
+            $this->configurableResource->getProductConfigurableAttributes($productDTO, $storeId);
 
         $productDTO['configurable_children'] = $configurableChildren;
 
