@@ -18,7 +18,7 @@ Sign up for a demo at https://vuestorefront.io/ (Vue Storefront integrated with 
 
 
 ### Version 1.x 
-Pull Requests should be made against 1.x branch. Changes from this branch won't be merge to master.
+Pull Requests should be made against 1.x branch. Changes from this branch won't be merge to main branch.
 Only fixes will be accepted.
 
 ### Version 2.0
@@ -29,8 +29,7 @@ Support ES5 and ES6+.
 ##### How to upgrade to 2.0
 Click here to find out [more](docs/upgrade-to-2.0.md)
 
-
-### Version 1.5.0/1.5.1 - support for aliases.
+##### Version 1.5.0/1.5.1 - support for aliases.
 Command ` php bin/magento vsbridge:reindex --all` will reindex all data to new index.
 It will create new index and update aliases at the end.
 
