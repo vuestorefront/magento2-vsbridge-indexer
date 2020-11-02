@@ -43,14 +43,15 @@ class TaxClasses
             $this->resource->getTableName('tax_calculation'),
             [
                 'tax_calculation_rule_id',
-                'customer_tax_class_id',
-                'product_tax_class_id',
+                'customer_tax_class_ids' => new \Zend_Db_Expr('GROUP_CONCAT(DISTINCT(`customer_tax_class_id`))'),
+                'product_tax_class_ids' => new \Zend_Db_Expr('GROUP_CONCAT(DISTINCT(`product_tax_class_id`))'),
             ]
-        )->where('tax_calculation_rule_id IN (?)', $ruleIds);
+        )->where('tax_calculation_rule_id IN (?)', $ruleIds
+        )->group('tax_calculation_rule_id');
 
         $select->distinct(true);
 
-        return $this->getConnection()->fetchAll($select);
+        return $this->getConnection()->fetchAssoc($select);
     }
 
     /**
