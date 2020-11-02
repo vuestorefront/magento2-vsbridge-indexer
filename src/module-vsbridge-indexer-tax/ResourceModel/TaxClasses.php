@@ -50,7 +50,7 @@ class TaxClasses
 
         $select->distinct(true);
 
-        return $this->getConnection()->fetchAssoc($select);
+        return $this->getConnection()->fetchAll($select);
     }
 
     /**
