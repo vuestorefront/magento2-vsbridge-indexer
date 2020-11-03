@@ -3,6 +3,15 @@
 ## Unreleased
 ...
 
+
+## [1.23.0] (2020.11.03)
+
+### Fixed
+- Fix module installation on fresh Magento. Fix sequence for agreement and catalog indexer.
+
+### Changed
+- Change main branch name, from `master` to `main`.
+
 ## [1.22.0] (2020.10.30)
 
 ### Fixed
