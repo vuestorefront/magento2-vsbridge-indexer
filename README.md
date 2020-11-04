@@ -15,7 +15,21 @@ Sign up for a demo at https://vuestorefront.io/ (Vue Storefront integrated with 
 
 ## Overview
 
-### Version 1.5.0/1.5.1 - support for aliases.
+
+
+### Version 1.x 
+Pull Requests should be made against 1.x branch. Changes from this branch won't be merge to main branch.
+Only fixes will be accepted.
+
+### Version 2.0
+Support ES5 and ES6+. 
+
+##### To read what changed click [here](CHANGELOG.MD#20)
+ 
+##### How to upgrade to 2.0
+Click here to find out [more](docs/upgrade-to-2.0.md)
+
+##### Version 1.5.0/1.5.1 - support for aliases.
 Command ` php bin/magento vsbridge:reindex --all` will reindex all data to new index.
 It will create new index and update aliases at the end.
 
@@ -79,7 +93,7 @@ Configure the module in Magento panel and run full indexation.
 
 **Check configuration [here](docs/configuration.md)** 
 
-### Update VSF/VSF-API configuration
+### Update VSF/VSF-API configuration for ES5
  **Important**: It is crucial to update configuration `elasticsearch.index` in the VSF and `elasticsearch.indices` in VSF-API
 
    *Index Alias Prefix* → define prefixes for ElasticSearch indexes. The panel allows adding prefix only to the catalog name e.g.: *vue_storefront_catalog*. For each store (store view) index name is generated on the base of defined prefix and either ID or Store Code. Aliases cannot be created.   
@@ -195,7 +209,10 @@ If you need a list off all available index-names, you can use `php bin/magento i
 
 *Update on Schedule* mode observes changes in corresponding tables, and probably will be more relevant in most cases. It is the default mode in any bigger stores.
      
+     
+     
 ### Compatibility
+--- version 2.0 - tested with ES: 5.6.11, 6.8.0, 7.6.2
 
 -- Vue Storefront >= 1.4.4
 Module was tested on:

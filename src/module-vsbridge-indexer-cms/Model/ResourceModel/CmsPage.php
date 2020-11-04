@@ -52,7 +52,7 @@ class CmsPage
      */
     public function loadPages($storeId = 1, array $pageIds = [], $fromId = 0, $limit = 1000)
     {
-        $metaData = $this->getCmsPageMetaData();
+        $metaData = $this->metaDataPool->getMetadata(PageInterface::class);
         $linkFieldId = $metaData->getLinkField();
 
         $select = $this->getConnection()->select()->from(['cms_page' => $metaData->getEntityTable()]);
@@ -88,14 +88,5 @@ class CmsPage
     private function getConnection()
     {
         return $this->resource->getConnection();
-    }
-
-    /**
-     * @return \Magento\Framework\EntityManager\EntityMetadataInterface
-     * @throws \Exception
-     */
-    private function getCmsPageMetaData()
-    {
-        return $this->metaDataPool->getMetadata(PageInterface::class);
     }
 }

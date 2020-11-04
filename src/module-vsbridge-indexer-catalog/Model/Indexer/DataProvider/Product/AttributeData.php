@@ -10,7 +10,6 @@ namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\AttributeDataProvider;
 use Divante\VsbridgeIndexerCore\Api\DataProviderInterface;
-use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface;
 use Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface;
 use Divante\VsbridgeIndexerCatalog\Model\ProductUrlPathGenerator;
@@ -25,11 +24,6 @@ class AttributeData implements DataProviderInterface
      * @var AttributeDataProvider
      */
     private $resourceModel;
-
-    /**
-     * @var DataFilter
-     */
-    private $dataFilter;
 
     /**
      * @var CatalogConfigurationInterface
@@ -54,10 +48,10 @@ class AttributeData implements DataProviderInterface
     /**
      * AttributeData constructor.
      *
+     * @param ProductAttributes $productAttributes
      * @param CatalogConfigurationInterface $configSettings
      * @param SlugGeneratorInterface $slugGenerator
      * @param ProductUrlPathGenerator $productUrlPathGenerator
-     * @param DataFilter $dataFilter
      * @param AttributeDataProvider $resourceModel
      */
     public function __construct(
@@ -65,13 +59,11 @@ class AttributeData implements DataProviderInterface
         CatalogConfigurationInterface $configSettings,
         SlugGeneratorInterface $slugGenerator,
         ProductUrlPathGenerator $productUrlPathGenerator,
-        DataFilter $dataFilter,
         AttributeDataProvider $resourceModel
     ) {
         $this->slugGenerator = $slugGenerator;
         $this->settings = $configSettings;
         $this->resourceModel = $resourceModel;
-        $this->dataFilter = $dataFilter;
         $this->productAttributes = $productAttributes;
         $this->productUrlPathGenerator = $productUrlPathGenerator;
     }

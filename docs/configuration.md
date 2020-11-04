@@ -1,14 +1,16 @@
 ### Magento Configuration
 Go to the new ‘Indexer’ section (Stores → Configuration → Vuestorefront → Indexer), available now in the in the Magento Panel, and configure it in the listed areas:
-1. ####General settings → Enable VS Bridge
- 
-   Enable to export data to elasticsearch. By default indexing is disable.
+1. ####General settings 
 
-    ![](./images/config-general-enable.png) 
- 
-1. ####General settings → List of stores to reindex
- 
-   Select stores for which data must be exported to ElasticSearch. By default stores 0 to 1 are selected. For each store view, a new, separate ElasticSearch index is created.
+   **Enable VS Bridge** → Enable to export data to elasticsearch. By default indexing is disable.
+
+    **Elasticsearch version**
+    
+    Select ES version depends on which ES you are using/is used by magento.
+    If you are using ES 5.x.x, choose Elasticsearch5, if you are using version 6.x.x or 7.x.x choose Elasticsearch6+.
+    By default Elasticsearch5 option is selected.
+    
+    **List of stores to reindex** → Select stores for which data must be exported to ElasticSearch. By default store with ID 1 is selected. For each store view, a new, separate ElasticSearch index is created.
 
     ![](./images/config-general.png)
 

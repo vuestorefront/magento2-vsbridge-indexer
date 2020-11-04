@@ -13,7 +13,7 @@ use Divante\VsbridgeIndexerCore\Api\BulkResponseInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class BulkLogger
+ * Log errors which appear after executing ES bulk request
  */
 class BulkLogger implements BulkLoggerInterface
 {

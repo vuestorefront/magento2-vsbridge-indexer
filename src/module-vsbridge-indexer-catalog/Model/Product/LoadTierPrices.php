@@ -80,37 +80,38 @@ class LoadTierPrices implements LoadTierPricesInterface
      */
     public function execute(array $indexData, int $storeId): array
     {
-        if ($this->syncTierPrices()) {
-            $linkField = $this->productMetaData->get()->getLinkField();
-            $linkFieldIds = array_column($indexData, $linkField);
-            $websiteId = $this->getWebsiteId($storeId);
+        if (!$this->syncTierPrices()) {
+            return $indexData;
+        }
 
-            $tierPrices = $this->tierPriceResource->loadTierPrices($websiteId, $linkFieldIds);
-            /** @var \Magento\Catalog\Model\Product\Attribute\Backend\TierPrice $backend */
-            $backend = $this->getTierPriceAttribute()->getBackend();
+        $linkField = $this->productMetaData->get()->getLinkField();
+        $linkFieldIds = array_column($indexData, $linkField);
+        $websiteId = $this->getWebsiteId($storeId);
 
-            foreach ($indexData as $productId => $product) {
-                $linkFieldValue = $product[$linkField];
+        $tierPrices = $this->tierPriceResource->loadTierPrices($websiteId, $linkFieldIds);
+        /** @var \Magento\Catalog\Model\Product\Attribute\Backend\TierPrice $backend */
+        $backend = $this->getTierPriceAttribute()->getBackend();
 
-                if (isset($tierPrices[$linkFieldValue])) {
-                    $tierRowsData = $tierPrices[$linkFieldValue];
-                    $tierRowsData = $backend->preparePriceData(
-                        $tierRowsData,
-                        $indexData[$productId]['type_id'],
-                        $websiteId
-                    );
+        foreach ($indexData as $productId => $product) {
+            $linkFieldValue = $product[$linkField];
+            $indexData[$productId]['tier_prices'] = [];
 
-                    foreach ($tierRowsData as $tierRowData) {
-                        if (Group::NOT_LOGGED_IN_ID === $tierRowData['cust_group'] && $tierRowData['price_qty'] == 1) {
-                            $price = (float) $indexData[$productId]['price'];
-                            $price = min((float) $tierRowData['price'], $price);
-                            $indexData[$productId]['price'] = $price;
-                        }
+            if (isset($tierPrices[$linkFieldValue])) {
+                $tierRowsData = $tierPrices[$linkFieldValue];
+                $tierRowsData = $backend->preparePriceData(
+                    $tierRowsData,
+                    $indexData[$productId]['type_id'],
+                    $websiteId
+                );
 
-                        $indexData[$productId]['tier_prices'][] = $this->prepareTierPrices($tierRowData);
+                foreach ($tierRowsData as $tierRowData) {
+                    if (Group::NOT_LOGGED_IN_ID === $tierRowData['cust_group'] && $tierRowData['price_qty'] == 1) {
+                        $price = (float) $indexData[$productId]['price'];
+                        $price = min((float) $tierRowData['price'], $price);
+                        $indexData[$productId]['price'] = $price;
                     }
-                } else {
-                    $indexData[$productId]['tier_prices'] = [];
+
+                    $indexData[$productId]['tier_prices'][] = $this->prepareTierPrices($tierRowData);
                 }
             }
         }
@@ -150,15 +151,10 @@ class LoadTierPrices implements LoadTierPricesInterface
     private function getWebsiteId($storeId)
     {
         $attribute = $this->getTierPriceAttribute();
-        $websiteId = 0;
 
-        if ($attribute->isScopeGlobal()) {
-            $websiteId = 0;
-        } elseif ($storeId) {
-            $websiteId = (int) ($this->storeManager->getStore($storeId)->getWebsiteId());
-        }
-
-        return $websiteId;
+        return $attribute->isScopeGlobal()
+            ? 0
+            : $this->storeManager->getStore($storeId)->getWebsiteId();
     }
 
     /**

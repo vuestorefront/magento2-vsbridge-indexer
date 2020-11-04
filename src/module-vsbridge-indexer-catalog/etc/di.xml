@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="Magento\Indexer\Console\Command\IndexerInfoCommand" type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerInfoCommand"/>
-    <preference for="Magento\Indexer\Console\Command\IndexerReindexCommand" type="Divante\VsbridgeIndexerCatalog\Console\Command\IndexerReindexCommand"/>
-
     <preference for="Divante\VsbridgeIndexerCatalog\Api\SlugGeneratorInterface" type="Divante\VsbridgeIndexerCatalog\Model\SlugGenerator"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\CatalogConfigurationInterface" type="Divante\VsbridgeIndexerCatalog\Model\SystemConfig\CatalogConfig"/>
     <preference for="Divante\VsbridgeIndexerCatalog\Api\ApplyCategorySlugInterface" type="Divante\VsbridgeIndexerCatalog\Model\Category\ApplyCategorySlug"/>
@@ -38,100 +35,54 @@
         </arguments>
     </type>
 
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Attribute"
+                 type="Divante\VsbridgeIndexerCore\Indexer\Base">
         <arguments>
-            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
-            <argument name="typeName" xsi:type="string">product</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\ProductCategoryHandlerVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
-        <arguments>
-            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
-            <argument name="typeName" xsi:type="string">product</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\CategoryIndexerHandlerVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
-        <arguments>
-            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
-            <argument name="typeName" xsi:type="string">category</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\AttributeIndexerHandlerVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
-        <arguments>
-            <argument name="indexIdentifier" xsi:type="string">vue_storefront_catalog</argument>
             <argument name="typeName" xsi:type="string">attribute</argument>
         </arguments>
     </virtualType>
 
-    <type name="Magento\Framework\Mview\ViewInterface">
-        <plugin name="updateMviewSubscriptions" type="Divante\VsbridgeIndexerCatalog\Plugin\Mview\ViewPlugin"/>
-    </type>
-    <type name="Magento\Indexer\Ui\DataProvider\Indexer\DataCollection">
-        <plugin name="hideVsbridgeProductCategoryIndexer"
-                type="Divante\VsbridgeIndexerCatalog\Plugin\Ui\DataProvider\Indexer\DataCollectionPlugin" />
-    </type>
-
-    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Product">
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Category"
+                 type="Divante\VsbridgeIndexerCore\Indexer\Base">
         <arguments>
-            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\ProductIndexerHandlerVirtual</argument>
+            <argument name="typeName" xsi:type="string">category</argument>
         </arguments>
-    </type>
+    </virtualType>
+
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Product"
+                 type="Divante\VsbridgeIndexerCore\Indexer\Base">
+        <arguments>
+            <argument name="typeName" xsi:type="string">product</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\ProductCategoryHandlerVirtual"
+                 type="Divante\VsbridgeIndexerCore\Indexer\GenericIndexerHandler">
+        <arguments>
+            <argument name="typeName" xsi:type="string">product</argument>
+        </arguments>
+    </virtualType>
+
     <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategory">
         <arguments>
             <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\ProductCategoryHandlerVirtual</argument>
         </arguments>
     </type>
-    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Category">
+
+    <type name="Divante\VsbridgeIndexerCore\Indexer\RebuildActionPool">
         <arguments>
-            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\CategoryIndexerHandlerVirtual</argument>
-        </arguments>
-    </type>
-    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\Attribute">
-        <arguments>
-            <argument name="indexerHandler" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\AttributeIndexerHandlerVirtual</argument>
+            <argument name="actions" xsi:type="array">
+                <item name="attribute" xsi:type="string">Divante\VsbridgeIndexerCatalog\Model\Indexer\Action\Attribute</item>
+                <item name="product" xsi:type="string">Divante\VsbridgeIndexerCatalog\Model\Indexer\Action\Product</item>
+                <item name="category" xsi:type="string">Divante\VsbridgeIndexerCatalog\Model\Indexer\Action\Category</item>
+            </argument>
         </arguments>
     </type>
 
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\CategoryDataFilterVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\DataFilter">
-        <arguments>
-            <argument name="integerProperties" xsi:type="array">
-                <item name="0" xsi:type="string">level</item>
-                <item name="1" xsi:type="string">id</item>
-                <item name="2" xsi:type="string">parent_id</item>
-                <item name="3" xsi:type="string">position</item>
-                <item name="4" xsi:type="string">children_count</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category\AttributeData">
-        <arguments>
-            <argument name="dataFilter" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\CategoryDataFilterVirtual</argument>
-        </arguments>
+    <type name="Magento\Framework\Mview\ViewInterface">
+        <plugin name="updateMviewSubscriptions" type="Divante\VsbridgeIndexerCatalog\Plugin\Mview\ViewPlugin"/>
     </type>
 
-    <virtualType name="Divante\VsbridgeIndexerCatalog\Indexer\CustomOptionsDataFilterVirtual"
-                 type="Divante\VsbridgeIndexerCore\Indexer\DataFilter">
-        <arguments>
-            <argument name="integerProperties" xsi:type="array">
-                <item name="1" xsi:type="string">sort_order</item>
-                <item name="2" xsi:type="string">option_id</item>
-                <item name="3" xsi:type="string">option_type_id</item>
-            </argument>
-            <argument name="floatProperties" xsi:type="array">
-                <item name="0" xsi:type="string">price</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Divante\VsbridgeIndexerCatalog\ArrayConverter\Product\CustomOptionConverter">
-        <arguments>
-            <argument name="dataFilter" xsi:type="object">Divante\VsbridgeIndexerCatalog\Indexer\CustomOptionsDataFilterVirtual</argument>
-        </arguments>
-    </type>
 
     <preference for="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\BaseSelectModifierInterface"
                 type="Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Product\CompositeWithWebsiteModifier" />
@@ -179,7 +130,6 @@
 
     <type name="Magento\Catalog\Model\Category">
         <plugin name="update_category_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Category\Save\UpdateCategoryDataPlugin"/>
-        <plugin name="update_product_in_es" type="Divante\VsbridgeIndexerCatalog\Plugin\Indexer\Category\Save\UpdateProductPlugin"/>
     </type>
 
     <type name="Magento\Catalog\Model\ResourceModel\Eav\Attribute">
@@ -274,10 +224,27 @@
         </arguments>
     </type>
 
-    <type name="Divante\VsbridgeIndexerCore\Console\Command\RebuildEsIndexCommand">
+    <type name="Divante\VsbridgeIndexerCore\Index\DataProviderResolver">
         <arguments>
-            <argument name="excludeIndices" xsi:type="array">
-                <item name="product_category" xsi:type="const">Divante\VsbridgeIndexerCatalog\Model\Indexer\ProductCategoryProcessor::INDEXER_ID</item>
+            <argument name="dataProviders" xsi:type="array">
+                <item name="product" xsi:type="array">
+                    <item name="attributes" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\AttributeData</item>
+                    <item name="bundle_options_data" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\BundleOptionsData</item>
+                    <item name="category_data" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CategoryData</item>
+                    <item name="price_data" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\PriceData</item>
+                    <item name="media_gallery" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\MediaGalleryData</item>
+                    <item name="link_data" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ProductLinksData</item>
+                    <item name="inventory_data" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\Inventory</item>
+                    <item name="configurable_data" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\ConfigurableData</item>
+                    <item name="custom_options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\CustomOptions</item>
+                    <item name="attributes_meta" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Product\AttributesMetadata</item>
+                </item>
+                <item name="category" xsi:type="array">
+                    <item name="categoryData" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Category\AttributeData</item>
+                </item>
+                <item name="attribute" xsi:type="array">
+                    <item name="options" xsi:type="object">Divante\VsbridgeIndexerCatalog\Model\Indexer\DataProvider\Attribute\Options</item>
+                </item>
             </argument>
         </arguments>
     </type>

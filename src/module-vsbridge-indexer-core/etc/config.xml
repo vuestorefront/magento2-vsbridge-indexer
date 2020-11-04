@@ -26,6 +26,7 @@
             <general_settings>
                 <allowed_stores>1</allowed_stores>
                 <enable>0</enable>
+                <es_version>elasticsearch5</es_version>
             </general_settings>
             <redis_cache_settings>
                 <clear_cache>0</clear_cache>

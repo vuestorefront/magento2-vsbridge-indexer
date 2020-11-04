@@ -10,7 +10,6 @@ use Divante\VsbridgeIndexerCore\Api\Index\TypeInterface;
  */
 class Index implements IndexInterface
 {
-
     /**
      * Name of the index.
      *
@@ -26,6 +25,8 @@ class Index implements IndexInterface
     private $types;
 
     /**
+     * Index alias
+     *
      * @var string
      */
     private $alias;

@@ -25,6 +25,12 @@
 - Fix error "Invalid template file..." when reindexing cms blocks/pages by cron. ([#191](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/351))
 - Fix providing label for the configurable_options field. Field is now using the label assigned for the currently active (reindex) store. ([#339](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/352))
 
+## [2.0]
+
+- Added support for ES6+. You can choose ES version in configuration (by default ES5 is selected). For ES 5 only one index is created, for ES6+ we have separated indices per type
+- vsbridge_indexer.xml was replaced with vsbridge.xml. You  declare type/entity and mapping in vsbridge.xml
+- Dataproviders configuration was moved to di.xml
+
 ## [1.21.0] (2020.09.16)
 
 ### Fixed

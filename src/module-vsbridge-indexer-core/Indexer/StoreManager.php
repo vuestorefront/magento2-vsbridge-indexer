@@ -1,10 +1,4 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCore
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerCore\Indexer;
 
@@ -46,7 +40,20 @@ class StoreManager
     }
 
     /**
-     * @param int|null $storeId
+     * @param string $store
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isStoreAllowedToReindex(string $store)
+    {
+        $storeModel = $this->storeManager->getStore($store);
+        $allowedStores = $this->getAllStoresAllowedToReindex();
+
+        return isset($allowedStores[$storeModel->getCode()]);
+    }
+
+    /**
+     * @param int|string|null $storeId
      *
      * @return array|\Magento\Store\Api\Data\StoreInterface[]
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -81,5 +88,18 @@ class StoreManager
     public function override(array $stores)
     {
         $this->loadedStores = $stores;
+    }
+
+    /**
+     * @return \Magento\Store\Api\Data\StoreInterface[]
+     */
+    private function getAllStoresAllowedToReindex()
+    {
+        $allowedStoreIds = $this->generalSettings->getStoresToIndex();
+        $storesByCode = $this->storeManager->getStores(false, true);
+
+        return array_filter($storesByCode, function ($store) use ($allowedStoreIds) {
+            return in_array($store->getId(), $allowedStoreIds);
+        });
     }
 }
