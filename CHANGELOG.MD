@@ -4,6 +4,13 @@
 ...
 
 
+## [1.25.0] (2020.11.04)
+
+### Fixed
+- Improved Customer and Product Tax Class fetcher for Tax Rules ([#354](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/353))
+
+## [1.24.0]
+
 ## [1.23.0] (2020.11.03)
 
 ### Fixed

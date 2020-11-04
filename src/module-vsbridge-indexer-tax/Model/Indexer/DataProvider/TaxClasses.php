@@ -40,10 +40,19 @@ class TaxClasses implements DataProviderInterface
 
         foreach ($taxClasses as $data) {
             $ruleId = $data['tax_calculation_rule_id'];
-            $indexData[$ruleId]['customer_tax_class_ids'][] = (int)$data['customer_tax_class_id'];
-            $indexData[$ruleId]['product_tax_class_ids'][] = (int)$data['product_tax_class_id'];
+            $indexData[$ruleId]['customer_tax_class_ids'] = $this->explodeAsInt($data['customer_tax_class_ids']);
+            $indexData[$ruleId]['product_tax_class_ids'] = $this->explodeAsInt($data['product_tax_class_ids']);
         }
 
         return $indexData;
+    }
+
+    /**
+     * @param string $concatIds
+     * @return array
+     */
+    protected function explodeAsInt(string $concatIds) : array
+    {
+        return array_map('intval', explode(',', $concatIds));
     }
 }
