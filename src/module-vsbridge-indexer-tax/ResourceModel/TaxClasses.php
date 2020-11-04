@@ -49,8 +49,6 @@ class TaxClasses
         )->where('tax_calculation_rule_id IN (?)', $ruleIds
         )->group('tax_calculation_rule_id');
 
-        $select->distinct(true);
-
         return $this->getConnection()->fetchAssoc($select);
     }
 
