@@ -52,19 +52,21 @@ class SetCategoryDefaultAttributes
         /** @var UpdateAttributesInConfiguration $updateConfiguration */
         $updateConfiguration = $this->updateAttributesInConfiguration->create(['entityType' => 'catalog_category']);
 
-        if (!empty($this->mainAttributes)) {
-            $updateConfiguration->execute(
-                $this->mainAttributes,
-                $this->getConfigPath(CategoryConfigInterface::CATEGORY_ATTRIBUTES)
-            );
-        }
+        try {
+            if (!empty($this->mainAttributes)) {
+                $updateConfiguration->execute(
+                    $this->mainAttributes,
+                    $this->getConfigPath(CategoryConfigInterface::CATEGORY_ATTRIBUTES)
+                );
+            }
 
-        if (!empty($this->childAttributes)) {
-            $updateConfiguration->execute(
-                $this->childAttributes,
-                $this->getConfigPath(CategoryConfigInterface::CHILD_ATTRIBUTES)
-            );
-        }
+            if (!empty($this->childAttributes)) {
+                $updateConfiguration->execute(
+                    $this->childAttributes,
+                    $this->getConfigPath(CategoryConfigInterface::CHILD_ATTRIBUTES)
+                );
+            }
+        } catch (\Exception $e) {}
     }
 
     /**
