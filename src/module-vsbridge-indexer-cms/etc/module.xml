@@ -3,6 +3,7 @@
     <module name="Divante_VsbridgeIndexerCms" setup_version="1.0.0">
         <sequence>
             <module name="Divante_VsbridgeIndexerCore"/>
+            <module name="Magento_Cms"/>
         </sequence>
     </module>
 </config>
