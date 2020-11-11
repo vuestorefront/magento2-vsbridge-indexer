@@ -110,8 +110,11 @@ class Processor
         }
 
         foreach ($batches as $batch) {
-            $this->logger->debug('BATCHES ' . implode(', ', $batch));
             $cacheInvalidateUrl = $this->getCacheInvalidateUrl($storeId, $dataType, $entityIds);
+            $this->logger->debug('BATCHES ' . implode(', ', $batch));
+            $this->logger->debug('Cache invalidate url ' . $cacheInvalidateUrl);
+            $this->logger->debug('Store id ' . $storeId);
+            $this->logger->debug('Data type ' . $dataType);
 
             try {
                 $this->call($storeId, $cacheInvalidateUrl);
