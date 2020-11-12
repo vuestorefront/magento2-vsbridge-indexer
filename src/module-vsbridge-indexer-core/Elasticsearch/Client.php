@@ -3,6 +3,7 @@
 namespace Divante\VsbridgeIndexerCore\Elasticsearch;
 
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
+use Divante\VsbridgeIndexerCore\Model\ElasticsearchResolverInterface;
 
 /**
  * Class Client
@@ -15,13 +16,22 @@ class Client implements ClientInterface
     private $client;
 
     /**
+     * @var ElasticsearchResolverInterface
+     */
+    private $esVersionResolver;
+
+    /**
      * Client constructor.
      *
+     * @param ElasticsearchResolverInterface $esVersionResolver
      * @param \Elasticsearch\Client $client
      */
-    public function __construct(\Elasticsearch\Client $client)
-    {
+    public function __construct(
+        ElasticsearchResolverInterface $esVersionResolver,
+        \Elasticsearch\Client $client
+    ) {
         $this->client = $client;
+        $this->esVersionResolver = $esVersionResolver;
     }
 
     /**
@@ -161,13 +171,19 @@ class Client implements ClientInterface
      */
     public function putMapping(string $indexName, string $type, array $mapping)
     {
-        $this->client->indices()->putMapping(
-            [
-                'index' => $indexName,
-                'type'  => $type,
-                'body'  => [$type => $mapping],
-            ]
-        );
+        $requestPayload = [
+            'index' => $indexName,
+            'type'  => $type,
+            'body'  => [$type => $mapping]
+        ];
+
+        $esVersion = $this->esVersionResolver->getVersion();
+
+        if ($esVersion === ElasticsearchResolverInterface::ES_6_PLUS_VERSION) {
+            $requestPayload['include_type_name'] = true;
+        }
+
+        $this->client->indices()->putMapping($requestPayload);
     }
 
     /**

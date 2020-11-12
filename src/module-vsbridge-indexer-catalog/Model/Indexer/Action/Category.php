@@ -1,19 +1,14 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCatalog
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Category as ResourceModel;
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
 
 /**
  * Class Category
  */
-class Category
+class Category implements RebuildActionInterface
 {
     /**
      * @var ResourceModel
@@ -37,7 +32,7 @@ class Category
      * @return \Generator
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function rebuild($storeId = 1, array $categoryIds = [])
+    public function rebuild(int $storeId, array $categoryIds): \Traversable
     {
         $lastCategoryId = 0;
 
@@ -50,10 +45,9 @@ class Category
 
             foreach ($categories as $category) {
                 $lastCategoryId = $category['entity_id'];
-                $categoryData['id'] = (int)$category['entity_id'];
-                $categoryData = $category;
+                $category['id'] = (int)$category['entity_id'];
 
-                yield $lastCategoryId => $categoryData;
+                yield $lastCategoryId => $category;
             }
         } while (!empty($categories));
     }

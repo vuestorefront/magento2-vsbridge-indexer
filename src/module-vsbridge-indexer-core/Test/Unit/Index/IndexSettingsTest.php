@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+namespace Divante\VsbridgeIndexerCore\Test\Unit\Index;
+
 use Divante\VsbridgeIndexerCore\Config\IndicesSettings;
 use Divante\VsbridgeIndexerCore\Index\IndexSettings;
-use Divante\VsbridgeIndexerCore\Index\Indicies\Config;
+use Divante\VsbridgeIndexerCore\Index\Indices\ConfigResolver;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +25,7 @@ class IndexSettingsTest extends TestCase
     /**
      * @var IndicesSettings|PHPUnit_Framework_MockObject_MockObject
      */
-    private $configurationSettings;
+    private $configResolver;
 
     /**
      * @var Store|PHPUnit_Framework_MockObject_MockObject
@@ -45,8 +47,7 @@ class IndexSettingsTest extends TestCase
      */
     protected function setUp()
     {
-        $this->storeManagerMock = $this->getMockBuilder(
-            StoreManagerInterface::class)
+        $this->storeManagerMock = $this->getMockBuilder(StoreManagerInterface::class)
             ->disableOriginalConstructor()
             ->setMethods([])
             ->getMockForAbstractClass();
@@ -56,11 +57,11 @@ class IndexSettingsTest extends TestCase
             ->getMock();
 
         $this->indicesSettingsMock = $this->createMock(IndicesSettings::class);
-        $this->configurationSettings = $this->createMock(Config::class);
+        $this->configResolver = $this->createMock(ConfigResolver::class);
 
         $this->esIndexSettings = new IndexSettings(
             $this->storeManagerMock,
-            $this->configurationSettings,
+            $this->configResolver,
             $this->indicesSettingsMock,
             new DateTimeFactory()
         );
@@ -71,7 +72,7 @@ class IndexSettingsTest extends TestCase
      *
      * @dataProvider provideStores
      */
-    public function testGetIndexAlias(string $storeCode)
+    public function testGetIndexAlias(string $identifier, string $storeCode)
     {
         $indexPrefix = 'vuestorefront';
         $this->indicesSettingsMock->method('addIdentifierToDefaultStoreView')->willReturn(true);
@@ -79,11 +80,12 @@ class IndexSettingsTest extends TestCase
         $this->indicesSettingsMock->method('getIndexIdentifier')->willReturn('code');
         $this->storeMock->method('getCode')->willReturn($storeCode);
 
+        $indexPrefix .= $identifier === IndexSettings::DUMMY_INDEX_IDENTIFIER ? '' : '_' . $identifier;
         $expectedAlias = strtolower(sprintf('%s_%s', $indexPrefix, $storeCode));
 
         $this->assertEquals(
             $expectedAlias,
-            $this->esIndexSettings->getIndexAlias($this->storeMock)
+            $this->esIndexSettings->getIndexAlias($identifier, $this->storeMock)
         );
     }
 
@@ -93,9 +95,12 @@ class IndexSettingsTest extends TestCase
     public function provideStores()
     {
         return [
-            ['de_code'],
-            ['De_code'],
-            ['DE_CODE'],
+            ['vue_storefront_catalog', 'de_code'],
+            ['vue_storefront_catalog', 'De_code'],
+            ['vue_storefront_catalog', 'DE_CODE'],
+            ['product', 'de_code'],
+            ['product', 'de_code'],
+            ['product', 'DE_CODE'],
         ];
     }
 }

@@ -3,11 +3,33 @@
 ## Unreleased
 ...
 
+
+## [1.25.0] (2020.11.04)
+
+### Fixed
+- Improved Customer and Product Tax Class fetcher for Tax Rules ([#354](https://github.com/DivanteLtd/magento2-vsbridge-indexer/issues/353))
+
+## [1.24.0]
+
+## [1.23.0] (2020.11.03)
+
+### Fixed
+- Fix module installation on fresh Magento. Fix sequence for agreement and catalog indexer.
+
+### Changed
+- Change main branch name, from `master` to `main`.
+
 ## [1.22.0] (2020.10.30)
 
 ### Fixed
 - Fix error "Invalid template file..." when reindexing cms blocks/pages by cron. ([#191](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/351))
 - Fix providing label for the configurable_options field. Field is now using the label assigned for the currently active (reindex) store. ([#339](https://github.com/DivanteLtd/magento2-vsbridge-indexer/pull/352))
+
+## [2.0]
+
+- Added support for ES6+. You can choose ES version in configuration (by default ES5 is selected). For ES 5 only one index is created, for ES6+ we have separated indices per type
+- vsbridge_indexer.xml was replaced with vsbridge.xml. You  declare type/entity and mapping in vsbridge.xml
+- Dataproviders configuration was moved to di.xml
 
 ## [1.21.0] (2020.09.16)
 

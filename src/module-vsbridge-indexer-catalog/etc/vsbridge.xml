@@ -1,0 +1,6 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Divante_VsbridgeIndexerCore:etc/vsbridge.xsd">
+    <type identifier="product" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Product"/>
+    <type identifier="category" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Category"/>
+    <type identifier="attribute" mapping="Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute"/>
+</config>

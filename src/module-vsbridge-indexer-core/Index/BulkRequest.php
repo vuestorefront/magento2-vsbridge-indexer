@@ -99,37 +99,6 @@ class BulkRequest implements BulkRequestInterface
     /**
      * @inheritdoc
      */
-    public function updateDocuments($index, $type, array $data)
-    {
-        foreach ($data as $docId => $documentData) {
-            $documentData = $this->prepareDocument($documentData);
-            $this->updateDocument($index, $type, $docId, $documentData);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    private function updateDocument($index, $type, $docId, array $data)
-    {
-        $this->bulkData[] = [
-            'update' => [
-                '_index' => $index,
-                '_id' => $docId,
-                '_type' => $type,
-            ]
-        ];
-
-        $this->bulkData[] = ['doc' => $data];
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function isEmpty()
     {
         return count($this->bulkData) == 0;

@@ -9,7 +9,7 @@
 
 namespace Divante\VsbridgeIndexerCatalog\ArrayConverter\Product;
 
-use Divante\VsbridgeIndexerCore\Indexer\DataFilter;
+use Divante\VsbridgeIndexerCore\Index\DataFilter;
 use Divante\VsbridgeIndexerCatalog\Api\ArrayConverter\Product\CustomOptionConverterInterface;
 
 /**
@@ -60,7 +60,7 @@ class CustomOptionConverter implements CustomOptionConverterInterface
             $optionValue = $this->prepareValue($optionValue);
             $options[$optionId]['values'][] = $optionValue;
         }
-
+        
         foreach ($options as $option) {
             $productId = $option['product_id'];
             $option = $this->prepareOption($option);
@@ -77,7 +77,7 @@ class CustomOptionConverter implements CustomOptionConverterInterface
      */
     private function prepareValue(array $option): array
     {
-        $option = $this->unsetFields($option);
+        $option = $this->filterData($option);
         unset($option['option_id']);
 
         return $option;
@@ -88,9 +88,13 @@ class CustomOptionConverter implements CustomOptionConverterInterface
      *
      * @return array
      */
-    private function unsetFields(array $option): array
+    private function filterData(array $option): array
     {
         $option = $this->dataFilter->execute($option, $this->fieldsToDelete);
+        $option['sort_order'] = (int) $option['sort_order'];
+        $option['option_id'] = (int) $option['sort_order'];
+        $option['option_type_id'] = (int) $option['sort_order'];
+        $option['price'] = (float) $option['price'];
 
         if (isset($option['sku']) !== true) {
             unset($option['sku']);
@@ -110,9 +114,8 @@ class CustomOptionConverter implements CustomOptionConverterInterface
      */
     private function prepareOption(array $option): array
     {
-        $option = $this->unsetFields($option);
-
-        $option = $this->dataFilter->execute($option, $this->fieldsToDelete);
+        $option['is_require'] = (boolean)$option['is_require'];
+        $option = $this->filterData($option);
 
         if ('drop_down' === $option['type']) {
             $option['type'] = 'select';

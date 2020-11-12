@@ -1,5 +1,7 @@
 <?php
 
+namespace Divante\VsbridgeIndexerCore\Test\Unit\Index;
+
 use Divante\VsbridgeIndexerCore\Api\Client\ClientInterface;
 use Divante\VsbridgeIndexerCore\Config\OptimizationSettings;
 use Divante\VsbridgeIndexerCore\Index\IndexOperations;
@@ -12,9 +14,6 @@ use Divante\VsbridgeIndexerCore\Elasticsearch\ClientResolver;
 use PHPUnit\Framework\TestCase;
 use Magento\Store\Model\Store;
 
-/**
- * Class IndexOperationsTest
- */
 class IndexOperationsTest extends TestCase
 {
     /**
@@ -130,7 +129,7 @@ class IndexOperationsTest extends TestCase
             ])
             ->willReturn($indexMock);
 
-        $this->esIndexSettingsMock->method('getIndicesConfig')->willReturn($this->indicesXmlConfiguration);
+        $this->esIndexSettingsMock->method('getConfig')->willReturn($this->indicesXmlConfiguration);
         $this->esIndexSettingsMock->method('getIndexAlias')->willReturn($alias);
         $this->esIndexSettingsMock->method('createIndexName')->willReturn($name);
         $this->esIndexSettingsMock->method('getEsConfig')->willReturn([]);
@@ -166,7 +165,7 @@ class IndexOperationsTest extends TestCase
             ])
             ->willReturn($indexMock);
 
-        $this->esIndexSettingsMock->method('getIndicesConfig')->willReturn($this->indicesXmlConfiguration);
+        $this->esIndexSettingsMock->method('getConfig')->willReturn($this->indicesXmlConfiguration);
         $this->esIndexSettingsMock->method('getIndexAlias')->willReturn($alias);
         $this->esIndexSettingsMock->method('createIndexName')->willReturn($name);
         $this->esIndexSettingsMock->method('getEsConfig')->willReturn([]);

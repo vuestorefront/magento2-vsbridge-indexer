@@ -1,21 +1,16 @@
 <?php
-/**
- * @package   Divante\VsbridgeIndexerCatalog
- * @author    Agata Firlejczyk <afirlejczyk@divante.pl>
- * @copyright 2019 Divante Sp. z o.o.
- * @license   See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerCatalog\Model\Indexer\Action;
 
 use Divante\VsbridgeIndexerCatalog\Model\ResourceModel\Attribute as ResourceModel;
 use Divante\VsbridgeIndexerCatalog\Index\Mapping\Attribute as AttributeMapping;
 use Divante\VsbridgeIndexerCore\Api\ConvertValueInterface;
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
 
 /**
  * Class Attribute
  */
-class Attribute
+class Attribute implements RebuildActionInterface
 {
     /**
      * @var ResourceModel
@@ -50,11 +45,12 @@ class Attribute
     }
 
     /**
+     * @param int $storeId
      * @param array $attributeIds
      *
      * @return \Traversable
      */
-    public function rebuild(array $attributeIds = [])
+    public function rebuild(int $storeId, array $attributeIds): \Traversable
     {
         $lastAttributeId = 0;
 

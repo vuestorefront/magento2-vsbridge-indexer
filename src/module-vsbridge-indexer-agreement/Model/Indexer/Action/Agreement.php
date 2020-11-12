@@ -1,15 +1,14 @@
 <?php
-/**
- * Copyright Divante Sp. z o.o.
- * See LICENSE_DIVANTE.txt for license details.
- */
 
 namespace Divante\VsbridgeIndexerAgreement\Model\Indexer\Action;
 
-
 use Divante\VsbridgeIndexerAgreement\Model\ResourceModel\Agreement as AgreementResource;
+use Divante\VsbridgeIndexerCore\Indexer\RebuildActionInterface;
 
-class Agreement
+/**
+ * Class Agreement
+ */
+class Agreement implements RebuildActionInterface
 {
     /**
      * @var AgreementResource
@@ -32,7 +31,7 @@ class Agreement
      *
      * @return \Traversable
      */
-    public function rebuild($storeId = 1, array $agreementIds = [])
+    public function rebuild(int $storeId, array $agreementIds): \Traversable
     {
         $lastAgreementId = 0;
 
