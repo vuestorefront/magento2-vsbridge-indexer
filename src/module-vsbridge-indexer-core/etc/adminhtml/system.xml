@@ -12,7 +12,7 @@
             <tab>vuestorefront_config</tab>
             <resource>Divante_VsbridgeIndexerCore::configuration</resource>
 
-            <group id="general_settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+            <group id="general_settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>General Settings</label>
                 <field id="enable" translate="label comment" type="select" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Enable VS Bridge</label>
