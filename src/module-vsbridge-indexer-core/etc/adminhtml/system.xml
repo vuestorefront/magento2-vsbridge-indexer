@@ -19,7 +19,7 @@
                     <comment>Enable to run indexes with Elasticsearch.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="allowed_stores" translate="label comment" type="multiselect" sortOrder="31" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="allowed_stores" translate="label comment" type="multiselect" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>List of stores to reindex</label>
                     <comment>For every store view separated index is created in Elastic</comment>
                     <source_model>Magento\Config\Model\Config\Source\Store</source_model>
