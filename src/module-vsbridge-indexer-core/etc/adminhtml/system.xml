@@ -19,6 +19,10 @@
                     <comment>Enable to run indexes with Elasticsearch.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="es_version" translate="label comment" type="select" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>ES Version</label>
+                    <source_model>Divante\VsbridgeIndexerCore\Model\Adminhtml\System\Config\Source\Version</source_model>
+                </field>
                 <field id="allowed_stores" translate="label comment" type="multiselect" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>List of stores to reindex</label>
                     <comment>For every store view separated index is created in Elastic</comment>
