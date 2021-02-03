@@ -31,7 +31,7 @@
                     <item name="content" xsi:type="object">Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\Page\ContentData</item>
                 </item>
                 <item name="cms_block" xsi:type="array">
-                    <item name="content" xsi:type="object">Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\Page\ContentData</item>
+                    <item name="content" xsi:type="object">Divante\VsbridgeIndexerCms\Model\Indexer\DataProvider\Block\ContentData</item>
                 </item>
             </argument>
         </arguments>
