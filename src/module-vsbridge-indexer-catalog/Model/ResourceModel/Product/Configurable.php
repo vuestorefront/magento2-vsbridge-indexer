@@ -229,7 +229,7 @@ class Configurable
             )
             ->group('product_id')
             ->where('product_id IN (?)', $productIds);
-        $this->dbHelper->addGroupConcatColumn($select, 'attribute_ids', 'attribute_id');
+        $this->dbHelper->addGroupConcatColumn($select, 'attribute_ids', 'attribute_id ORDER BY position ASC');
 
         return $this->getConnection()->fetchAssoc($select);
     }
