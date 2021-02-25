@@ -252,16 +252,9 @@ class AttributeMetadata
     {
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter(
-            [
-                'is_visible',
-                'is_visible_on_front',
-            ],
-            [
-                ['eq' => 1],
-                ['eq' => 1],
-            ]
-        );
+        $collection
+          ->addFieldToFilter('is_visible', ['eq' => 1])
+          ->addFieldToFilter('is_visible_on_front', ['eq' => 1]);
 
         return $collection->getSelect();
     }
