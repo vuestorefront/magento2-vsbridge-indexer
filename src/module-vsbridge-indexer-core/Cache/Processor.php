@@ -8,8 +8,8 @@
 
 namespace Divante\VsbridgeIndexerCore\Cache;
 
-use Magento\Framework\HTTP\Adapter\CurlFactory;
 use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Framework\HTTP\Adapter\CurlFactory;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -80,15 +80,11 @@ class Processor
      */
     public function cleanCacheByDocIds($storeId, $dataType, array $entityIds)
     {
-        if ($this->config->clearCache($storeId)) {
+        if (isset($this->getCacheTags()[$dataType]) && $this->config->clearCache($storeId)) {
             if (!empty($entityIds)) {
                 $this->cleanCacheInBatches($storeId, $dataType, $entityIds);
             } else {
-                $cacheTags = $this->getCacheTags();
-
-                if (isset($cacheTags[$dataType])) {
-                    $this->cleanCacheByTags($storeId, [$dataType]);
-                }
+                $this->cleanCacheByTags($storeId, [$dataType]);
             }
         }
 
@@ -129,15 +125,22 @@ class Processor
     {
         $storeId = (int) $storeId;
 
-        if ($this->config->clearCache($storeId)) {
-            $cacheTags = implode(',', $tags);
-            $cacheInvalidateUrl = $this->getInvalidateCacheUrl($storeId) . $cacheTags;
+        $cacheTags = array_intersect($tags, $this->getCacheTags());
+        if (empty($cacheTags)) {
+            return;
+        }
+        
+        if (!$this->config->clearCache($storeId)) {
+            return;
+        }
 
-            try {
-                $this->call($storeId, $cacheInvalidateUrl);
-            } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
-            }
+        $cacheTags = implode(',', $cacheTags);
+        $cacheInvalidateUrl = $this->getInvalidateCacheUrl($storeId) . $cacheTags;
+
+        try {
+            $this->call($storeId, $cacheInvalidateUrl);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
         }
     }
 
