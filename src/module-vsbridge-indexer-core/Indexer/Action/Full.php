@@ -2,6 +2,7 @@
 
 namespace Divante\VsbridgeIndexerCore\Indexer\Action;
 
+use Divante\VsbridgeIndexerCore\Cache\Processor;
 use Divante\VsbridgeIndexerCore\Indexer\RebuildActionPool;
 use Divante\VsbridgeIndexerCore\Indexer\StoreManager;
 use Divante\VsbridgeIndexerCore\Model\ElasticsearchResolverInterface;
@@ -16,13 +17,19 @@ class Full extends AbstractAction
      * @var ElasticsearchResolverInterface
      */
     private $esVersionResolver;
+    /**
+     * @var Processor
+     */
+    private $cacheProcessor;
 
     /**
      * Full constructor.
+     *
      * @param ElasticsearchResolverInterface $esVersionResolver
      * @param RebuildActionPool $actionPool
      * @param GenericIndexerHandlerFactory $indexerHandlerFactory
      * @param StoreManager $storeManager
+     * @param Processor $cacheProcessor
      * @param string $typeName
      */
     public function __construct(
@@ -30,11 +37,13 @@ class Full extends AbstractAction
         RebuildActionPool $actionPool,
         GenericIndexerHandlerFactory $indexerHandlerFactory,
         StoreManager $storeManager,
+        Processor $cacheProcessor,
         string $typeName
     ) {
         parent::__construct($actionPool, $indexerHandlerFactory, $storeManager, $typeName);
 
         $this->esVersionResolver = $esVersionResolver;
+        $this->cacheProcessor = $cacheProcessor;
     }
 
     /**
@@ -53,11 +62,13 @@ class Full extends AbstractAction
             foreach ($stores as $store) {
                 $this->getIndexerHandler()->saveIndex($this->rebuild((int) $store->getId(), []), $store);
                 $this->getIndexerHandler()->cleanUpByTransactionKey($store);
+                $this->cacheProcessor->cleanCacheByTags($store->getId(), [$this->getIndexerHandler()->getTypeName()]);
             }
         } else {
             foreach ($stores as $store) {
                 $this->getIndexerHandler()->createIndex($store);
                 $this->getIndexerHandler()->saveIndex($this->rebuild((int) $store->getId(), []), $store);
+                $this->cacheProcessor->cleanCacheByTags($store->getId(), [$this->getIndexerHandler()->getTypeName()]);
             }
         }
     }
