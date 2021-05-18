@@ -116,6 +116,16 @@ class Links
                     ];
                 }
             }
+            
+            // sort list by position
+            usort($linkProductList, function ($a, $b) {
+                $aPosition = $a['position'];
+                $bPosition = $b['position'];
+                if ($aPosition == $bPosition) {
+                    return 0;
+                }
+                return ($aPosition > $bPosition) ? +1 : -1;
+            });
 
             return $linkProductList;
         }
