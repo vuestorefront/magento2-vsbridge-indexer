@@ -22,6 +22,8 @@ class Fields
         'product_id',
         'is_in_stock',
         'min_qty',
+        'min_sale_qty',
+        'use_config_min_sale_qty',
         'notify_stock_qty',
         'use_config_notify_stock_qty',
         'qty',
