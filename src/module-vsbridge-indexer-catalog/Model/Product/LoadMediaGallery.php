@@ -92,7 +92,7 @@ class LoadMediaGallery implements LoadMediaGalleryInterface
 
             $valueId = $mediaImage['value_id'];
 
-            if (isset($videoSet[$valueId])) {
+            if (isset($videoSet[$valueId]) && isset($videoSet[$valueId]['url']) && is_string($videoSet[$valueId]['url'])) {
                 $image['vid'] = $this->prepareVideoData($videoSet[$valueId]);
             }
 
