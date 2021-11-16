@@ -92,8 +92,8 @@ class CustomOptionConverter implements CustomOptionConverterInterface
     {
         $option = $this->dataFilter->execute($option, $this->fieldsToDelete);
         $option['sort_order'] = (int) $option['sort_order'];
-        $option['option_id'] = (int) $option['sort_order'];
-        $option['option_type_id'] = (int) $option['sort_order'];
+        $option['option_id'] = (int) $option['option_id'];
+        $option['option_type_id'] = (int) $option['option_type_id'];
         $option['price'] = (float) $option['price'];
 
         if (isset($option['sku']) !== true) {
