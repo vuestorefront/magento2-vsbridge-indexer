@@ -151,6 +151,17 @@ class Gallery
             ),
             $this->videoProperties
         );
+        $select->joinLeft(
+            ['cpemgv' => 'catalog_product_entity_media_gallery_value'],
+            implode(
+                ' AND ',
+                [
+                    'cpemgv.value_id = value.value_id',
+                    $this->getConnection()->quoteInto('cpemgv.store_id = ?', (int)$storeId),
+                ]
+            ),
+            ['cpemgv.disabled']
+        );
 
         return $connection->fetchAll($select);
     }
