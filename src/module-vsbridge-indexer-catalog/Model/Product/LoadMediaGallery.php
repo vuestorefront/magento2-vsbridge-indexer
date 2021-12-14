@@ -92,11 +92,14 @@ class LoadMediaGallery implements LoadMediaGalleryInterface
 
             $valueId = $mediaImage['value_id'];
 
-            if (isset($videoSet[$valueId])) {
-                $image['vid'] = $this->prepareVideoData($videoSet[$valueId]);
+            if (isset($videoSet[$valueId]) && isset($videoSet[$valueId]['url']) && is_string($videoSet[$valueId]['url'])) {
+                if($videoSet[$valueId]['disabled'] === "0"){
+                    $image['vid'] = $this->prepareVideoData($videoSet[$valueId]);
+                    $indexData[$entityId]['media_gallery'][] = $image;
+                }
+            } else{
+                $indexData[$entityId]['media_gallery'][] = $image;
             }
-
-            $indexData[$entityId]['media_gallery'][] = $image;
         }
 
         $this->rowIdToEntityId = [];
