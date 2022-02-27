@@ -1,5 +1,4 @@
 # Divante VueStorefrontIndexer Extension for Magento2
-  ---------
 
 ### Stay connected
 
@@ -10,10 +9,6 @@
 
 ![Branch stable](https://img.shields.io/badge/stable%20branch-master-blue.svg)
 ![Branch Develop](https://img.shields.io/badge/dev%20branch-develop-blue.svg)
-<a href="http://discord.vuestorefront.io/">
-<img src="https://discordapp.com/api/guilds/770285988244750366/widget.png?style=shield" alt="Discord Shield"/>
-</a>
-
 
 This projects is a native, Magento2 data indexer for [Vue Storefront - first Progressive Web App for e-Commerce](https://github.com/DivanteLtd/vue-storefront). It fills the ElasticSearch data index with all the products, categories and static information required by Vue Storefront to work.
 
