@@ -1,4 +1,4 @@
-# Divante VueStorefrontIndexer Extension for Magento2
+# Divante AlokaiIndexer Extension for Magento2
 
 ### Stay connected
 
@@ -10,15 +10,15 @@
 ![Branch stable](https://img.shields.io/badge/stable%20branch-master-blue.svg)
 ![Branch Develop](https://img.shields.io/badge/dev%20branch-develop-blue.svg)
 
-This projects is a native, Magento2 data indexer for [Vue Storefront - first Progressive Web App for e-Commerce](https://github.com/DivanteLtd/vue-storefront). It fills the ElasticSearch data index with all the products, categories and static information required by Vue Storefront to work.
+This projects is a native, Magento2 data indexer for [Alokai - first Progressive Web App for e-Commerce](https://github.com/DivanteLtd/vue-storefront). It fills the ElasticSearch data index with all the products, categories and static information required by Alokai to work.
 
-**Note on mage2vuestorefront project**: This native indexer updates the ElasticSearch index in the very same format like the [mage2vuestorefront](https://github.com/DivanteLtd/mage2vuestorefront). Our intention was to speed up the indexation process and make it more reliable. With native indexer we were able to use the Magento2 ORM and events to optimize the indexation process. Please do use this module instead of mage2vuestorefront if You experience any issues regarding indexing performance. Both projects are currently supported.
+**Note on mage2alokai project**: This native indexer updates the ElasticSearch index in the very same format like the [mage2alokai](https://github.com/DivanteLtd/mage2vuestorefront). Our intention was to speed up the indexation process and make it more reliable. With native indexer we were able to use the Magento2 ORM and events to optimize the indexation process. Please do use this module instead of mage2alokai if You experience any issues regarding indexing performance. Both projects are currently supported.
 
-Vue Storefront is a standalone PWA storefront for your eCommerce, possible to connect with any eCommerce backend (eg. Magento, Pimcore, Prestashop or Shopware) through the API.
+Alokai is a standalone PWA storefront for your eCommerce, possible to connect with any eCommerce backend (eg. Magento, Pimcore, Prestashop or Shopware) through the API.
 
  ## Video demo
  [![See how it works!](https://github.com/DivanteLtd/vue-storefront/raw/master/docs/.vuepress/public/Fil-Rakowski-VS-Demo-Youtube.png)](https://www.youtube.com/watch?v=L4K-mq9JoaQ)
-Sign up for a demo at https://vuestorefront.io/ (Vue Storefront integrated with Pimcore OR Magento2).
+Sign up for a demo at https://vuestorefront.io/ (Alokai integrated with Pimcore OR Magento2).
 
 ## Overview
 
@@ -86,8 +86,8 @@ Configure the module in Magento panel and run full indexation.
 
 **Check configuration [here](docs/configuration.md)** 
 
-### Update VSF/VSF-API configuration
- **Important**: It is crucial to update configuration `elasticsearch.index` in the VSF and `elasticsearch.indices` in VSF-API
+### Update Alokai/Alokai-API configuration
+ **Important**: It is crucial to update configuration `elasticsearch.index` in the Alokai and `elasticsearch.indices` in Alokai-API
 
    *Index Alias Prefix* → define prefixes for ElasticSearch indexes. The panel allows adding prefix only to the catalog name e.g.: *vue_storefront_catalog*. For each store (store view) index name is generated on the base of defined prefix and either ID or Store Code. Aliases cannot be created.   
    *Example*: When we define following indexes: *vue_storefront_catalog_1*, *vue_storefront_catalog_2*, "vue_storefront_catalog_3".  
@@ -96,7 +96,7 @@ Configure the module in Magento panel and run full indexation.
    
    *Example with Store ID*   
     
-   VSF config (base on default index prefix name: vue_storefront_magento)
+   Alokai config (base on default index prefix name: vue_storefront_magento)
    
    "vue_storefront_magento_1" - index for store view with id 1
    ```json
@@ -107,7 +107,7 @@ Configure the module in Magento panel and run full indexation.
    }
    ```   
    
-   VSF-API config
+   Alokai-API config
    
 ```json
   "elasticsearch": {
@@ -122,7 +122,7 @@ Configure the module in Magento panel and run full indexation.
 
    *Example with Store Code*
     
-   VSF config (base on default index prefix name: vue_storefront_magento)
+   Alokai config (base on default index prefix name: vue_storefront_magento)
    
    "vue_storefront_magento_en_us" - index for store view with code "en_us"
 ```json
@@ -133,7 +133,7 @@ Configure the module in Magento panel and run full indexation.
 }
 ```
 
-   VSF-API config   
+   Alokai-API config   
     
 ```json
   "elasticsearch": {
@@ -204,7 +204,7 @@ If you need a list off all available index-names, you can use `php bin/magento i
      
 ### Compatibility
 
--- Vue Storefront >= 1.4.4
+-- Alokai >= 1.4.4
 Module was tested on:
  -- Magento Community version 2.2.7. It should perform without any issues on Magento 2.2.* and above versions.
   
